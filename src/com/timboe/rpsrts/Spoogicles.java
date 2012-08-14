@@ -7,6 +7,8 @@ public class Spoogicles extends Sprite {
 	protected int nSpooge;
 	protected int nDead;
 	
+	protected LinkedList<MyFloat> x_start = new LinkedList<MyFloat>();
+	protected LinkedList<MyFloat> y_start = new LinkedList<MyFloat>();
 	protected LinkedList<MyFloat> x = new LinkedList<MyFloat>();
 	protected LinkedList<MyFloat> y = new LinkedList<MyFloat>();
 	protected LinkedList<MyFloat> spooge_x_vel = new LinkedList<MyFloat>();
@@ -31,9 +33,11 @@ public class Spoogicles extends Sprite {
 		
 		nSpooge = _spoogicles;
 		for (int s = 0; s < _spoogicles; ++s) {
-			x.add( new MyFloat( (float) _x ) );
-			y.add( new MyFloat( (float) _y ) );
-			spooge_x_vel.add( new MyFloat( (float) (theSpriteManager.utility.rnd.nextGaussian() * 0.5f * scale)) );
+			x.add( new MyFloat( 0f ) );
+			y.add( new MyFloat( 0f ) );
+			x_start.add( new MyFloat( (float) _x ) );
+			y_start.add( new MyFloat( (float) _y ) );
+			spooge_x_vel.add( new MyFloat( (float) (theSpriteManager.utility.rnd.nextGaussian() * 0.5f * scale )) );
 			spooge_y_vel.add( new MyFloat( (float) (-2.5 - Math.abs(theSpriteManager.utility.rnd.nextGaussian() * 2f * scale)) ));
 			
 			isDead.add( new MyFloat( -1f ) );

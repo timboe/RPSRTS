@@ -123,7 +123,11 @@ public class SpriteManager_Applet extends SpriteManager {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void Render(Graphics2D _g2, AffineTransform _af, AffineTransform _af_translate_zoom, AffineTransform _af_shear_rotate, AffineTransform _af_none) {
+	public void Render(Graphics2D _g2, 
+			AffineTransform _af, 
+			AffineTransform _af_translate_zoom, 
+			AffineTransform _af_shear_rotate, 
+			AffineTransform _af_none) {
 //		if (thePathfinderGrid != null && utility.dbg == true) {
 //			for (final WeightedPoint _w : thePathfinderGrid.point_collection) {
 //				_w.Render(_g2, _af);
@@ -147,7 +151,12 @@ public class SpriteManager_Applet extends SpriteManager {
 		}
 		HashSet<Spoogicles_Applet> SpoogiclesObjects_Applet = (HashSet) SpoogicleObjects;
 		for (final Spoogicles_Applet _s : SpoogiclesObjects_Applet) {
-			_s.Render(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
+			_s.Render(_g2, 
+					_af, 
+					_af_translate_zoom, 
+					_af_shear_rotate, 
+					_af_none,
+					TickCount);
 		}
 	}
 	

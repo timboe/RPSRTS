@@ -105,6 +105,8 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
     AffineTransform af = null;
     AffineTransform af_translate_zoom = null;
     AffineTransform af_shear_rotate = null;
+    //AffineTransform af_translate_zoom_counter_rotate = null;
+    //AffineTransform af_anti_shear_rotate = null;
     Font myFont = new Font(Font.MONOSPACED, Font.BOLD, 12);
     
 //    private void DrawBufferedBackground(Graphics2D _g2) {
@@ -631,6 +633,8 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		af_translate_zoom = g2.getTransform();
 		af_shear_rotate = g2.getTransform();
 		af_backing = g2.getTransform();
+		//af_translate_zoom_counter_rotate = g2.getTransform();
+		//af_anti_shear_rotate = g2.getTransform();
 
 		g2.setColor (Color.black);
 		g2.fillRect (0, 0, window_X, window_Y);
@@ -648,9 +652,18 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 
 	    af_translate_zoom.translate(((window_X+TRANSLATE_X)/2),((window_Y+TRANSLATE_Y)/2)); //*(1./ZOOM)
 	    af_translate_zoom.scale(1.5*ZOOM, 1.5*ZOOM);
+	    
+	    //af_translate_zoom_counter_rotate.rotate(-ROTATE);
+	    //af_translate_zoom_counter_rotate.translate(((window_X+TRANSLATE_X)/2),((window_Y+TRANSLATE_Y)/2)); //*(1./ZOOM)
+	    //af_translate_zoom_counter_rotate.scale(1.5*ZOOM, 1.5*ZOOM);
+
 	    //
 	    af_shear_rotate.scale(1, YSHEAR);
 	    af_shear_rotate.rotate(-ROTATE);
+	    
+	    //af_anti_shear_rotate.scale(1, YSHEAR);
+	    //af_anti_shear_rotate.rotate(-ROTATE);	   
+
 
 	    if (CurMouse != null) {
 			try {
@@ -670,9 +683,13 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	    	ContentCreation(g2, af);
 	    } else {
 	    	//DrawBufferedBackground(g2);
-    	    DrawSea(g2);
 		    theWorld.DrawTiles(g2, false, GetAA());
-		    theSpriteManger.Render(g2, af, af_translate_zoom, af_shear_rotate, af_none);
+    		//theSpriteManger.PlaceSpooge(0, 200, ObjectOwner.Player, 5, 1f); //test
+		    theSpriteManger.Render(g2, 
+		    		af, 
+		    		af_translate_zoom, 
+		    		af_shear_rotate, 
+		    		af_none);
 		    if (buildingToPlace != null) {
 		    	final boolean placed = theSpriteManger.TryPlaceItem(buildingToPlace, g2, af, af_translate_zoom, af_shear_rotate, af_none, (int)MouseTF.getX(), (int)MouseTF.getY(), mouseClick);
 		    	if (placed == true) {
