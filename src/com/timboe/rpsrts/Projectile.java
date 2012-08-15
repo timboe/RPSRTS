@@ -16,6 +16,11 @@ public class Projectile extends Sprite {
 
 	}
 	
+	@Override
+	public boolean GetIsProjectile() {
+		return true;
+	}
+	
 	void Tick(int _tick_count) {
 		if (dead == true) return;
 		if (target == null || target.GetDead() == true) {

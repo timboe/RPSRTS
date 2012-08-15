@@ -40,10 +40,10 @@ public class Resource_Applet extends Resource {
 
 		if (type == ResourceType.Tree) {
 			_g2.setTransform(_af_translate_zoom);
-			_g2.drawImage(theBitmaps.tree[anim], _x - r, _y - r - 6, null);
+			_g2.drawImage(theBitmaps.tree[anim], _x - r, _y - r - 9, null);
 		} else if (type == ResourceType.Cactus) {
 			_g2.setTransform(_af_translate_zoom);
-			_g2.drawImage(theBitmaps.cactus[anim], _x - r, _y - r - 6, null);
+			_g2.drawImage(theBitmaps.cactus[anim], _x - r, _y - r - 9, null);
 		} else if (type == ResourceType.Mine) {
 			_g2.setTransform(_af);
 			_g2.drawImage(theBitmaps.mine[toDraw], x - r - (anim/2) - 1, y - r - (anim/2) - 1, 2 * r + (anim/1) - 2, 2 * r + (anim/1) - 2, null);

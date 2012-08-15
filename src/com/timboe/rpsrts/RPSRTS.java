@@ -479,6 +479,8 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
 			if (last_X > -1) {
 				ROTATE = (float) (ROTATE + ((e.getX() - last_X)/(float)window_X)*Math.PI);
+				utility.rotateAngle = ROTATE;
+				//System.out.println("Rotation: "+ROTATE);
 				YSHEAR = YSHEAR + ((e.getY() - last_Y)/(float)window_Y);
 				if (YSHEAR > 1) {
 					YSHEAR = 1;
@@ -652,17 +654,9 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 
 	    af_translate_zoom.translate(((window_X+TRANSLATE_X)/2),((window_Y+TRANSLATE_Y)/2)); //*(1./ZOOM)
 	    af_translate_zoom.scale(1.5*ZOOM, 1.5*ZOOM);
-	    
-	    //af_translate_zoom_counter_rotate.rotate(-ROTATE);
-	    //af_translate_zoom_counter_rotate.translate(((window_X+TRANSLATE_X)/2),((window_Y+TRANSLATE_Y)/2)); //*(1./ZOOM)
-	    //af_translate_zoom_counter_rotate.scale(1.5*ZOOM, 1.5*ZOOM);
 
-	    //
 	    af_shear_rotate.scale(1, YSHEAR);
 	    af_shear_rotate.rotate(-ROTATE);
-	    
-	    //af_anti_shear_rotate.scale(1, YSHEAR);
-	    //af_anti_shear_rotate.rotate(-ROTATE);	   
 
 
 	    if (CurMouse != null) {
@@ -684,7 +678,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	    } else {
 	    	//DrawBufferedBackground(g2);
 		    theWorld.DrawTiles(g2, false, GetAA());
-    		//theSpriteManger.PlaceSpooge(0, 200, ObjectOwner.Player, 5, 1f); //test
+    		if (utility.dbg == true) theSpriteManger.PlaceSpooge(100, 200, ObjectOwner.Player, 5, 1f); //test
 		    theSpriteManger.Render(g2, 
 		    		af, 
 		    		af_translate_zoom, 

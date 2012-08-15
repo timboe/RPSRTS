@@ -10,6 +10,8 @@ public class Utility {
 	
 	public boolean dbg = false;
 	public boolean wg = false;
+	
+	public float rotateAngle = 0f;
 
 	//time settings
 	int ticks_per_tock = 30;

@@ -47,7 +47,12 @@ public class Spoogicles extends Sprite {
 		
 	}
 	
+	@Override
+	public boolean GetIsSpoogicle() {
+		return true;
+	}
 	
+
 	
 	
 

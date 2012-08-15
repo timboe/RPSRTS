@@ -32,6 +32,11 @@ public class Resource extends Sprite {
 	}
 	
 	@Override
+	public boolean GetIsResource() {
+		return true;
+	}
+	
+	@Override
 	public void Kill() {
 		if (dead == true) return;
 		dead = true;

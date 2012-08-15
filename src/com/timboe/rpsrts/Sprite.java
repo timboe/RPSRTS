@@ -1,6 +1,6 @@
 package com.timboe.rpsrts;
 
-public class Sprite {
+public class Sprite implements Comparable<Sprite> {
 
 	GameWorld theWorld;
 	protected SpriteManager theSpriteManager;
@@ -8,8 +8,8 @@ public class Sprite {
 	int ID;
 	protected int x;
 	protected int y;
-	float x_prec;
-	float y_prec;
+	protected float x_prec;
+	protected float y_prec;
 	WorldPoint loc;
 	protected int r;
 	
@@ -33,8 +33,8 @@ public class Sprite {
 		theSpriteManager = _sm;
 		x= _x;
 		y = _y;
-		x_prec = _x;
-		y_prec = _y;
+		x_prec = _x + theSpriteManager.utility.rnd.nextFloat() - .5f;
+		y_prec = _y + theSpriteManager.utility.rnd.nextFloat() - .5f;
 		r = _r;
 		loc = new WorldPoint();
 		ticks_per_tock = theSpriteManager.utility.ticks_per_tock;
@@ -69,6 +69,19 @@ public class Sprite {
 	public boolean GetIsBuilding() {
 		return false;
 	}
+	
+	public boolean GetIsResource() {
+		return false;
+	}
+	
+	public boolean GetIsSpoogicle() {
+		return false;
+	}
+	
+	public boolean GetIsProjectile() {
+		return false;
+	}
+
 
 	public WorldPoint GetLoc() {
 		loc.setLocation(x, y);
@@ -90,9 +103,28 @@ public class Sprite {
 	public int GetY() {
 		return y;
 	}
+	
+	public float GetPreciseX() {
+		return x_prec;
+	}
+
+	public float GetPreciseY() {
+		return y_prec;
+	}
 
 	public void Kill() {
 		dead = true;
+	}
+
+	public float GetZOrder() {
+		return (float) (x_prec * Math.cos(theSpriteManager.utility.rotateAngle) - (y_prec * Math.sin(theSpriteManager.utility.rotateAngle)));
+
+	}
+	
+	@Override
+	public int compareTo(Sprite comp) {
+		//return (int) (this.GetZOrder() - comp.GetZOrder());
+		return (int) ((GetZOrder() - comp.GetZOrder())*100000);
 	}
 
 

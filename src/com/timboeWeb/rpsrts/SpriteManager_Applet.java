@@ -7,6 +7,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
+import java.util.TreeSet;
 
 import com.timboe.rpsrts.Actor;
 import com.timboe.rpsrts.ActorType;
@@ -133,6 +134,8 @@ public class SpriteManager_Applet extends SpriteManager {
 //				_w.Render(_g2, _af);
 //			}
 //		}
+		
+		if (false) {
 		HashSet<Actor_Applet> ActorObjects_Applet = (HashSet) ActorObjects;
 		for (final Actor_Applet _s : ActorObjects_Applet) {
 			_s.Render(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
@@ -151,13 +154,49 @@ public class SpriteManager_Applet extends SpriteManager {
 		}
 		HashSet<Spoogicles_Applet> SpoogiclesObjects_Applet = (HashSet) SpoogicleObjects;
 		for (final Spoogicles_Applet _s : SpoogiclesObjects_Applet) {
-			_s.Render(_g2, 
-					_af, 
-					_af_translate_zoom, 
-					_af_shear_rotate, 
-					_af_none,
-					TickCount);
+			_s.Render(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none,	TickCount);
 		}
+		}
+		
+		//System.out.println("Base ZPos: "+ (player_base.GetPreciseX() * Math.cos(utility.rotateAngle) - (player_base.GetPreciseY() * Math.sin(utility.rotateAngle)) ) + " R:" + utility.rotateAngle );
+		
+		TreeSet<Sprite> ZOrder = new TreeSet<Sprite>();
+		
+		HashSet<Sprite> ActorObjects_Applet = (HashSet) ActorObjects;
+		for (final Sprite _s : ActorObjects_Applet) {
+			ZOrder.add(_s);
+		}
+		HashSet<Sprite> BuildingObjects_Applet = (HashSet) BuildingOjects;
+		for (final Sprite _s : BuildingObjects_Applet) {
+			ZOrder.add(_s);
+		}
+		HashSet<Sprite> ResourceObjects_Applet = (HashSet) ResourceObjects;
+		for (final Sprite _s : ResourceObjects_Applet) {
+			ZOrder.add(_s);
+		}
+		HashSet<Sprite> ProjectileObjects_Applet = (HashSet) ProjectileObjects;
+		for (final Sprite _s : ProjectileObjects_Applet) {
+			ZOrder.add(_s);
+		}
+		HashSet<Sprite> SpoogiclesObjects_Applet = (HashSet) SpoogicleObjects;
+		for (final Sprite _s : SpoogiclesObjects_Applet) {
+			ZOrder.add(_s);
+		}
+		
+		for (final Sprite _Z : ZOrder) {
+			if (_Z.GetIsActor() == true) {
+				((Actor_Applet) _Z).Render(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
+			} else if (_Z.GetIsResource() == true) {
+				((Resource_Applet) _Z).Render(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
+			} else if (_Z.GetIsBuilding() == true) {
+				((Building_Applet) _Z).Render(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
+			} else if (_Z.GetIsProjectile() == true) {
+				((Projectile_Applet) _Z).Render(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
+			} else if (_Z.GetIsSpoogicle() == true) {
+				((Spoogicles_Applet) _Z).Render(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
+			}
+		}
+		
 	}
 	
 	
