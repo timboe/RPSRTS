@@ -126,6 +126,10 @@ public class Actor_Applet extends Actor {
 		if (theSpriteManager.utility.dbg == true && destination != null) {
 			_g2.drawOval(destination.GetX()-4, destination.GetY()-4, 8, 8);
 		}
+		
+		_g2.setColor(Color.white);
+		_g2.setTransform(_af);
+		_g2.fillOval(x - 1, y - 1 + r, 2, 2);
 	}
 	
     public static void recolourImage(BufferedImage img, int r, int g, int b) {

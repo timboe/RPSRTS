@@ -46,15 +46,15 @@ public class Resource_Applet extends Resource {
 			_g2.drawImage(theBitmaps.cactus[anim], _x - r, _y - r - 9, null);
 		} else if (type == ResourceType.Mine) {
 			_g2.setTransform(_af);
-			_g2.drawImage(theBitmaps.mine[toDraw], x - r - (anim/2) - 1, y - r - (anim/2) - 1, 2 * r + (anim/1) - 2, 2 * r + (anim/1) - 2, null);
+			_g2.drawImage(theBitmaps.mine[toDraw], x - r - (anim/2), y - r - (anim/2), 2 * r + (anim/1), 2 * r + (anim/1), null);
 		} else if (type == ResourceType.Rockpile) {
 			_g2.setTransform(_af_translate_zoom);
-			_g2.drawImage(theBitmaps.stone[toDraw], _x - r - (anim/2) - 1, _y - r - (anim/2) - 1, 2 * r + (anim/1) - 2, 2 * r + (anim/1) - 2, null);
+			_g2.drawImage(theBitmaps.stone[toDraw], _x - r - (anim/2), _y - r - (anim/2), 2 * r + (anim/1), 2 * r + (anim/1), null);
 		}
-		if (not_reachable_penalty > 0) {
+		if (not_reachable_penalty > 0 || true) {
 			_g2.setColor(Color.red);
 			_g2.setTransform(_af);
-			_g2.fillOval(x - r, y - r, r * 2, r * 2);
+			_g2.fillRect(x - 1, y - 1 + r, 2, 2);
 		}
 		if (theSpriteManager.utility.dbg == true) {
 			_g2.setColor(Color.white);

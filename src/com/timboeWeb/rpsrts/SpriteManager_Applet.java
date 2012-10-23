@@ -135,30 +135,6 @@ public class SpriteManager_Applet extends SpriteManager {
 //			}
 //		}
 		
-		if (false) {
-		HashSet<Actor_Applet> ActorObjects_Applet = (HashSet) ActorObjects;
-		for (final Actor_Applet _s : ActorObjects_Applet) {
-			_s.Render(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
-		}
-		HashSet<Building_Applet> BuildingObjects_Applet = (HashSet) BuildingOjects;
-		for (final Building_Applet _s : BuildingObjects_Applet) {
-			_s.Render(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
-		}
-		HashSet<Resource_Applet> ResourceObjects_Applet = (HashSet) ResourceObjects;
-		for (final Resource_Applet _s : ResourceObjects_Applet) {
-			_s.Render(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
-		}
-		HashSet<Projectile_Applet> ProjectileObjects_Applet = (HashSet) ProjectileObjects;
-		for (final Projectile_Applet _s : ProjectileObjects_Applet) {
-			_s.Render(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
-		}
-		HashSet<Spoogicles_Applet> SpoogiclesObjects_Applet = (HashSet) SpoogicleObjects;
-		for (final Spoogicles_Applet _s : SpoogiclesObjects_Applet) {
-			_s.Render(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none,	TickCount);
-		}
-		}
-		
-		//System.out.println("Base ZPos: "+ (player_base.GetPreciseX() * Math.cos(utility.rotateAngle) - (player_base.GetPreciseY() * Math.sin(utility.rotateAngle)) ) + " R:" + utility.rotateAngle );
 		
 		TreeSet<Sprite> ZOrder = new TreeSet<Sprite>();
 		

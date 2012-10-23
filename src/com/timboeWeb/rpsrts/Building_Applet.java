@@ -156,7 +156,11 @@ public class Building_Applet extends Building {
 		}
 
 		_g2.setTransform(_af_translate_zoom);
-		_g2.drawImage(spriteGraphic[animStep % animSteps], _x - r, _y - r - y_offset, null);
+		_g2.drawImage(spriteGraphic[animStep % animSteps], _x, _y, null);
+		
+		_g2.setColor(Color.blue);
+		_g2.setTransform(_af);
+		_g2.fillRect(x, y, 1, 1);
 		
 
 	}

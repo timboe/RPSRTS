@@ -124,7 +124,7 @@ public class Sprite implements Comparable<Sprite> {
 	@Override
 	public int compareTo(Sprite comp) {
 		//return (int) (this.GetZOrder() - comp.GetZOrder());
-		return (int) ((GetZOrder() - comp.GetZOrder())*100000);
+		return (int) (( comp.GetZOrder() - GetZOrder() )*100000);
 	}
 
 
