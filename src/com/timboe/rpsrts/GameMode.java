@@ -1,5 +1,5 @@
 package com.timboe.rpsrts;
 
 public enum GameMode {
-	titleScreen, gameOn, gameOver
+	titleScreen, gameOn, gameOverWon, gameOverLost
 }

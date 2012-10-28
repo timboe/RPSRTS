@@ -20,7 +20,6 @@ import com.timboe.rpsrts.Resource;
 import com.timboe.rpsrts.ResourceType;
 import com.timboe.rpsrts.Sprite;
 import com.timboe.rpsrts.SpriteManager;
-import com.timboe.rpsrts.Utility;
 import com.timboe.rpsrts.WorldPoint;
 
 public class SpriteManager_App extends SpriteManager {

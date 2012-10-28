@@ -82,8 +82,8 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 
 	Utility utility = Utility.GetUtility();
 	GameWorld_Applet theWorld = GameWorld_Applet.GetGameWorld_Applet();
-	SpriteManager_Applet theSpriteManger;
 	Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();
+	SpriteManager_Applet theSpriteManger;
 	
 	public BufferedImage TopBar;
 	
@@ -480,7 +480,19 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	public void mouseDragged(MouseEvent e) {
 		CurMouse = e.getPoint();
 		if (utility.gameMode == GameMode.titleScreen) return;
-		if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
+		int bothMask = MouseEvent.BUTTON1_DOWN_MASK | MouseEvent.BUTTON3_DOWN_MASK;
+		if ((e.getModifiersEx() & bothMask) == bothMask) {
+			if (last_X > -1) {
+				System.out.println("zoom: "+ZOOM);
+				ZOOM = ZOOM + ((e.getY() - last_Y)/(float)window_Y);
+				if (ZOOM > 10f) {
+					ZOOM = 10f;
+				}
+				if (ZOOM < 0.1f) {
+					ZOOM = 0.1f;
+				}
+			}
+		} else if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
 			if (last_X > -1) {
 				ROTATE = (float) (ROTATE + ((e.getX() - last_X)/(float)window_X)*Math.PI);
 				utility.rotateAngle = ROTATE;
@@ -667,7 +679,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	    	} else if (theSpriteManger.GetWorldSeeded() == true) {
 	    		drawStartPlayingOption(g2);
 	    	}
-	    } else {
+	    } else if (utility.gameMode == GameMode.gameOn){
 	    	//DrawBufferedBackground(g2);
 		    theWorld.DrawTiles(g2, false, GetAA());
     		if (utility.dbg == true) theSpriteManger.PlaceSpooge(100, 200, ObjectOwner.Player, 5, 1f); //test
@@ -696,19 +708,32 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		    theSpriteManger.Tick();
 		    
 			//check WIN/LOOSE
-			if (theSpriteManger.enemy_base.GetDead() == true && endGame == 0) {
-				endGame = 1;
-			} else if (theSpriteManger.player_base.GetDead() == true && endGame == 0) {
-				endGame = 2;
+			if (theSpriteManger.enemy_base.GetDead() == true) {
+				utility.gameMode = GameMode.gameOverWon;
+				utility.loose_time = System.currentTimeMillis() / 1000l;
+			} else if (theSpriteManger.player_base.GetDead() == true) {
+				utility.gameMode = GameMode.gameOverLost;
+				utility.loose_time = System.currentTimeMillis() / 1000l;
 			}
-
-			if (endGame == 1) {
-				g2.setTransform(af_none);
-				g2.drawImage(theBitmaps.WIN,0,0,null);
-			} else if (endGame == 2) {
-				g2.setTransform(af_none);
-				g2.drawImage(theBitmaps.LOOSE,0,0,null);
-			}
+	    } else if (utility.gameMode == GameMode.gameOverLost || utility.gameMode == GameMode.gameOverWon) {
+		    theWorld.DrawTiles(g2, false, GetAA());
+		    theSpriteManger.Render(g2, 
+		    		af, 
+		    		af_translate_zoom, 
+		    		af_shear_rotate, 
+		    		af_none);
+		    DrawTopBar(g2);
+		    theSpriteManger.Tick();
+		    if ( (System.currentTimeMillis() / 1000l) - utility.loose_time > 3) {
+				if (endGame == 1) {
+					g2.setTransform(af_none);
+					g2.drawImage(theBitmaps.WIN,0,0,null);
+				} else if (endGame == 2) {
+					g2.setTransform(af_none);
+					g2.drawImage(theBitmaps.LOOSE,0,0,null);
+				}
+		    }
+		    
 	    }
 
 		mouseClick = false;
@@ -870,7 +895,16 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		g2.drawString("ISLAND SEED:"+utility.rndSeedTxt+cursor, x+20, y+43);
 		
 	}
-
+	
+	public void drawEndScreen(Graphics2D g2) {
+		if (utility.gameMode == GameMode.gameOverWon) {
+			g2.setTransform(af_none);
+			g2.drawImage(theBitmaps.WIN,0,0,null);
+		} else {
+			g2.setTransform(af_none);
+			g2.drawImage(theBitmaps.LOOSE,0,0,null);
+		}
+	}
 	@Override
 	public void run() {
 		// lower ThreadPriority

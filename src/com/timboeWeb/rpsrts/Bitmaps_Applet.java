@@ -10,7 +10,6 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import com.timboe.rpsrts.Bitmaps;
-import com.timboe.rpsrts.Utility;
 
 public class Bitmaps_Applet extends Bitmaps {
 	

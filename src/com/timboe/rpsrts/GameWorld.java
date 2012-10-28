@@ -3,9 +3,6 @@ package com.timboe.rpsrts;
 import java.util.HashSet;
 import java.util.Vector;
 
-import com.timboeWeb.rpsrts.WorldChunk_Applet;
-import com.timboeWeb.rpsrts.WorldTile_Applet;
-
 public class GameWorld {
 	protected final Utility utility = Utility.GetUtility();
 

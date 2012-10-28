@@ -3,7 +3,6 @@ package com.timboeWeb.rpsrts;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-import com.timboe.rpsrts.Utility;
 import com.timboe.rpsrts.WorldChunk;
 
 public class WorldChunk_Applet extends WorldChunk {
