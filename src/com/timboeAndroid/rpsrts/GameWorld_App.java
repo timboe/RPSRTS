@@ -3,8 +3,9 @@ package com.timboeAndroid.rpsrts;
 import java.util.HashSet;
 
 import com.timboe.rpsrts.GameWorld;
-import com.timboe.rpsrts.Utility;
 import com.timboe.rpsrts.WorldTile;
+import com.timboeWeb.rpsrts.WorldChunk_Applet;
+import com.timboeWeb.rpsrts.WorldTile_Applet;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -13,11 +14,22 @@ import android.graphics.RectF;
 
 public class GameWorld_App extends GameWorld {
 
-	public GameWorld_App(int _world_tiles, int _tiles_size, int _tiles_per_chunk, Utility _utility) {
-		super(_world_tiles, _tiles_size, _tiles_per_chunk);
+	public GameWorld_App() {
+		super();
+	}
+	
+	@Override
+	public void Init(int _world_tiles, int _tiles_size, int _tiles_per_chunk) {
+		world_tiles = _world_tiles;
+		tiles_per_chunk = _tiles_per_chunk;
+		world_chunks = world_tiles / tiles_per_chunk;
+		tiles_size = _tiles_size;
+		chunks_size = _tiles_size * _tiles_per_chunk;
+		world_size = world_tiles * tiles_size;
+		island_size = (int) Math.round(utility.island_scale * world_size);
 		
-		tiles = new WorldTile_App[world_tiles*world_tiles];
-		chunks = new WorldChunk_App[world_chunks*world_chunks];
+		tiles = new WorldTile_Applet[world_tiles*world_tiles];
+		chunks = new WorldChunk_Applet[world_chunks*world_chunks];
 		render_tiles = new HashSet<WorldTile>();
 		
 		int ID = 0;

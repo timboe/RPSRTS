@@ -3,12 +3,15 @@ package com.timboe.rpsrts;
 import java.util.HashSet;
 import java.util.Vector;
 
+import com.timboeWeb.rpsrts.WorldChunk_Applet;
+import com.timboeWeb.rpsrts.WorldTile_Applet;
+
 public class GameWorld {
-	private final Utility utility = Utility.GetUtility();
+	protected final Utility utility = Utility.GetUtility();
 
 	protected int world_tiles;
 	protected int world_chunks;
-	int tiles_per_chunk;
+	protected int tiles_per_chunk;
 	public int tiles_size;
 	protected int chunks_size;
 	protected int world_size;
@@ -27,40 +30,18 @@ public class GameWorld {
 	private float wg_time_of_last_operation;
 
 
-	public GameWorld(int _world_tiles, int _tiles_size, int _tiles_per_chunk) {
-		world_tiles = _world_tiles;
-		tiles_per_chunk = _tiles_per_chunk;
-		world_chunks = world_tiles / tiles_per_chunk;
-		tiles_size = _tiles_size;
-		chunks_size = _tiles_size * _tiles_per_chunk;
-		world_size = world_tiles * tiles_size;
-		island_size = (int) Math.round(utility.island_scale * world_size);
-
-//		tiles = new WorldTile[world_tiles*world_tiles];
-//		chunks = new WorldChunk[world_chunks*world_chunks];
-//		render_tiles = new HashSet<WorldTile>();
+	public GameWorld() {
 		biomes = new HashSet<Biome>();
 		island_offset = new long[utility.wg_DegInCircle];
-
 		wg_finished = false;
 		wg_state = 0;
-
-//		int ID = 0;
-//	    for (int x = -(world_size/2); x < (world_size/2); x = x + tiles_size) {
-//		    for (int y = -(world_size/2); y < (world_size/2); y = y + tiles_size) {
-//		    	tiles[ID++] = new WorldTile(x,y,tiles_size,ID,utility);
-//		    }
-//	    }
-//
-//	    ID = 0;
-//	    for (int x = -(world_size/2); x < (world_size/2); x = x + chunks_size) {
-//		    for (int y = -(world_size/2); y < (world_size/2); y = y + chunks_size) {
-//		    	chunks[ID++] = new WorldChunk(x,y,chunks_size,ID,utility);
-//		    }
-//	    }
+	}
+	
+	public void Init(int _world_tiles, int _tiles_size, int _tiles_per_chunk) {
+		//OVERRIDDEN
 	}
 
-	public boolean CheckSafeToPlaceTile(float _x, float _y, int _pice_radius) {
+ 	public boolean CheckSafeToPlaceTile(float _x, float _y, int _pice_radius) {
 		int _ID = -1;
 		//HACK!
 		//_x -= tiles_size;

@@ -32,22 +32,22 @@ public class Utility {
 	public int pathfind_counter = 0;
 	
 	//world manager settings
-	public float wg_seconds_to_wait = 0f; //Time to wait between steps
-	public int wg_DegInCircle = 360;
-	public float island_scale = 0.75f; //Size of initial circular island w.r.t. world
-	public float wg_CrinkleScale = 30; //Multiplier to Gaussian edge smear
-	public int wg_CrinkleCoarseness = 3; //Maximum gradient to smear under
-	public float wg_kTStartPt = 1.f; //Min random chunk energy
-	public float wg_kTEndPt = 10.f; //Max random chunk energy
-	public float wg_kT_R = 70; //kT algorithm R parameter
-	public int wg_MinBiomes = 15; //Min number of generated biomes
-	public long wg_MaxBiomes = 65; //Max number of generated biomes
-	public float wg_MainBaseRadius = 0.8f; //How far out the main bases are placed
-	public int wg_ErrodeIterations = 4; //times to errode world
-	public int wg_EnemyBaseAngle = 135; //starting angle for enemy
-	public int wg_PlayerBaseAngle = 315; //starting angle for player
-	public float minimiser_start = 999999; //Where minimiser routines start
-	public float wg_PercChanceKeepWater = 0.03f;
+	public final float wg_seconds_to_wait = 0f; //Time to wait between steps
+	public final int wg_DegInCircle = 360;
+	public final float island_scale = 0.75f; //Size of initial circular island w.r.t. world
+	public final float wg_CrinkleScale = 30; //Multiplier to Gaussian edge smear
+	public final int wg_CrinkleCoarseness = 3; //Maximum gradient to smear under
+	public final float wg_kTStartPt = 1.f; //Min random chunk energy
+	public final float wg_kTEndPt = 10.f; //Max random chunk energy
+	public float wg_kT_R = 70; //kT algorithm R parameter  (SET IN INIT)
+	public final int wg_MinBiomes = 15; //Min number of generated biomes
+	public final long wg_MaxBiomes = 65; //Max number of generated biomes
+	public final float wg_MainBaseRadius = 0.8f; //How far out the main bases are placed
+	public final int wg_ErrodeIterations = 4; //times to errode world
+	public final int wg_EnemyBaseAngle = 135; //starting angle for enemy
+	public final int wg_PlayerBaseAngle = 315; //starting angle for player
+	public final float minimiser_start = 999999; //Where minimiser routines start
+	public final float wg_PercChanceKeepWater = 0.03f;
 
 	//sprite manager settings
 	public int pathfinding_max_depth = 100000; //kill pathfinding early in the 500-2000 range
@@ -72,14 +72,14 @@ public class Utility {
 	public int actor_aggro_radius = 60;
 
 	//biome settings
-	public int biome_golbal_density_mod = 0;
-	public float biome_colour_range = 10; //smear of colours in biome
-	public int biome_desert_min_density = 2 + biome_golbal_density_mod;
-	public int biome_desert_rnd_density = 2 + biome_golbal_density_mod;
-	public int biome_grass_min_density = 3 + biome_golbal_density_mod;
-	public int biome_grass_rnd_density = 3 + biome_golbal_density_mod;
-	public int biome_forest_min_density = 6 + biome_golbal_density_mod;
-	public int biome_forest_rnd_density = 6 + biome_golbal_density_mod;
+	public int biome_golbal_density_mod = 0; //set in init
+	public final float biome_colour_range = 10; //smear of colours in biome
+	public final int biome_desert_min_density = 2 + biome_golbal_density_mod;
+	public final int biome_desert_rnd_density = 2 + biome_golbal_density_mod;
+	public final int biome_grass_min_density = 3 + biome_golbal_density_mod;
+	public final int biome_grass_rnd_density = 3 + biome_golbal_density_mod;
+	public final int biome_forest_min_density = 6 + biome_golbal_density_mod;
+	public final int biome_forest_rnd_density = 6 + biome_golbal_density_mod;
 
 	//resource settings
 	public int not_reachable_penelty_tocks = 20; //if an actor fails to pathfind to this as a target, how long to quarantine for.

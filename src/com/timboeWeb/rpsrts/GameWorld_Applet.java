@@ -5,14 +5,27 @@ import java.awt.Graphics2D;
 import java.util.HashSet;
 
 import com.timboe.rpsrts.GameWorld;
-import com.timboe.rpsrts.Utility;
 import com.timboe.rpsrts.WorldTile;
 
-
 public class GameWorld_Applet extends GameWorld {
+	private static GameWorld_Applet singleton = new GameWorld_Applet();
+	public static GameWorld_Applet GetGameWorld_Applet() {
+		return singleton;
+	}
 
-	public GameWorld_Applet(int _world_tiles, int _tiles_size, int _tiles_per_chunk) {
-		super(_world_tiles, _tiles_size, _tiles_per_chunk);
+	public GameWorld_Applet() {
+		super();
+	}
+	
+	@Override
+	public void Init(int _world_tiles, int _tiles_size, int _tiles_per_chunk) {
+		world_tiles = _world_tiles;
+		tiles_per_chunk = _tiles_per_chunk;
+		world_chunks = world_tiles / tiles_per_chunk;
+		tiles_size = _tiles_size;
+		chunks_size = _tiles_size * _tiles_per_chunk;
+		world_size = world_tiles * tiles_size;
+		island_size = (int) Math.round(utility.island_scale * world_size);
 		
 		tiles = new WorldTile_Applet[world_tiles*world_tiles];
 		chunks = new WorldChunk_Applet[world_chunks*world_chunks];

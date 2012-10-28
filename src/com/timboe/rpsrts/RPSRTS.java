@@ -81,7 +81,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	private Graphics dbg;
 
 	Utility utility = Utility.GetUtility();
-	GameWorld_Applet theWorld;
+	GameWorld_Applet theWorld = GameWorld_Applet.GetGameWorld_Applet();
 	SpriteManager_Applet theSpriteManger;
 	Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();
 	
@@ -424,12 +424,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			e1.printStackTrace();
 		}
 		
-		theWorld = new GameWorld_Applet(world_tiles, tiles_size, tiles_per_chunk);
-//		try {
-//			theBitmaps = new Bitmaps_Applet();
-//		} catch (final IOException e) {
-//			e.printStackTrace();
-//		}
+		theWorld.Init(world_tiles, tiles_size, tiles_per_chunk); //important!!!!
 		theSpriteManger = new SpriteManager_Applet(theWorld, theBitmaps);
 
 		addMouseWheelListener(this);
