@@ -29,7 +29,7 @@ public class Building extends Sprite {
 		animSteps = 4;
 		y_offset = 0;
 		underConstruction = false;
-		maxHealth = theSpriteManager.utility.building_max_health;
+		maxHealth = utility.building_max_health;
 		theSpriteManager.resource_manager.AddBuildingToTally(_oo, _bt);
 		no_local_resource_counter = 0;
 		
@@ -69,7 +69,7 @@ public class Building extends Sprite {
 				iCollect.add(ResourceType.Mine);
 			}
 		}
-		animStep = theSpriteManager.utility.rnd.nextInt(animSteps);
+		animStep = utility.rnd.nextInt(animSteps);
 	}
 
 	private void GridRegister() {
@@ -96,7 +96,7 @@ public class Building extends Sprite {
 
 	public void BuildAction() {
 		if (underConstruction == false) return;
-		health += theSpriteManager.utility.building_health_per_build_action;
+		health += utility.building_health_per_build_action;
 		if (health >= maxHealth) { //BUILT
 			health = maxHealth;
 			underConstruction = false;
@@ -151,9 +151,9 @@ public class Building extends Sprite {
 
 	public Resource GetNewGatherTask(Actor _client) {
 		Resource toFetch = null;
-		toFetch = theSpriteManager.GetNearestResource(this, _client, theSpriteManager.utility.building_gather_radius); //Get nearest resource - no distance requirement
+		toFetch = theSpriteManager.GetNearestResource(this, _client, utility.building_gather_radius); //Get nearest resource - no distance requirement
 		if (toFetch == null ) {
-			no_local_resource_penalty += theSpriteManager.utility.building_no_resource_penalty;
+			no_local_resource_penalty += utility.building_no_resource_penalty;
 			no_local_resource_counter++;
 			System.out.println("BUILDING NOT TAKING ANY MORE WORKERS FOR "+no_local_resource_penalty+" SEC");
 		}

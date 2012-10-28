@@ -3,6 +3,8 @@ package com.timboe.rpsrts;
 import java.util.HashSet;
 
 public class Biome {
+	private final Utility utility = Utility.GetUtility();
+
 	GameWorld theWorld;
 	int ID = 0;
 	BiomeType type;
@@ -36,20 +38,20 @@ public class Biome {
 	public void AssignBiomeType(BiomeType _type) {
 		type = _type;
 		if (type == BiomeType.DESERT) {
-			r = (int) (218 + Math.round(theWorld.utility.rnd.nextGaussian() * theWorld.utility.biome_colour_range));
-			g = (int) (165 + Math.round(theWorld.utility.rnd.nextGaussian() * theWorld.utility.biome_colour_range));
-			b = (int) (32 + Math.round(theWorld.utility.rnd.nextGaussian() * theWorld.utility.biome_colour_range));
-			resourceDensity = (float) ((theWorld.utility.rnd.nextInt(theWorld.utility.biome_desert_rnd_density) + theWorld.utility.biome_desert_min_density) / 100.);
+			r = (int) (218 + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
+			g = (int) (165 + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
+			b = (int) (32 + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
+			resourceDensity = (float) ((utility.rnd.nextInt(utility.biome_desert_rnd_density) + utility.biome_desert_min_density) / 100.);
 		} else if (type == BiomeType.FORREST) {
-			r = (int) (46 + Math.round(theWorld.utility.rnd.nextGaussian() * theWorld.utility.biome_colour_range));
-			g = (int) (139 + Math.round(theWorld.utility.rnd.nextGaussian() * theWorld.utility.biome_colour_range));
-			b = (int) (87 + Math.round(theWorld.utility.rnd.nextGaussian() * theWorld.utility.biome_colour_range));
-			resourceDensity = (float) ((theWorld.utility.rnd.nextInt(theWorld.utility.biome_forest_rnd_density) + theWorld.utility.biome_forest_min_density) / 100.);
+			r = (int) (46 + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
+			g = (int) (139 + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
+			b = (int) (87 + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
+			resourceDensity = (float) ((utility.rnd.nextInt(utility.biome_forest_rnd_density) + utility.biome_forest_min_density) / 100.);
 		} else if (type == BiomeType.GRASS) {
-			r = (int) (154 + Math.round(theWorld.utility.rnd.nextGaussian() * theWorld.utility.biome_colour_range));
-			g = (int) (205 + Math.round(theWorld.utility.rnd.nextGaussian() * theWorld.utility.biome_colour_range));
-			b = (int) (50 + Math.round(theWorld.utility.rnd.nextGaussian() * theWorld.utility.biome_colour_range));
-			resourceDensity = (float) ((theWorld.utility.rnd.nextInt(theWorld.utility.biome_grass_rnd_density) + theWorld.utility.biome_grass_min_density) / 100.);
+			r = (int) (154 + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
+			g = (int) (205 + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
+			b = (int) (50 + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
+			resourceDensity = (float) ((utility.rnd.nextInt(utility.biome_grass_rnd_density) + utility.biome_grass_min_density) / 100.);
 		} else if (type == BiomeType.WATER) {
 			r = 65;
 			g = 105;
@@ -106,9 +108,9 @@ public class Biome {
 	}
 
 	private void RandomColour() {
-		int _r = (int) (r + Math.round(theWorld.utility.rnd.nextGaussian() * theWorld.utility.biome_colour_range));
-		int _g = (int) (g + Math.round(theWorld.utility.rnd.nextGaussian() * theWorld.utility.biome_colour_range));
-		int _b = (int) (b + Math.round(theWorld.utility.rnd.nextGaussian() * theWorld.utility.biome_colour_range));
+		int _r = (int) (r + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
+		int _g = (int) (g + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
+		int _b = (int) (b + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
 		set_r = Constrain(_r);
 		set_g = Constrain(_g);
 		set_b = Constrain(_b);

@@ -37,8 +37,8 @@ public class Spoogicles extends Sprite {
 			y.add( new MyFloat( 0f ) );
 			x_start.add( new MyFloat( (float) _x ) );
 			y_start.add( new MyFloat( (float) _y ) );
-			spooge_x_vel.add( new MyFloat( (float) (theSpriteManager.utility.rnd.nextGaussian() * 0.5f * scale )) );
-			spooge_y_vel.add( new MyFloat( (float) (-2.5 - Math.abs(theSpriteManager.utility.rnd.nextGaussian() * 2f * scale)) ));
+			spooge_x_vel.add( new MyFloat( (float) (utility.rnd.nextGaussian() * 0.5f * scale )) );
+			spooge_y_vel.add( new MyFloat( (float) (-2.5 - Math.abs(utility.rnd.nextGaussian() * 2f * scale)) ));
 			
 			isDead.add( new MyFloat( -1f ) );
 

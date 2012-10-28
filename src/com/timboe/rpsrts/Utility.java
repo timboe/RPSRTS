@@ -3,10 +3,18 @@ package com.timboe.rpsrts;
 import java.util.Random;
 
 public class Utility {
+	
+	private static Utility singleton = new Utility();
+	
+	public static Utility GetUtility() {
+		return singleton;
+	}
 
 	//Program configuration
 	public String rndSeedTxt;
 	public Random rnd;
+	
+	
 	
 	public boolean dbg = false;
 	public boolean wg = false;
@@ -131,7 +139,7 @@ public class Utility {
 	public int EXTRA_Scissors_PerSmelter = 6;
 
 
-	public Utility() {
+	private Utility() {
 		rndSeedTxt = "Dave";//((Integer) rnd.nextInt(10000000)).toString();
 		rnd = new Random(rndSeedTxt.hashCode());
 	}

@@ -86,12 +86,12 @@ public class Actor_Applet extends Actor {
 
 		_g2.setTransform(_af);
 
-		if (theSpriteManager.utility.dbg == true && wander != null) {
+		if (utility.dbg == true && wander != null) {
 			_g2.setColor(Color.yellow);
 			_g2.drawLine(x, y, wander.getX(), wander.getY());
 		}
 
-		if (theSpriteManager.utility.dbg == true && attack_target != null) {
+		if (utility.dbg == true && attack_target != null) {
 			int _x_off = 0;
 			int _y_off = 0;
 			if (owner == ObjectOwner.Player) {
@@ -112,7 +112,7 @@ public class Actor_Applet extends Actor {
 			_g2.setColor(Color.blue);
 		}
 
-		if (theSpriteManager.utility.dbg == true && waypoint_list != null) {
+		if (utility.dbg == true && waypoint_list != null) {
 			for (final WorldPoint p : waypoint_list) {
 				if (p == null) {
 					continue;
@@ -120,10 +120,10 @@ public class Actor_Applet extends Actor {
 				_g2.fillRect((int) p.getX()-1, (int) p.getY()-1, 2, 2);
 			}
 		}
-		if (theSpriteManager.utility.dbg == true && waypoint != null) {
+		if (utility.dbg == true && waypoint != null) {
 			_g2.fillRect((int) waypoint.getX()-1, (int) waypoint.getY()-1, 3, 3);
 		}
-		if (theSpriteManager.utility.dbg == true && destination != null) {
+		if (utility.dbg == true && destination != null) {
 			_g2.drawOval(destination.GetX()-4, destination.GetY()-4, 8, 8);
 		}
 		

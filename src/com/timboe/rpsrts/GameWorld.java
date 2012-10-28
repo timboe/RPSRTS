@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Vector;
 
 public class GameWorld {
+	private final Utility utility = Utility.GetUtility();
 
 	protected int world_tiles;
 	protected int world_chunks;
@@ -25,10 +26,8 @@ public class GameWorld {
 	private int wg_times_erroded;
 	private float wg_time_of_last_operation;
 
-	protected Utility utility;
 
-	public GameWorld(int _world_tiles, int _tiles_size, int _tiles_per_chunk, Utility _utility) {
-		utility = _utility;
+	public GameWorld(int _world_tiles, int _tiles_size, int _tiles_per_chunk) {
 		world_tiles = _world_tiles;
 		tiles_per_chunk = _tiles_per_chunk;
 		world_chunks = world_tiles / tiles_per_chunk;

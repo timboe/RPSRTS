@@ -28,7 +28,7 @@ public class Projectile extends Sprite {
 			return;
 		}
 		
-		float _hypotenuse = theSpriteManager.utility.Seperation(GetLoc(), target.GetLoc());
+		float _hypotenuse = utility.Seperation(GetLoc(), target.GetLoc());
 		if (_hypotenuse < r) {
 			target.Attack(strength*multiplier);
 			int n = 2;

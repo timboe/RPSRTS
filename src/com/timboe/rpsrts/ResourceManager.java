@@ -1,8 +1,8 @@
 package com.timboe.rpsrts;
 
 public class ResourceManager {
+	private final Utility utility = Utility.GetUtility();
 
-	Utility utility;
 	SpriteManager theSpriteManager;
 
 	//
@@ -122,8 +122,7 @@ public class ResourceManager {
 		return amount_per_attractor;
 	}
 
-	public ResourceManager(Utility _utility, SpriteManager _sm) {
-		utility = _utility;
+	public ResourceManager(SpriteManager _sm) {
 		theSpriteManager = _sm;
 
 		PLAYER_IRON = utility.StartingResources;

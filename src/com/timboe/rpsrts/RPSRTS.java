@@ -80,10 +80,10 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	private Image dbImage;
 	private Graphics dbg;
 
+	Utility utility = Utility.GetUtility();
 	GameWorld_Applet theWorld;
 	SpriteManager_Applet theSpriteManger;
 	Bitmaps_Applet theBitmaps;
-	Utility utility;
 	
 	public BufferedImage TopBar;
 	
@@ -415,7 +415,6 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 
 		setSize(window_X, window_Y);
 
-		utility = new Utility();
 		utility.wg_kT_R = 14 * tiles_size;
 		utility.biome_golbal_density_mod = tiles_size;
 		
@@ -425,13 +424,13 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			e1.printStackTrace();
 		}
 		
-		theWorld = new GameWorld_Applet(world_tiles, tiles_size, tiles_per_chunk, utility);
+		theWorld = new GameWorld_Applet(world_tiles, tiles_size, tiles_per_chunk);
 		try {
 			theBitmaps = new Bitmaps_Applet();
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
-		theSpriteManger = new SpriteManager_Applet(theWorld, theBitmaps, utility);
+		theSpriteManger = new SpriteManager_Applet(theWorld, theBitmaps);
 
 		addMouseWheelListener(this);
 		addMouseMotionListener(this);

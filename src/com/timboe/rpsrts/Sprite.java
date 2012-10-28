@@ -1,7 +1,8 @@
 package com.timboe.rpsrts;
 
 public class Sprite implements Comparable<Sprite> {
-
+	protected final Utility utility = Utility.GetUtility();
+	
 	GameWorld theWorld;
 	protected SpriteManager theSpriteManager;
 
@@ -33,12 +34,12 @@ public class Sprite implements Comparable<Sprite> {
 		theSpriteManager = _sm;
 		x= _x;
 		y = _y;
-		x_prec = _x + theSpriteManager.utility.rnd.nextFloat() - .5f;
-		y_prec = _y + theSpriteManager.utility.rnd.nextFloat() - .5f;
+		x_prec = _x + utility.rnd.nextFloat() - .5f;
+		y_prec = _y + utility.rnd.nextFloat() - .5f;
 		r = _r;
 		loc = new WorldPoint();
-		ticks_per_tock = theSpriteManager.utility.ticks_per_tock;
-		tick_offset = theSpriteManager.utility.rnd.nextInt(ticks_per_tock);
+		ticks_per_tock = utility.ticks_per_tock;
+		tick_offset = utility.rnd.nextInt(ticks_per_tock);
 		animSteps = 4;
 		animStep = 0;
 		flashTicks = 0;
@@ -117,7 +118,7 @@ public class Sprite implements Comparable<Sprite> {
 	}
 
 	public float GetZOrder() {
-		return (float) (x_prec * Math.cos(theSpriteManager.utility.rotateAngle) - (y_prec * Math.sin(theSpriteManager.utility.rotateAngle)));
+		return (float) (x_prec * Math.cos(utility.rotateAngle) - (y_prec * Math.sin(utility.rotateAngle)));
 
 	}
 	

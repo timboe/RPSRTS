@@ -3,11 +3,11 @@ package com.timboe.rpsrts;
 import java.util.HashSet;
 
 public class WeightedPoint {
+	private final Utility utility = Utility.GetUtility();
+
 	int x;
 	int y;
-	WorldPoint myLocation;
-	Utility utility;
-	
+	WorldPoint myLocation;	
 	
 	HashSet<WeightedPoint> nieghbour_collection = new HashSet<WeightedPoint>();
 	
@@ -50,10 +50,9 @@ public class WeightedPoint {
 		return nieghbour_collection;
 	}
 
-	WeightedPoint(int _x, int _y, Utility _utility) {
+	WeightedPoint(int _x, int _y) {
 		x = _x;
 		y = _y;
-		utility = _utility;
 		myLocation = new WorldPoint(_x, _y);
 	}
 	

@@ -27,8 +27,8 @@ public class SpriteManager_App extends SpriteManager {
 
 	Bitmaps_App theBitmaps;
 	
-	public SpriteManager_App(GameWorld_App _theWorld, Bitmaps_App _bm, Utility _utility) {
-		super(_theWorld, _utility);
+	public SpriteManager_App(GameWorld_App _theWorld, Bitmaps_App _bm) {
+		super(_theWorld);
 		theBitmaps = _bm;
 		// TODO Auto-generated constructor stub
 	}

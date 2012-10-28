@@ -1,6 +1,5 @@
 package com.timboeAndroid.rpsrts;
 
-import com.timboe.rpsrts.Utility;
 import com.timboe.rpsrts.WorldChunk;
 
 import android.graphics.Canvas;
@@ -9,8 +8,8 @@ import android.graphics.Paint;
 
 public class WorldChunk_App extends WorldChunk {
 
-	public WorldChunk_App(int _x, int _y, int _tile_size, int _ID, Utility _utility) {
-		super(_x, _y, _tile_size, _ID, _utility);
+	public WorldChunk_App(int _x, int _y, int _tile_size, int _ID) {
+		super(_x, _y, _tile_size, _ID);
 	}
 	
 	public void DrawTileState (Canvas canvas, boolean _useEnergy, boolean _aa) {

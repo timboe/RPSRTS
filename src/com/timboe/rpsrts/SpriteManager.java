@@ -4,12 +4,13 @@ import java.util.HashSet;
 import java.util.Vector;
 
 public class SpriteManager {
+	protected final Utility utility = Utility.GetUtility();
+
 	protected GameWorld theWorld;
 	
 	public PathfinderGrid thePathfinderGrid;
 	protected Thread thePathfinderGridThread;
 	
-	public Utility utility;
 	public ResourceManager resource_manager;
 	private int ws_step = 0;
 	private float ws_time_of_last_operation;
@@ -39,15 +40,14 @@ public class SpriteManager {
 	protected final HashSet<Resource> TempResourceHolder = new HashSet<Resource>();
 
 
-	protected SpriteManager(GameWorld _theWorld, Utility _utility) {
-		utility = _utility;
+	protected SpriteManager(GameWorld _theWorld) {
 		theWorld = _theWorld;
 		worldSeeded = false;
-		resource_manager = new ResourceManager(utility, this);
+		resource_manager = new ResourceManager(this);
 		GlobalSpriteCounter = 0;
 		ticks_per_tock = utility.ticks_per_tock;
 		//Start the AI
-		theAI = new AI(theWorld,this,resource_manager, utility);
+		theAI = new AI(theWorld,this,resource_manager);
 		AI_thread = new Thread(theAI);
 	}
 
@@ -346,7 +346,7 @@ public class SpriteManager {
 		BuildingOjects.clear();
 		ResourceObjects.clear();
 		ProjectileObjects.clear();
-		resource_manager = new ResourceManager(utility, this);
+		resource_manager = new ResourceManager(this);
 		thePathfinderGrid = null;
 	}
 
@@ -362,7 +362,7 @@ public class SpriteManager {
 
 			//Setup the pathfinding grid 
 			System.out.println("CONSTRUCT GRID");
-			thePathfinderGrid = new PathfinderGrid(theWorld.tiles_size, theWorld.world_tiles, utility, this, theWorld);
+			thePathfinderGrid = new PathfinderGrid(theWorld.tiles_size, theWorld.world_tiles, this, theWorld);
 			thePathfinderGridThread = new Thread(thePathfinderGrid);
 			thePathfinderGridThread.start();
 			
@@ -386,7 +386,7 @@ public class SpriteManager {
 
 			
 			//get passable route?
-			pathfinder = new Pathfinder(player_base, enemy_base, this, utility);
+			pathfinder = new Pathfinder(player_base, enemy_base, this);
 			pathfinding_thread = new Thread(pathfinder);
 			pathfinding_thread.start();
 

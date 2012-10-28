@@ -56,7 +56,7 @@ public class Resource_Applet extends Resource {
 			_g2.setTransform(_af);
 			_g2.fillRect(x - 1, y - 1 + r, 2, 2);
 		}
-		if (theSpriteManager.utility.dbg == true) {
+		if (utility.dbg == true) {
 			_g2.setColor(Color.white);
 			_g2.setTransform(_af_translate_zoom);
 			_g2.drawString(Integer.toString(stuff), _x - r, _y - r);

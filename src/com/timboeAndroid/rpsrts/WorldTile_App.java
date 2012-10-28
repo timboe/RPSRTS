@@ -1,6 +1,5 @@
 package com.timboeAndroid.rpsrts;
 
-import com.timboe.rpsrts.Utility;
 import com.timboe.rpsrts.WorldTile;
 
 import android.graphics.Canvas;
@@ -13,8 +12,8 @@ public class WorldTile_App extends WorldTile {
 	int g;
 	int b;
 
-	public WorldTile_App(int _x, int _y, int _tile_size, int _ID, Utility _utility) {
-		super(_x, _y, _tile_size, _ID, _utility);
+	public WorldTile_App(int _x, int _y, int _tile_size, int _ID) {
+		super(_x, _y, _tile_size, _ID);
 		r = 50;
 		g = 50;
 		b = 50;

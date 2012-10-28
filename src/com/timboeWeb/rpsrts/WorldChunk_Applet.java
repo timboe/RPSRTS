@@ -8,9 +8,8 @@ import com.timboe.rpsrts.WorldChunk;
 
 public class WorldChunk_Applet extends WorldChunk {
 
-	public WorldChunk_Applet(int _x, int _y, int _tile_size, int _ID,
-			Utility _utility) {
-		super(_x, _y, _tile_size, _ID, _utility);
+	public WorldChunk_Applet(int _x, int _y, int _tile_size, int _ID) {
+		super(_x, _y, _tile_size, _ID);
 	}
 	
 	public void DrawTileState (Graphics2D _g2, boolean _useEnergy, boolean _aa) {

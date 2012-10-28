@@ -70,7 +70,7 @@ public class Actor extends Sprite {
 
 		
 		health = maxHealth;
-		animStep = theSpriteManager.utility.rnd.nextInt(animSteps);
+		animStep = utility.rnd.nextInt(animSteps);
 	}
 
 	private boolean AttemptMove(float _suggest_new_x, float _suggest_new_y) {
@@ -193,13 +193,13 @@ public class Actor extends Sprite {
 		}
 		if (tick == true) {
 			if (wander != null
-					|| theSpriteManager.utility.Seperation(GetLoc(), attack_target.GetLoc()) > attack_range
-					|| theSpriteManager.utility.rnd.nextFloat() < (0.05 * RPS)) { //TODO tweak this range, currently paper wander 20% tick
+					|| utility.Seperation(GetLoc(), attack_target.GetLoc()) > attack_range
+					|| utility.rnd.nextFloat() < (0.05 * RPS)) { //TODO tweak this range, currently paper wander 20% tick
 				//if (wander == null) wander = theSpriteManager.FindGoodSpot(attack_target.GetLoc(), r, attack_range, false);
 				WanderAbout(attack_target, attack_range, attack_range/2);
 			}
 		} else if (tock == true) {
-			final float _sep = theSpriteManager.utility.Seperation(GetLoc(), attack_target.GetLoc());
+			final float _sep = utility.Seperation(GetLoc(), attack_target.GetLoc());
 			if (_sep > 2 * attack_range) {
 				attack_target = null;
 				return;
@@ -213,7 +213,7 @@ public class Actor extends Sprite {
 	
 	private void Job_Idle() {
 		if (tick == true) {
-			WanderAbout(theSpriteManager.GetBase(owner), theSpriteManager.utility.wander_radius, theSpriteManager.utility.wander_pull_to_target);
+			WanderAbout(theSpriteManager.GetBase(owner), utility.wander_radius, utility.wander_pull_to_target);
 		}
 		//TODO Add code here to try and drop off resources
 	}
@@ -234,11 +234,11 @@ public class Actor extends Sprite {
 				behaviour = ActorBehaviour.Guarding;
 			}
 		} else if (tick == true && behaviour == ActorBehaviour.Guarding) {
-			if (theSpriteManager.utility.Seperation(GetLoc(), boss.GetLoc()) > 2 * theSpriteManager.utility.wander_radius) {
+			if (utility.Seperation(GetLoc(), boss.GetLoc()) > 2 * utility.wander_radius) {
 				behaviour = ActorBehaviour.DoingNothing;
 				return;
 			}
-			WanderAbout(boss, theSpriteManager.utility.wander_radius, theSpriteManager.utility.wander_pull_to_target);
+			WanderAbout(boss, utility.wander_radius, utility.wander_pull_to_target);
 		}
 	}
 	
@@ -297,7 +297,7 @@ public class Actor extends Sprite {
 				}
 				carrying = nodeType;
 			}
-			final int amountGathered = ((Resource) target).Plunder(theSpriteManager.utility.amount_collect_per_tock);
+			final int amountGathered = ((Resource) target).Plunder(utility.amount_collect_per_tock);
 			++animStep;
 			//System.out.println("Gathered "+amountGathered);
 			carryAmount += amountGathered;
@@ -322,10 +322,10 @@ public class Actor extends Sprite {
 				}
 			}
 		} else if (tock == true && behaviour == ActorBehaviour.DroppingOffGoods) {
-			if (carryAmount > theSpriteManager.utility.amount_collect_per_tock) {
+			if (carryAmount > utility.amount_collect_per_tock) {
 				//System.out.println("Dropping off "+amount_collect_per_tock);
-				theSpriteManager.resource_manager.AddResources(carrying, theSpriteManager.utility.amount_collect_per_tock, owner);
-				carryAmount -= theSpriteManager.utility.amount_collect_per_tock;
+				theSpriteManager.resource_manager.AddResources(carrying, utility.amount_collect_per_tock, owner);
+				carryAmount -= utility.amount_collect_per_tock;
 				++animStep;
 			} else if (carryAmount > 0) {
 				theSpriteManager.resource_manager.AddResources(carrying, carryAmount, owner);
@@ -339,7 +339,7 @@ public class Actor extends Sprite {
 	public void Job_Stuck() {
 		if (tick == true) {
 			--stuck_wander_ticks;
-			WanderAbout(destination, theSpriteManager.utility.wander_radius, theSpriteManager.utility.wander_pull_to_target); //Wander about here - pull to destination
+			WanderAbout(destination, utility.wander_radius, utility.wander_pull_to_target); //Wander about here - pull to destination
 			if (stuck_wander_ticks == 0) {
 				SetDestination(destination);
 			}
@@ -349,11 +349,11 @@ public class Actor extends Sprite {
 	public boolean Move() { //Goal in mind pathfinding
 		if (waypoint != null) { //Have at least one destination in list
 			//System.out.println("moveLoop FIRST WAYPOINT WP("+waypoint.getX()+","+waypoint.getY()+") POS ("+x_prec+","+y_prec+")");
-			final float _hypotenuse = theSpriteManager.utility.Seperation(x_prec, waypoint.getX(), y_prec, waypoint.getY()); //  // Math.sqrt( Math.pow(x_prec - destination_list.lastElement().getX(),2) +  Math.pow(y_prec - destination_list.lastElement().getY(),2) );
+			final float _hypotenuse = utility.Seperation(x_prec, waypoint.getX(), y_prec, waypoint.getY()); //  // Math.sqrt( Math.pow(x_prec - destination_list.lastElement().getX(),2) +  Math.pow(y_prec - destination_list.lastElement().getY(),2) );
 			float radiusToAchieve = 1f; //If pathfinding to pathfind node
 			if (waypoint_list == null || waypoint_list.size() == 0)
 			 {
-				radiusToAchieve = theSpriteManager.utility.pathfinding_accuracy + r + destination.GetR(); //If final target
+				radiusToAchieve = utility.pathfinding_accuracy + r + destination.GetR(); //If final target
 			}
 			if (_hypotenuse <= radiusToAchieve) { //At waypoint?
 				//Is there another waypoint?
@@ -363,7 +363,7 @@ public class Actor extends Sprite {
 					waypoint_list.remove( waypoint_list.size() - 1 );
 				} else {
 					//OK, so no more waypoints - are we there?
-					if (theSpriteManager.utility.Seperation(waypoint, destination.GetLoc()) < r + destination.GetR()) {
+					if (utility.Seperation(waypoint, destination.GetLoc()) < r + destination.GetR()) {
 						//Reached final destination
 						//System.out.println("INFO REACHED FINAL DESTINATION");
 						ClearDestination();
@@ -403,7 +403,7 @@ public class Actor extends Sprite {
 	public void QuitJob(boolean resign) {
 		ClearDestination();
 		if (resign == false) {
-			tocks_since_quit = theSpriteManager.utility.tocks_before_retake_job_from_boss;
+			tocks_since_quit = utility.tocks_before_retake_job_from_boss;
 			if (boss != null) {
 				previous_bad_employers.add(boss);
 			}
@@ -420,7 +420,7 @@ public class Actor extends Sprite {
 		wander = null;
 		navagate_status = PathfindStatus.NotRun;
 
-		pathfinder = new Pathfinder(this, _d, theSpriteManager, theSpriteManager.utility);
+		pathfinder = new Pathfinder(this, _d, theSpriteManager);
 		pathfinding_thread = new Thread(pathfinder);
 		pathfinding_thread.start();
 
@@ -514,8 +514,8 @@ public class Actor extends Sprite {
 
 	public void WanderAbout (Sprite _target, int _wander_radius, int _pull) { //target optional - random walk towards target
 		if (wander == null) {
-			int pull_x = (int) (x_prec - _wander_radius + theSpriteManager.utility.rnd.nextInt(_wander_radius*2));
-			int pull_y = (int) (y_prec - _wander_radius + theSpriteManager.utility.rnd.nextInt(_wander_radius*2));
+			int pull_x = (int) (x_prec - _wander_radius + utility.rnd.nextInt(_wander_radius*2));
+			int pull_y = (int) (y_prec - _wander_radius + utility.rnd.nextInt(_wander_radius*2));
 			if (_target != null) {
 				if (x_prec > _target.GetX()) {
 					pull_x -= _pull;
@@ -529,11 +529,11 @@ public class Actor extends Sprite {
 				}
 			}
 			final WorldPoint _p = new WorldPoint(pull_x, pull_y);
-			wander = theSpriteManager.FindGoodSpot( _p, r, theSpriteManager.utility.wander_radius, false);
+			wander = theSpriteManager.FindGoodSpot( _p, r, utility.wander_radius, false);
 			if (wander == null) return;
 			//System.out.println("wander to ("+wander.getX()+","+wander.getY()+")");
 		}
-		final float _hypotenuse = theSpriteManager.utility.Seperation(x_prec, wander.getX(), y_prec, wander.getY());
+		final float _hypotenuse = utility.Seperation(x_prec, wander.getX(), y_prec, wander.getY());
 		if (_hypotenuse <= r) {
 			wander = null;
 			return;

@@ -4,18 +4,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class PathfinderGrid implements Runnable {
+	private final Utility utility = Utility.GetUtility();
+
 	public HashSet<WeightedPoint> point_collection = new HashSet<WeightedPoint>();
-	
 	public HashMap<WorldPoint,WeightedPoint> point_collection_map = new HashMap<WorldPoint,WeightedPoint>();
-	
-	SpriteManager theSpriteManager;
-	
+	SpriteManager theSpriteManager;	
 	int step;
-	Utility utility;
 	
-	PathfinderGrid(int _tile_size, int _world_tiles, Utility _utility, SpriteManager _sm, GameWorld _gw) {
+	PathfinderGrid(int _tile_size, int _world_tiles, SpriteManager _sm, GameWorld _gw) {
 		theSpriteManager = _sm;
-		utility = _utility;
 		step = utility.pathfinding_accuracy;
 		
 		int world_size = (_world_tiles*_tile_size);
@@ -24,7 +21,7 @@ public class PathfinderGrid implements Runnable {
 		for (int x = -(world_size/2); x < (world_size/2); x = x + _tile_size) {
 			for (int y = -(world_size/2); y < (world_size/2); y = y + _tile_size) {
 				if (_gw.tiles[ID++].GetWalkable() == false) continue; //unreachable
-				WeightedPoint WP = new WeightedPoint(x+(_tile_size/2), y+(_tile_size/2), utility);
+				WeightedPoint WP = new WeightedPoint(x+(_tile_size/2), y+(_tile_size/2));
 				point_collection.add(WP);
 				point_collection_map.put(new WorldPoint(x+(_tile_size/2),y+(_tile_size/2)), WP);
 			}

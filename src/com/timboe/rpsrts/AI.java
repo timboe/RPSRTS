@@ -3,7 +3,7 @@ package com.timboe.rpsrts;
 import java.util.Vector;
 
 public class AI implements Runnable {
-	Utility utility;
+	private final Utility utility = Utility.GetUtility();
 	ResourceManager resources;
 	GameWorld theWorld;
 	SpriteManager theSpriteManger;
@@ -30,11 +30,10 @@ public class AI implements Runnable {
 	Vector<Building> attack_attractors = new Vector<Building>();
 	Vector<Building> defence_attractors = new Vector<Building>();
 
-	AI (GameWorld _gw, SpriteManager _sm, ResourceManager _re, Utility _ut) {
+	AI (GameWorld _gw, SpriteManager _sm, ResourceManager _re) {
 		resources = _re;
 		theWorld = _gw;
 		theSpriteManger = _sm;
-		utility = _ut;
 	}
 
 	private WorldPoint FindBestLocationForBuilding(BuildingType _bt) {
@@ -395,14 +394,14 @@ public class AI implements Runnable {
 			boolean aOK = false;
 			for (Building _b : attack_attractors) {
 				if (_b.iCollect.contains( _a.type ) == false) continue;
-				if (utility.Seperation(_b.GetLoc(), _a.GetLoc()) < 4 * theSpriteManger.utility.wander_radius) {
+				if (utility.Seperation(_b.GetLoc(), _a.GetLoc()) < 4 * utility.wander_radius) {
 					aOK = true;
 					break;
 				}
 			}
 			for (Building _b : defence_attractors) {
 				if (_b.iCollect.contains( _a.type ) == false) continue;
-				if (utility.Seperation(_b.GetLoc(), _a.GetLoc()) < 4 * theSpriteManger.utility.wander_radius) {
+				if (utility.Seperation(_b.GetLoc(), _a.GetLoc()) < 4 * utility.wander_radius) {
 					aOK = true;
 					break;
 				}
@@ -448,7 +447,7 @@ public class AI implements Runnable {
 			boolean aOK = false;
 			for (Building _bb : theSpriteManger.BuildingOjects) {
 				if (_bb.GetOwner() == ObjectOwner.Enemy) continue;
-				if (utility.Seperation(_b.GetLoc(), _bb.GetLoc()) < 2 * theSpriteManger.utility.wander_radius) {
+				if (utility.Seperation(_b.GetLoc(), _bb.GetLoc()) < 2 * utility.wander_radius) {
 					aOK = true;
 					break;
 				}
@@ -488,7 +487,7 @@ public class AI implements Runnable {
 			boolean player_nearby = false;
 			boolean enemy_nearby = false;
 			for (Actor _a : theSpriteManger.ActorObjects) {
-				if (utility.Seperation(_b.GetLoc(), _a.GetLoc()) < 2 *  theSpriteManger.utility.wander_radius) {
+				if (utility.Seperation(_b.GetLoc(), _a.GetLoc()) < 2 *  utility.wander_radius) {
 					if (_a.GetOwner() == ObjectOwner.Player) player_nearby = true;
 					else if (_a.GetOwner() == ObjectOwner.Enemy) enemy_nearby = true;
 					if (player_nearby == true && enemy_nearby == true) break;

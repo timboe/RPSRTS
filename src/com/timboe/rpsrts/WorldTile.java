@@ -1,6 +1,8 @@
 package com.timboe.rpsrts;
 
 public class WorldTile {
+	private final Utility utility = Utility.GetUtility();
+
 	protected int x;			// Start x - Position
 	protected int y;
 	protected int tile_s;
@@ -8,14 +10,12 @@ public class WorldTile {
 	protected int ID;
 	protected boolean part_of_biome;
 	protected Biome ownedBy;
-	private final Utility utility;
 
-	public WorldTile (int _x, int _y,int _tile_size, int _ID, Utility _utility) {
+	public WorldTile (int _x, int _y,int _tile_size, int _ID) {
 		ID = _ID;
 		x = _x;
 		y = _y;
 		tile_s= _tile_size;
-		utility = _utility;
 	}
 
 	public int GetAngle() {

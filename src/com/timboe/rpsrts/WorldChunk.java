@@ -7,8 +7,8 @@ public class WorldChunk extends WorldTile {
 	protected float state;
 	protected int biome_ID;
 
-	public WorldChunk(int _x, int _y, int _tile_size, int _ID, Utility _utility) {
-		super(_x, _y, _tile_size, _ID, _utility);
+	public WorldChunk(int _x, int _y, int _tile_size, int _ID) {
+		super(_x, _y, _tile_size, _ID);
 		//As WorldTile
 		state = 0;
 		biome_ID = 0;

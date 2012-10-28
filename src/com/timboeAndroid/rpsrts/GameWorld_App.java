@@ -14,7 +14,7 @@ import android.graphics.RectF;
 public class GameWorld_App extends GameWorld {
 
 	public GameWorld_App(int _world_tiles, int _tiles_size, int _tiles_per_chunk, Utility _utility) {
-		super(_world_tiles, _tiles_size, _tiles_per_chunk, _utility);
+		super(_world_tiles, _tiles_size, _tiles_per_chunk);
 		
 		tiles = new WorldTile_App[world_tiles*world_tiles];
 		chunks = new WorldChunk_App[world_chunks*world_chunks];
@@ -23,14 +23,14 @@ public class GameWorld_App extends GameWorld {
 		int ID = 0;
 	    for (int x = -(world_size/2); x < (world_size/2); x = x + tiles_size) {
 		    for (int y = -(world_size/2); y < (world_size/2); y = y + tiles_size) {
-		    	tiles[ID++] = new WorldTile_App(x,y,tiles_size,ID,utility);
+		    	tiles[ID++] = new WorldTile_App(x,y,tiles_size,ID);
 		    }
 	    }
 
 	    ID = 0;
 	    for (int x = -(world_size/2); x < (world_size/2); x = x + chunks_size) {
 		    for (int y = -(world_size/2); y < (world_size/2); y = y + chunks_size) {
-		    	chunks[ID++] = new WorldChunk_App(x,y,chunks_size,ID,utility);
+		    	chunks[ID++] = new WorldChunk_App(x,y,chunks_size,ID);
 		    }
 	    }
 	}

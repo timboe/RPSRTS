@@ -3,16 +3,14 @@ package com.timboeWeb.rpsrts;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-import com.timboe.rpsrts.Utility;
 import com.timboe.rpsrts.WorldTile;
 
 public class WorldTile_Applet extends WorldTile {
 	
 	protected Color c;
 
-	public WorldTile_Applet(int _x, int _y, int _tile_size, int _ID,
-			Utility _utility) {
-		super(_x, _y, _tile_size, _ID, _utility);
+	public WorldTile_Applet(int _x, int _y, int _tile_size, int _ID) {
+		super(_x, _y, _tile_size, _ID);
 		c = Color.DARK_GRAY;
 	}
 	

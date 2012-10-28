@@ -86,7 +86,7 @@ public class Building_Applet extends Building {
 			_g2.setColor(Color.red);
 			final int[] _x_points = new int[4];
 			final int[] _y_points = new int[4];
-			final int b_r = theSpriteManager.utility.buildingRadius;
+			final int b_r = utility.buildingRadius;
 			_x_points[0] = x - b_r - 2;
 			_x_points[1] = x - b_r + 2;
 			_x_points[2] = x + b_r + 2;
@@ -128,7 +128,7 @@ public class Building_Applet extends Building {
 			_g2.fillRect(_x - r, _y - r - 4 - y_offset, (int) Math.round(r * 2 * ((float)health/(float)maxHealth) ), 1);
 		}
 
-		if (theSpriteManager.utility.dbg == true) {
+		if (utility.dbg == true) {
 			_g2.setTransform(_af_translate_zoom);
 			_g2.setColor(Color.red);
 			_g2.drawString(Integer.toString(GetEmployees()), _x - r, _y - r - 10);

@@ -21,17 +21,15 @@ import com.timboe.rpsrts.ResourceType;
 import com.timboe.rpsrts.Spoogicles;
 import com.timboe.rpsrts.Sprite;
 import com.timboe.rpsrts.SpriteManager;
-import com.timboe.rpsrts.Utility;
 //import com.timboe.rpsrts.WeightedPoint;
 import com.timboe.rpsrts.WorldPoint;
-
 
 public class SpriteManager_Applet extends SpriteManager {
 
 	Bitmaps_Applet theBitmaps;
 	
-	public SpriteManager_Applet(GameWorld_Applet _theWorld, Bitmaps_Applet _bm, Utility _utility) {
-		super((GameWorld)_theWorld, _utility);
+	public SpriteManager_Applet(GameWorld_Applet _theWorld, Bitmaps_Applet _bm) {
+		super((GameWorld)_theWorld);
 		theBitmaps = _bm;
 
 	}

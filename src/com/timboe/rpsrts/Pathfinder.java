@@ -5,19 +5,18 @@ import java.util.HashSet;
 import java.util.Vector;
 
 public class Pathfinder implements Runnable {
+	private final Utility utility = Utility.GetUtility();
 
-	private final Utility utility;
 	private final SpriteManager theSpriteManager;
 	private Vector<WorldPoint> result = null; //TODO make me something better
 	private final Sprite fromSprite;
 	private final Sprite toSprite;
 	private Boolean killMe = false;
 	
-    Pathfinder(Sprite _from, Sprite _to, SpriteManager _sm, Utility _utility) {
+    Pathfinder(Sprite _from, Sprite _to, SpriteManager _sm) {
     	fromSprite = _from;
     	toSprite = _to;
     	theSpriteManager = _sm;
-    	utility = _utility;
     }
 
     public Vector<WorldPoint> GetResult() {
