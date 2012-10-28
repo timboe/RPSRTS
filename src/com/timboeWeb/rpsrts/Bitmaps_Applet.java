@@ -10,8 +10,15 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import com.timboe.rpsrts.Bitmaps;
+import com.timboe.rpsrts.Utility;
 
 public class Bitmaps_Applet extends Bitmaps {
+	
+	private static Bitmaps_Applet singleton = new Bitmaps_Applet();
+	
+	public static Bitmaps_Applet GetBitmaps_Applet() {
+		return singleton;
+	}
 	
 	public BufferedImage off[];
 	public BufferedImage on[];
@@ -58,19 +65,33 @@ public class Bitmaps_Applet extends Bitmaps {
 
 	public BufferedImage X[];
 
-	public Bitmaps_Applet() throws IOException {
+	private Bitmaps_Applet() {
 		super();
-        final BufferedImage resource_sheet = ImageIO.read(Bitmaps.class.getResource("/resource/resource_sheet.gif"));
-        final BufferedImage resource_actors = ImageIO.read(Bitmaps.class.getResource("/resource/resource_actors.gif"));
-        final BufferedImage resource_attractor = ImageIO.read(Bitmaps.class.getResource("/resource/resource_attractor.gif"));
-        final BufferedImage resource_trees = ImageIO.read(Bitmaps.class.getResource("/resource/resource_tree.gif"));
-        final BufferedImage resource_on_off = ImageIO.read(Bitmaps.class.getResource("/resource/offon.gif"));
-        final BufferedImage resource_projectile = ImageIO.read(Bitmaps.class.getResource("/resource/resource_projectile.gif"));
-        final BufferedImage resource_mine = ImageIO.read( this.getClass().getResource("/resource/mine.gif") );
-        final BufferedImage resource_stone =  ImageIO.read( this.getClass().getResource("/resource/stone.gif") );
-        
-        WIN = ImageIO.read( this.getClass().getResource("/resource/youreawinner.png") );
-        LOOSE = ImageIO.read( this.getClass().getResource("/resource/yourealooser.png") );
+		
+		BufferedImage resource_sheet = null;
+        BufferedImage resource_actors = null;
+        BufferedImage resource_attractor = null;
+        BufferedImage resource_trees = null;
+        BufferedImage resource_on_off = null;
+        BufferedImage resource_projectile = null;
+        BufferedImage resource_mine = null;
+        BufferedImage resource_stone = null;
+		
+		try {
+			resource_sheet = ImageIO.read(Bitmaps.class.getResource("/resource/resource_sheet.gif"));
+	        resource_actors = ImageIO.read(Bitmaps.class.getResource("/resource/resource_actors.gif"));
+	        resource_attractor = ImageIO.read(Bitmaps.class.getResource("/resource/resource_attractor.gif"));
+	        resource_trees = ImageIO.read(Bitmaps.class.getResource("/resource/resource_tree.gif"));
+	        resource_on_off = ImageIO.read(Bitmaps.class.getResource("/resource/offon.gif"));
+	        resource_projectile = ImageIO.read(Bitmaps.class.getResource("/resource/resource_projectile.gif"));
+	        resource_mine = ImageIO.read( this.getClass().getResource("/resource/mine.gif") );
+	        resource_stone =  ImageIO.read( this.getClass().getResource("/resource/stone.gif") );
+	        
+	        WIN = ImageIO.read( this.getClass().getResource("/resource/youreawinner.png") );
+	        LOOSE = ImageIO.read( this.getClass().getResource("/resource/yourealooser.png") );
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
         
         X = new BufferedImage[1];
         
