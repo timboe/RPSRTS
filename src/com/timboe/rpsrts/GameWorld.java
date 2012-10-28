@@ -95,6 +95,8 @@ public class GameWorld {
 			wg_time_of_last_operation = (System.nanoTime() / 1000000) / 1000.0f;
 			wg_state = 1;
 		}
+		
+		if (utility.doWorldGen == false) return 1; //Stop until player clicks GO
 
 		if (wg_state == 1 && (timeNow-wg_time_of_last_operation) > utility.wg_seconds_to_wait ) {
 			GenerateWorld_CrinkleIslandEdge();

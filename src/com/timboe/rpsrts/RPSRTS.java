@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -34,14 +35,12 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	 *
 	 */
 	private static final long serialVersionUID = -4515697164989975837L;
-	float TIME_OF_FRAME = 0;
-	float TIME_OF_LAST_SECOND = 0;
-	int FPS_LAST_SECOND = 0;
-	float TIME_TO_RENDER = 0;
-	int FPS = 0;
-	int FRAMES=0;
-	int FRAMES_LAST_SECOND=0;
-	int SLEEP = 30;
+	private long _TIME_OF_LAST_TICK = 0; // Internal
+	private long _FPS = 0;
+	private final int _DO_FPS_EVERY_X_TICKS = 10; // refresh FPS after X frames
+	private long _TIME_OF_NEXT_TICK; // Internal
+	private int _TICK; // Counter
+	private final int _DESIRED_TPS = 30; // Ticks per second to aim for
 
 	//Top bar settings
 	int con_start_x = 400;
@@ -108,6 +107,9 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
     //AffineTransform af_translate_zoom_counter_rotate = null;
     //AffineTransform af_anti_shear_rotate = null;
     Font myFont = new Font(Font.MONOSPACED, Font.BOLD, 12);
+    Font myBigFont = new Font(Font.MONOSPACED, Font.BOLD, 100);
+    Font myMediumFont = new Font(Font.MONOSPACED, Font.BOLD, 50);
+
     
 //    private void DrawBufferedBackground(Graphics2D _g2) {
 //    	if (background_buffered == null) {
@@ -131,33 +133,32 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	    	if (status == 1) { //Object made, circle island, plane grid
 	    		theWorld.DrawChunks(_g2,true,GetAA());
 	    		theWorld.DrawIslandEdge(_g2);
-	    		TopText(_g2,"Setup Grid");
 	    	} else if (status == 2) { //Island perimeter
 	    		theWorld.DrawChunks(_g2,true,GetAA());
 	    		theWorld.DrawIslandEdge(_g2);
-	    		TopText(_g2,"Crinkle the Fjords");
+	    		TopText(_g2,"CRINKLING THE FJORDS");
 	    	} else if (status == 3) { //Chunks touching and inside perimeter, random energy
 	    		theWorld.DrawChunks(_g2,true,GetAA());
 	    		theWorld.DrawIslandEdge(_g2);
-	    		TopText(_g2,"Random Seed Chunks");
+	    		TopText(_g2,"SEEDING WORLD GRID");
 	    	} else if (status == 4) { //Doing kt
 	    		theWorld.DrawChunks(_g2,true,GetAA());
 	    		theWorld.DrawIslandEdge(_g2);
-	    		TopText(_g2,"Apply kT Algorithm");
+	    		TopText(_g2,"RUNNING KT ALGORITHM");
 	    	} else if (status == 5) { //Doing kt
 	    		theWorld.DrawChunks(_g2,false,GetAA());
 	    		theWorld.DrawIslandEdge(_g2);
-	    		TopText(_g2,"Apply kT Algorithm");
+	    		TopText(_g2,"RUNNING KT ALGORITHM");
 	    	} else if (status == 6) { //Doing biomes
 	    		DrawSea(_g2);
 	    		theWorld.DrawTiles(_g2,false,GetAA());
 	    		theWorld.DrawIslandEdge(_g2);
-	    		TopText(_g2,"Assign Biomes");
+	    		TopText(_g2,"ASSIGNING LANDMASSES");
 	    	} else { //Eroding
 	    		DrawSea(_g2);
 	    		theWorld.DrawTiles(_g2,false,GetAA());
 	    		theWorld.DrawIslandEdge(_g2);
-	    		TopText(_g2,"Erode Edges");
+	    		TopText(_g2,"WEATHERING TERRAIN");
 	    	}
     	} else {
     		final int seeding = theSpriteManger.SeedWorld();
@@ -170,7 +171,9 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
     		theWorld.DrawIslandEdge(_g2);
     		theSpriteManger.Render(_g2, af, af_translate_zoom, af_shear_rotate, af_none);
     		_g2.setTransform(af_none);
-    		TopText(_g2,"Populating World");
+    		if (theSpriteManger.GetWorldSeeded() == false) {
+    			TopText(_g2,"POPULATING THE ISLAND");
+    		}
     	}
 	}
     
@@ -218,7 +221,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 
 		_g2.drawString(theSpriteManger.resource_manager.GetResourceText(), 15, 20);
 		_g2.drawString(theSpriteManger.resource_manager.GetUnitText(), 15, 40);
-		_g2.drawString("SEED:"+utility.rndSeed+" FPS:"+FPS+", DELAY:" +SLEEP, 15, 60);
+		_g2.drawString("SEED:"+utility.rndSeedTxt+" FPS:"+_FPS, 15, 60);
 
     	_g2.setTransform(af_none);
 		_g2.translate(con_start_x + (0 * x_add), y_height/2);
@@ -441,41 +444,48 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-			mouseClick = false;
-			buildingToPlace = null;
-			buildingToMove = null;
-		} else if (e.getKeyChar() == 'a') {
-			disable_aa = !disable_aa;
-		} else if (e.getKeyChar() == 'd') {
-			utility.dbg = !utility.dbg;
-		} else if (e.getKeyChar() == 'w') {
-			utility.wg = !utility.wg;
-		} else if (e.getKeyChar() == 'c') {
-			theSpriteManger.resource_manager.AddResources(ResourceType.Cactus, 100, ObjectOwner.Player);
-			theSpriteManger.resource_manager.AddResources(ResourceType.Rockpile, 100, ObjectOwner.Player);
-			theSpriteManger.resource_manager.AddResources(ResourceType.Mine, 100, ObjectOwner.Player);
+		if (utility.gameMode == GameMode.titleScreen) {
+			if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+				if (utility.rndSeedTxt.length() > 0) {
+					utility.rndSeedTxt = utility.rndSeedTxt.substring(0, utility.rndSeedTxt.length()-1 );
+				}
+			} else if (utility.rndSeedTxt.length() < 8) {
+				if (e.getKeyChar() >= '!' && e.getKeyChar() <= '~') { //assuming ASCII
+					utility.rndSeedTxt += e.getKeyChar();
+				}
+			}
+		} else {
+		
+		
+			if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+				mouseClick = false;
+				buildingToPlace = null;
+				buildingToMove = null;
+			} else if (e.getKeyChar() == 'a') {
+				disable_aa = !disable_aa;
+			} else if (e.getKeyChar() == 'd') {
+				utility.dbg = !utility.dbg;
+			} else if (e.getKeyChar() == 'w') {
+				utility.wg = !utility.wg;
+			} else if (e.getKeyChar() == 'c') {
+				theSpriteManger.resource_manager.AddResources(ResourceType.Cactus, 100, ObjectOwner.Player);
+				theSpriteManger.resource_manager.AddResources(ResourceType.Rockpile, 100, ObjectOwner.Player);
+				theSpriteManger.resource_manager.AddResources(ResourceType.Mine, 100, ObjectOwner.Player);
+			}
 		}
 	}
 
 	@Override
-	public void keyReleased(KeyEvent e) {
-
-	}
-
+	public void keyReleased(KeyEvent e) {}
 	@Override
-	public void keyTyped(KeyEvent e) {
-
-	}
-
+	public void keyTyped(KeyEvent e) {}
 	@Override
-	public void mouseClicked(MouseEvent e) {
-
-	}
+	public void mouseClicked(MouseEvent e) {}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		CurMouse = e.getPoint();
+		if (utility.gameMode == GameMode.titleScreen) return;
 		if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
 			if (last_X > -1) {
 				ROTATE = (float) (ROTATE + ((e.getX() - last_X)/(float)window_X)*Math.PI);
@@ -510,18 +520,14 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	}
 
 	@Override
-	public void mouseEntered(MouseEvent arg0) {
-
-	}
-
+	public void mouseEntered(MouseEvent arg0) {}
 	@Override
-	public void mouseExited(MouseEvent arg0) {
-
-	}
+	public void mouseExited(MouseEvent arg0) {}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		CurMouse = e.getPoint();
+		if (utility.gameMode == GameMode.titleScreen) return;
 		if (CurMouse.getX() > (con_start_x + (0 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (0 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 			buildingStatBox = 1;
 		} else if (CurMouse.getX() > (con_start_x + (1 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (1 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
@@ -551,33 +557,32 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	public void mousePressed(MouseEvent e) {
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			if (endGame == 1 || endGame == 2) endGame = 3;
-			mouseClick = false;
-		    if (CurMouse.getX() > (con_start_x + (0 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (0 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+		    if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (0 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (0 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 				if (buildingToPlace == BuildingType.Woodshop) buildingToPlace = null;
 				else buildingToPlace = BuildingType.Woodshop;
-			} else if (CurMouse.getX() > (con_start_x + (1 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (1 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+			} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (1 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (1 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 				if (buildingToPlace == BuildingType.Rockery) buildingToPlace = null;
 				else buildingToPlace = BuildingType.Rockery;
-			} else if (CurMouse.getX() > (con_start_x + (2 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (2 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+			} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (2 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (2 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 				if (buildingToPlace == BuildingType.Smelter) buildingToPlace = null;
 				else buildingToPlace = BuildingType.Smelter;
-			} else if (CurMouse.getX() > (con_start_x + (3 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (3 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+			} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (3 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (3 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 				if (buildingToPlace == BuildingType.AttractorPaper) buildingToPlace = null;
 				else buildingToPlace = BuildingType.AttractorPaper;
-			} else if (CurMouse.getX() > (con_start_x + (4 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (4 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+			} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (4 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (4 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 				if (buildingToPlace == BuildingType.AttractorRock) buildingToPlace = null;
 				else buildingToPlace = BuildingType.AttractorRock;
-			} else if (CurMouse.getX() > (con_start_x + (5 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (5 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+			} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (5 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (5 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 				if (buildingToPlace == BuildingType.AttractorScissors) buildingToPlace = null;
 				else buildingToPlace = BuildingType.AttractorScissors;
-			} else if (CurMouse.getX() > (con_start_x + (6 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (6 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+			} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (6 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (6 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 				if (buildingToPlace == BuildingType.X) buildingToPlace = null;
 				else buildingToPlace = BuildingType.X;
-			} else if (CurMouse.getX() > (con_start_x + (7 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (7 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+			} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (7 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (7 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 				theSpriteManger.resource_manager.GEN_PAPER_PLAYER = !theSpriteManger.resource_manager.GEN_PAPER_PLAYER;
-			} else if (CurMouse.getX() > (con_start_x + (8 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (8 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+			} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (8 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (8 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 				theSpriteManger.resource_manager.GEN_ROCK_PLAYER = !theSpriteManger.resource_manager.GEN_ROCK_PLAYER;
-			} else if (CurMouse.getX() > (con_start_x + (9 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (9 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+			} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (9 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (9 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 				theSpriteManger.resource_manager.GEN_SCISSORS_PLAYER = !theSpriteManger.resource_manager.GEN_SCISSORS_PLAYER;
 			} else {
 				mouseClick = true;
@@ -593,8 +598,6 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			last_X = -1;
 			last_Y = -1;
 		}
-
-
 	}
 
 	@Override
@@ -611,16 +614,6 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 
 	@Override
 	public void paint (Graphics g) {
-		final float TIME = (System.nanoTime() / 1000000);
-		TIME_TO_RENDER = TIME - TIME_OF_FRAME;
-		TIME_OF_FRAME = TIME;
-		++FRAMES;
-		if (TIME > TIME_OF_LAST_SECOND) {
-			FPS = FRAMES - FRAMES_LAST_SECOND;
-			FRAMES_LAST_SECOND = FRAMES;
-			TIME_OF_LAST_SECOND = (float) (TIME + 1000.);
-		}
-
 		final Graphics2D g2 = (Graphics2D)g;
 		g2.setFont(myFont);
 		if (af_none == null) {
@@ -673,8 +666,13 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			SetAA(g2,true);
 		}
 
-	    if (theSpriteManger.GetWorldSeeded() == false) {
+	    if (utility.gameMode == GameMode.titleScreen) {
 	    	ContentCreation(g2, af);
+	    	if (utility.doWorldGen == false) {
+	    		drawTitleScreen(g2);
+	    	} else if (theSpriteManger.GetWorldSeeded() == true) {
+	    		drawStartPlayingOption(g2);
+	    	}
 	    } else {
 	    	//DrawBufferedBackground(g2);
 		    theWorld.DrawTiles(g2, false, GetAA());
@@ -725,26 +723,185 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	    g2.setTransform(af_none);
 	}
 
+	private void drawStartPlayingOption(Graphics2D g2) {
+		g2.setTransform(af_none);
+		g2.setFont(myMediumFont);
+		int x = 10;
+		int y = 10;
+		Color c1 = front_blue;
+		Color c2 = backing_brown;
+		g2.setColor(c1);
+		g2.fillRoundRect(x, y, 970, 50, 10, 10);
+		g2.setColor(Color.white);
+		g2.drawRoundRect(x, y, 970, 50, 10, 10);
+		g2.setColor(c2);
+		g2.fillRoundRect(x+3, y+3, 970, 50, 10, 10);
+		g2.setColor(Color.white);
+		g2.drawRoundRect(x+3, y+3, 970, 50, 10, 10);
+		g2.setColor(c1);
+		g2.drawString("DO YOU WANT TO PLAY THIS ISLAND?", x+10, y+43);
+		
+		x = 525;
+		y = 70;
+		if (CurMouse != null 
+				&& CurMouse.getX() > x 
+				&& CurMouse.getX() < x+250 
+				&& CurMouse.getY() > y 
+				&& CurMouse.getY() < y+50) {
+			c1 = backing_brown;
+			c2 = front_blue;
+			if (mouseClick == true) {
+				//utility.rndSeedTxt = ((Integer) utility.rnd.nextInt(10000000)).toString();
+				int rnd = utility.rndSeedTxt.hashCode();
+				System.out.print("RND:"+rnd);
+				utility.rnd.setSeed(rnd);
+				theSpriteManger.Reset();
+				theWorld.Reset();				
+			}
+		}
+		g2.setColor(c1);
+		g2.fillRoundRect(x, y, 250, 50, 10, 10);
+		g2.setColor(Color.white);
+		g2.drawRoundRect(x, y, 250, 50, 10, 10);
+		g2.setColor(c2);
+		g2.fillRoundRect(x+3, y+3, 250, 50, 10, 10);
+		g2.setColor(Color.white);
+		g2.drawRoundRect(x+3, y+3, 250, 50, 10, 10);
+		g2.setColor(c1);
+		g2.drawString("RE-ROLL", x+20, y+43);
+		
+		x = 225;
+		y = 70;
+		c1 = front_blue;
+		c2 = backing_brown;
+		if (CurMouse != null 
+				&& CurMouse.getX() > x 
+				&& CurMouse.getX() < x+250 
+				&& CurMouse.getY() > y 
+				&& CurMouse.getY() < y+50) {
+			c1 = backing_brown;
+			c2 = front_blue;
+			if (mouseClick == true) {
+				utility.gameMode = GameMode.gameOn;
+			}
+		}
+		g2.setColor(c1);
+		g2.fillRoundRect(x, y, 250, 50, 10, 10);
+		g2.setColor(Color.white);
+		g2.drawRoundRect(x, y, 250, 50, 10, 10);
+		g2.setColor(c2);
+		g2.fillRoundRect(x+3, y+3, 250, 50, 10, 10);
+		g2.setColor(Color.white);
+		g2.drawRoundRect(x+3, y+3, 250, 50, 10, 10);
+		g2.setColor(c1);
+		g2.drawString("YES", x+80, y+43);
+	}
+
+	private void drawTitleScreen(Graphics2D g2) {
+		int x = 100;
+		int y = 100;
+		Rectangle clip1 = new Rectangle(x,     y, 210, 115);
+		Rectangle clip2 = new Rectangle(x+210, y, 210, 115);
+		g2.setFont(myBigFont);
+
+		g2.setTransform(af_none);
+		g2.setClip(clip1);
+		g2.setColor(front_blue);
+		g2.fillRoundRect(x, y, 400, 100, 20, 20);
+		g2.setColor(Color.white);
+		g2.drawRoundRect(x, y, 400, 100, 20, 20);
+		g2.setColor(backing_brown);
+		g2.fillRoundRect(x+10, y+10, 400, 100, 20, 20);
+		g2.setColor(Color.white);
+		g2.drawRoundRect(x+10, y+10, 400, 100, 20, 20);
+		g2.setColor(front_blue);
+		g2.drawString("RPSRTS", x+30, y+90);
+		
+		g2.setClip(clip2);
+		g2.setColor(backing_brown);
+		g2.fillRoundRect(x, y, 400, 100, 20, 20);
+		g2.setColor(Color.white);
+		g2.drawRoundRect(x, y, 400, 100, 20, 20);
+		g2.setColor(front_blue);
+		g2.fillRoundRect(x+10, y+10, 400, 100, 20, 20);
+		g2.setColor(Color.white);
+		g2.drawRoundRect(x+10, y+10, 400, 100, 20, 20);
+		g2.setColor(backing_brown);
+		g2.drawString("RPSRTS", x+34, y+90);
+		g2.setClip(null);
+		
+		g2.setFont(myMediumFont);
+		x = 250;
+		y = 300;
+		Color c1 = front_blue;
+		Color c2 = backing_brown;
+		if (CurMouse != null 
+				&& CurMouse.getX() > x 
+				&& CurMouse.getX() < x+500 
+				&& CurMouse.getY() > y 
+				&& CurMouse.getY() < y+50) {
+			c1 = backing_brown;
+			c2 = front_blue;
+			if (mouseClick == true) {
+				utility.rnd.setSeed(utility.rndSeedTxt.hashCode());
+				utility.doWorldGen = true;
+			}
+		}
+		g2.setColor(c1);
+		g2.fillRoundRect(x, y, 500, 50, 10, 10);
+		g2.setColor(Color.white);
+		g2.drawRoundRect(x, y, 500, 50, 10, 10);
+		g2.setColor(c2);
+		g2.fillRoundRect(x+3, y+3, 500, 50, 10, 10);
+		g2.setColor(Color.white);
+		g2.drawRoundRect(x+3, y+3, 500, 50, 10, 10);
+		g2.setColor(c1);
+		g2.drawString("GENERATE ISLAND", x+30, y+43);
+		
+		x = 175;
+		y = 400;
+		g2.setColor(front_blue);
+		g2.fillRoundRect(x, y, 650, 50, 10, 10);
+		g2.setColor(Color.white);
+		g2.drawRoundRect(x, y, 650, 50, 10, 10);
+		g2.setColor(backing_brown);
+		g2.fillRoundRect(x+3, y+3, 650, 50, 10, 10);
+		g2.setColor(Color.white);
+		g2.drawRoundRect(x+3, y+3, 650, 50, 10, 10);
+		g2.setColor(front_blue);
+		String cursor = "";
+		if ((System.currentTimeMillis() / 1000L) % 2 == 0) { // if even second
+			cursor = "|";
+		}
+		g2.drawString("ISLAND SEED:"+utility.rndSeedTxt+cursor, x+20, y+43);
+		
+	}
+
 	@Override
 	public void run() {
 		// lower ThreadPriority
 		Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 		// run a long while (true) this means in our case "always"
 		while (true) {
-			// repaint
-			repaint();
-			try	{
-				if (TIME_TO_RENDER + SLEEP > 1000./30) --SLEEP;
-				else if (TIME_TO_RENDER + SLEEP < 1000./30) ++SLEEP;
-				if (SLEEP < 3) SLEEP = 3;
-				else if (SLEEP > 40) SLEEP = 40;
+			if (_TIME_OF_NEXT_TICK > System.currentTimeMillis()) {
+				// too soon to repaint, wait...
+				try {
+					Thread.sleep(Math.abs(_TIME_OF_NEXT_TICK
+							- System.currentTimeMillis()));
+				} catch (final InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			_TIME_OF_NEXT_TICK = System.currentTimeMillis()
+					+ Math.round(1000f / _DESIRED_TPS);
+			++_TICK;
 
-				Thread.sleep (SLEEP);
+			if (_TICK % _DO_FPS_EVERY_X_TICKS == 0) {
+				_FPS = Math.round(1. / (System.currentTimeMillis() - _TIME_OF_LAST_TICK)
+								  * 1000. * _DO_FPS_EVERY_X_TICKS);
+				_TIME_OF_LAST_TICK = System.currentTimeMillis();
 			}
-			catch (final InterruptedException ex)	{
-				// do nothing
-			}
-			// set ThreadPriority to maximum value
+			repaint();
 			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		}
 	}
@@ -773,7 +930,9 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	private void TopText(Graphics2D _g2, String _str) {
 		_g2.setTransform(af_none);
 		_g2.setColor(Color.white);
-		_g2.drawString(_str, 25, 25);
+		_g2.setFont(myMediumFont);
+		_g2.drawString(_str, 20, 580);
+		_g2.setFont(myFont);
 	}
 	@Override
 	public void update (Graphics g)	{

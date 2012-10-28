@@ -5,13 +5,17 @@ import java.util.Random;
 public class Utility {
 
 	//Program configuration
-	public long rndSeed;
+	public String rndSeedTxt;
 	public Random rnd;
 	
 	public boolean dbg = false;
 	public boolean wg = false;
 	
 	public float rotateAngle = 0f;
+	
+	public boolean doWorldGen = false;
+	
+	GameMode gameMode = GameMode.titleScreen;
 
 	//time settings
 	int ticks_per_tock = 30;
@@ -20,7 +24,7 @@ public class Utility {
 	public int pathfind_counter = 0;
 	
 	//world manager settings
-	public float wg_seconds_to_wait = 0.f; //Time to wait between steps
+	public float wg_seconds_to_wait = 0f; //Time to wait between steps
 	public int wg_DegInCircle = 360;
 	public float island_scale = 0.75f; //Size of initial circular island w.r.t. world
 	public float wg_CrinkleScale = 30; //Multiplier to Gaussian edge smear
@@ -126,10 +130,10 @@ public class Utility {
 	public int EXTRA_Rock_PerRockery = 3;
 	public int EXTRA_Scissors_PerSmelter = 6;
 
+
 	public Utility() {
-		rnd = new Random();
-		rndSeed = rnd.nextInt(10000);
-		rnd = new Random(rndSeed);
+		rndSeedTxt = "Dave";//((Integer) rnd.nextInt(10000000)).toString();
+		rnd = new Random(rndSeedTxt.hashCode());
 	}
 
 
