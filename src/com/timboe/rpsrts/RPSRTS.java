@@ -481,7 +481,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		CurMouse = e.getPoint();
 		if (utility.gameMode == GameMode.titleScreen) return;
 		int bothMask = MouseEvent.BUTTON1_DOWN_MASK | MouseEvent.BUTTON3_DOWN_MASK;
-		if ((e.getModifiersEx() & bothMask) == bothMask) {
+		if (e.getModifiers() == InputEvent.BUTTON2_MASK || (e.getModifiersEx() & bothMask) == bothMask) {
 			if (last_X > -1) {
 				System.out.println("zoom: "+ZOOM);
 				ZOOM = ZOOM + ((e.getY() - last_Y)/(float)window_Y);
