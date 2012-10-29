@@ -23,14 +23,17 @@ import com.timboe.rpsrts.SpriteManager;
 import com.timboe.rpsrts.WorldPoint;
 
 public class SpriteManager_App extends SpriteManager {
-
-	Bitmaps_App theBitmaps;
-	
-	public SpriteManager_App(GameWorld_App _theWorld, Bitmaps_App _bm) {
-		super(_theWorld);
-		theBitmaps = _bm;
-		// TODO Auto-generated constructor stub
+	private static SpriteManager_App singleton = new SpriteManager_App();
+	public static SpriteManager_App GetSpriteManager_App() {
+		return singleton;
 	}
+
+	private SpriteManager_App() {
+		super();
+		this_object = (SpriteManager)this; 
+	}
+
+	Bitmaps_App theBitmaps = Bitmaps_App.GetBitmaps_App();
 	
 	@Override
 	public Actor PlaceActor(WorldPoint _p, ActorType _at, ObjectOwner _o) {
@@ -39,9 +42,6 @@ public class SpriteManager_App extends SpriteManager {
 				, (int)_p.getX()
 				, (int)_p.getY()
 				, utility.actorRadius
-				, theWorld
-				, (Bitmaps_App) theBitmaps
-				, this
 				, _at
 				, _o);
 		ActorObjects.add(newActor);
@@ -61,9 +61,6 @@ public class SpriteManager_App extends SpriteManager {
 				, (int)_p.getX()
 				, (int)_p.getY()
 				, _r
-				, theWorld
-				, (Bitmaps_App) theBitmaps
-				, this
 				, _bt
 				, _oo);
 		GetBuildingOjects().add(newBuilding);
@@ -78,9 +75,6 @@ public class SpriteManager_App extends SpriteManager {
 		final Projectile newProjectile = new Projectile_App(++GlobalSpriteCounter
 				, _source
 				, utility.projectileRadius
-				, theWorld
-				, (Bitmaps_App) theBitmaps
-				, this
 				, _target);
 		GetProjectileObjects().add(newProjectile);
 	}
@@ -93,9 +87,7 @@ public class SpriteManager_App extends SpriteManager {
 		final Resource newResource = new Resource_App(++GlobalSpriteCounter
 				, (int)_p.getX()
 				, (int)_p.getY()
-				, _r, theWorld
-				, (Bitmaps_App) theBitmaps
-				, this
+				, _r
 				, _rt);
 		if (AddToTempList == false) {
 			GetResourceObjects().add(newResource);

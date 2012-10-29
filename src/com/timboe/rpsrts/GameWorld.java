@@ -5,6 +5,11 @@ import java.util.Vector;
 
 public class GameWorld {
 	protected final Utility utility = Utility.GetUtility();
+	
+	protected static GameWorld this_object;
+	public static GameWorld GetGameWorld() {
+		return this_object;  //set by inherited Applet or Web 
+	}
 
 	protected int world_tiles;
 	protected int world_chunks;
@@ -27,14 +32,14 @@ public class GameWorld {
 	private float wg_time_of_last_operation;
 
 
-	public GameWorld() {
+	protected GameWorld() {
 		biomes = new HashSet<Biome>();
 		island_offset = new long[utility.wg_DegInCircle];
 		wg_finished = false;
 		wg_state = 0;
 	}
 	
-	public void Init(int _world_tiles, int _tiles_size, int _tiles_per_chunk) {
+	public void Init() {
 		//OVERRIDDEN
 	}
 

@@ -9,80 +9,76 @@ import java.awt.image.BufferedImage;
 
 import com.timboe.rpsrts.Building;
 import com.timboe.rpsrts.BuildingType;
-import com.timboe.rpsrts.GameWorld;
 import com.timboe.rpsrts.ObjectOwner;
-import com.timboe.rpsrts.SpriteManager;
 
 public class Building_Applet extends Building {
 
 	BufferedImage[] spriteGraphic;	
-	Bitmaps_Applet theBitmaps;
-	
-	public Building_Applet(int _ID, int _x, int _y, int _r, GameWorld _gw,
-			Bitmaps_Applet _bm, SpriteManager _sm, BuildingType _bt, ObjectOwner _oo) {
-		super(_ID, _x, _y, _r, _gw, _sm, _bt, _oo);
-		
-		theBitmaps = _bm;
+	protected Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();
+	protected TransformStore theTransforms = TransformStore.GetTransformStore();
+
+	public Building_Applet(int _ID, int _x, int _y, int _r, BuildingType _bt, ObjectOwner _oo) {
+		super(_ID, _x, _y, _r, _bt, _oo);
 		
 		if (type == BuildingType.Base) {
 			if (_oo == ObjectOwner.Player) {
-				spriteGraphic = _bm.base_player;
+				spriteGraphic = theBitmaps.base_player;
 			} else {
-				spriteGraphic = _bm.base_enemy;
+				spriteGraphic = theBitmaps.base_enemy;
 			}
 		} else if (type == BuildingType.AttractorPaper) {
 			if (_oo == ObjectOwner.Player) {
-				spriteGraphic = _bm.attractor_paper_player;
+				spriteGraphic = theBitmaps.attractor_paper_player;
 			} else {
-				spriteGraphic = _bm.attractor_paper_enemy;
+				spriteGraphic = theBitmaps.attractor_paper_enemy;
 			}
 		} else if (type == BuildingType.AttractorRock) {
 			if (_oo == ObjectOwner.Player) {
-				spriteGraphic = _bm.attractor_rock_player;
+				spriteGraphic = theBitmaps.attractor_rock_player;
 			} else {
-				spriteGraphic = _bm.attractor_rock_enemy;
+				spriteGraphic = theBitmaps.attractor_rock_enemy;
 			}
 		} else if (type == BuildingType.AttractorScissors) {
 			if (_oo == ObjectOwner.Player) {
-				spriteGraphic = _bm.attractor_scissors_player;
+				spriteGraphic = theBitmaps.attractor_scissors_player;
 			} else {
-				spriteGraphic = _bm.attractor_scissors_enemy;
+				spriteGraphic = theBitmaps.attractor_scissors_enemy;
 			}
 		} else if (type == BuildingType.Woodshop) {
 				if (_oo == ObjectOwner.Player) {
-					spriteGraphic = _bm.woodshop_player;
+					spriteGraphic = theBitmaps.woodshop_player;
 				} else {
-					spriteGraphic = _bm.woodshop_enemy;
+					spriteGraphic = theBitmaps.woodshop_enemy;
 				}
 		} else if (type == BuildingType.Rockery) {
 			if (_oo == ObjectOwner.Player) {
-				spriteGraphic = _bm.rockery_player;
+				spriteGraphic = theBitmaps.rockery_player;
 			} else {
-				spriteGraphic = _bm.rockery_enemy;
+				spriteGraphic = theBitmaps.rockery_enemy;
 			}
 		} else if (type == BuildingType.Smelter) {
 			if (_oo == ObjectOwner.Player) {
-				spriteGraphic = _bm.smelter_player;
+				spriteGraphic = theBitmaps.smelter_player;
 			} else {
-				spriteGraphic = _bm.smelter_enemy;
+				spriteGraphic = theBitmaps.smelter_enemy;
 			}
 		}
 	}
 	
-	public void Render(Graphics2D _g2, AffineTransform _af, AffineTransform _af_translate_zoom, AffineTransform _af_shear_rotate, AffineTransform _af_none, int _tick_count) {
+	public void Render(Graphics2D _g2, int _tick_count) {
 		if (dead == true) return;
 		if (_tick_count % 2 == 0) {
 			++animStep;
 		}
 
 		Point2D transform = null;
-		transform = _af_shear_rotate.transform(new Point(x, y), transform);
+		transform = theTransforms.af_shear_rotate.transform(new Point(x, y), transform);
 		final int _x = (int)Math.round(transform.getX());
 		final int _y = (int)Math.round(transform.getY());
 
 		if (delete_hover) {
 			//Can't place here
-			_g2.setTransform(_af);
+			_g2.setTransform(theTransforms.af);
 			_g2.setColor(Color.red);
 			final int[] _x_points = new int[4];
 			final int[] _y_points = new int[4];
@@ -117,7 +113,7 @@ public class Building_Applet extends Building {
 
 		//Do health
 		if (health < maxHealth) {
-			_g2.setTransform(_af_translate_zoom);
+			_g2.setTransform(theTransforms.af_translate_zoom);
 			_g2.setColor(Color.black);
 			_g2.fillRect(_x - r, _y - r - 4 - y_offset, r * 2, 1);
 			if (owner == ObjectOwner.Player) {
@@ -129,7 +125,7 @@ public class Building_Applet extends Building {
 		}
 
 		if (utility.dbg == true) {
-			_g2.setTransform(_af_translate_zoom);
+			_g2.setTransform(theTransforms.af_translate_zoom);
 			_g2.setColor(Color.red);
 			_g2.drawString(Integer.toString(GetEmployees()), _x - r, _y - r - 10);
 		}
@@ -146,7 +142,7 @@ public class Building_Applet extends Building {
 			} else {
 				conStep = 3;
 			}
-			_g2.setTransform(_af_translate_zoom);
+			_g2.setTransform(theTransforms.af_translate_zoom);
 			if (owner == ObjectOwner.Player) {
 				_g2.drawImage(theBitmaps.construction_player[conStep], _x - r, _y - r, null);
 			} else {
@@ -155,11 +151,11 @@ public class Building_Applet extends Building {
 			return;
 		}
 
-		_g2.setTransform(_af_translate_zoom);
+		_g2.setTransform(theTransforms.af_translate_zoom);
 		_g2.drawImage(spriteGraphic[animStep % animSteps], _x, _y, null);
 		
 		_g2.setColor(Color.blue);
-		_g2.setTransform(_af);
+		_g2.setTransform(theTransforms.af);
 		_g2.fillRect(x, y, 1, 1);
 		
 

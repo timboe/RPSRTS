@@ -4,9 +4,14 @@ import java.util.HashSet;
 import java.util.Vector;
 
 public class SpriteManager {
+	
+	protected static SpriteManager this_object;
+	public static SpriteManager GetSpriteManager() {
+		return this_object; //set by inherited Applet or Web 
+	}
+	
 	protected final Utility utility = Utility.GetUtility();
-
-	protected GameWorld theWorld;
+	protected GameWorld theWorld = GameWorld.GetGameWorld();
 	
 	public PathfinderGrid thePathfinderGrid;
 	protected Thread thePathfinderGridThread;
@@ -40,8 +45,7 @@ public class SpriteManager {
 	protected final HashSet<Resource> TempResourceHolder = new HashSet<Resource>();
 
 
-	protected SpriteManager(GameWorld _theWorld) {
-		theWorld = _theWorld;
+	protected SpriteManager() {
 		worldSeeded = false;
 		resource_manager = new ResourceManager(this);
 		GlobalSpriteCounter = 0;

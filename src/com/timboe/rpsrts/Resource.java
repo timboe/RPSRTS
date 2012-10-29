@@ -10,8 +10,8 @@ public class Resource extends Sprite {
 	protected int not_reachable_penalty;
 	int penalty_size;
 
-	public Resource(int _ID, int _x, int _y, int _r, GameWorld _gw, SpriteManager _sm, ResourceType _type) {
-		super(_ID, _x, _y, _r, _gw, _sm);
+	public Resource(int _ID, int _x, int _y, int _r, ResourceType _type) {
+		super(_ID, _x, _y, _r);
 		type = _type;
 		int _start_stuff = utility.rnd.nextInt(utility.resource_rnd)
 				+ utility.resource_min;

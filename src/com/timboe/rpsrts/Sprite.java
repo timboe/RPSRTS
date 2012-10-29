@@ -2,9 +2,8 @@ package com.timboe.rpsrts;
 
 public class Sprite implements Comparable<Sprite> {
 	protected final Utility utility = Utility.GetUtility();
-	
-	GameWorld theWorld;
-	protected SpriteManager theSpriteManager;
+	protected GameWorld theWorld = GameWorld.GetGameWorld();
+	protected SpriteManager theSpriteManager = SpriteManager.GetSpriteManager();
 
 	int ID;
 	protected int x;
@@ -28,10 +27,8 @@ public class Sprite implements Comparable<Sprite> {
 	int ticks_per_tock; 
 	int tick_offset;
 
-	protected Sprite(int _ID, int _x, int _y, int _r, GameWorld _gw, SpriteManager _sm) {
+	protected Sprite(int _ID, int _x, int _y, int _r) {
 		ID = _ID;
-		theWorld = _gw;
-		theSpriteManager = _sm;
 		x= _x;
 		y = _y;
 		x_prec = _x + utility.rnd.nextFloat() - .5f;

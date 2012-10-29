@@ -13,7 +13,6 @@ import com.timboe.rpsrts.Actor;
 import com.timboe.rpsrts.ActorType;
 import com.timboe.rpsrts.Building;
 import com.timboe.rpsrts.BuildingType;
-import com.timboe.rpsrts.GameWorld;
 import com.timboe.rpsrts.ObjectOwner;
 import com.timboe.rpsrts.Projectile;
 import com.timboe.rpsrts.Resource;
@@ -21,18 +20,22 @@ import com.timboe.rpsrts.ResourceType;
 import com.timboe.rpsrts.Spoogicles;
 import com.timboe.rpsrts.Sprite;
 import com.timboe.rpsrts.SpriteManager;
-//import com.timboe.rpsrts.WeightedPoint;
 import com.timboe.rpsrts.WorldPoint;
 
 public class SpriteManager_Applet extends SpriteManager {
-
-	Bitmaps_Applet theBitmaps;
-	
-	public SpriteManager_Applet(GameWorld_Applet _theWorld, Bitmaps_Applet _bm) {
-		super((GameWorld)_theWorld);
-		theBitmaps = _bm;
-
+	private static SpriteManager_Applet singleton = new SpriteManager_Applet();
+	public static SpriteManager_Applet GetSpriteManager_Applet() {
+		return singleton;
 	}
+
+	private SpriteManager_Applet() {
+		super();
+		this_object = (SpriteManager)this; 
+	}
+	
+	Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();
+	TransformStore theTransforms = TransformStore.GetTransformStore();
+
 	
 	@Override
 	public Actor PlaceActor(WorldPoint _p, ActorType _at, ObjectOwner _o) {
@@ -41,9 +44,6 @@ public class SpriteManager_Applet extends SpriteManager {
 				, (int)_p.getX()
 				, (int)_p.getY()
 				, utility.actorRadius
-				, theWorld
-				, (Bitmaps_Applet) theBitmaps
-				, this
 				, _at
 				, _o);
 		ActorObjects.add(newActor);
@@ -63,9 +63,6 @@ public class SpriteManager_Applet extends SpriteManager {
 				, (int)_p.getX()
 				, (int)_p.getY()
 				, _r
-				, theWorld
-				, (Bitmaps_Applet) theBitmaps
-				, this
 				, _bt
 				, _oo);
 		GetBuildingOjects().add(newBuilding);
@@ -80,9 +77,6 @@ public class SpriteManager_Applet extends SpriteManager {
 		final Projectile newProjectile = new Projectile_Applet(++GlobalSpriteCounter
 				, _source
 				, utility.projectileRadius
-				, theWorld
-				, (Bitmaps_Applet) theBitmaps
-				, this
 				, _target);
 		GetProjectileObjects().add(newProjectile);
 	}
@@ -95,9 +89,7 @@ public class SpriteManager_Applet extends SpriteManager {
 		final Resource newResource = new Resource_Applet(++GlobalSpriteCounter
 				, (int)_p.getX()
 				, (int)_p.getY()
-				, _r, theWorld
-				, (Bitmaps_Applet) theBitmaps
-				, this
+				, _r
 				, _rt);
 		if (AddToTempList == false) {
 			GetResourceObjects().add(newResource);
@@ -113,8 +105,6 @@ public class SpriteManager_Applet extends SpriteManager {
 		final Spoogicles newSpoogicles = new Spoogicles_Applet(++GlobalSpriteCounter,
 				_x,
 				_y,
-				theWorld,
-				this,
 				_oo,
 				_n,
 				_scale);		
@@ -122,11 +112,7 @@ public class SpriteManager_Applet extends SpriteManager {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void Render(Graphics2D _g2, 
-			AffineTransform _af, 
-			AffineTransform _af_translate_zoom, 
-			AffineTransform _af_shear_rotate, 
-			AffineTransform _af_none) {
+	public void Render(Graphics2D _g2) {
 //		if (thePathfinderGrid != null && utility.dbg == true) {
 //			for (final WeightedPoint _w : thePathfinderGrid.point_collection) {
 //				_w.Render(_g2, _af);
@@ -159,24 +145,24 @@ public class SpriteManager_Applet extends SpriteManager {
 		
 		for (final Sprite _Z : ZOrder) {
 			if (_Z.GetIsActor() == true) {
-				((Actor_Applet) _Z).Render(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
+				((Actor_Applet) _Z).Render(_g2, TickCount);
 			} else if (_Z.GetIsResource() == true) {
-				((Resource_Applet) _Z).Render(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
+				((Resource_Applet) _Z).Render(_g2, TickCount);
 			} else if (_Z.GetIsBuilding() == true) {
-				((Building_Applet) _Z).Render(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
+				((Building_Applet) _Z).Render(_g2, TickCount);
 			} else if (_Z.GetIsProjectile() == true) {
-				((Projectile_Applet) _Z).Render(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
+				((Projectile_Applet) _Z).Render(_g2, TickCount);
 			} else if (_Z.GetIsSpoogicle() == true) {
-				((Spoogicles_Applet) _Z).Render(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
+				((Spoogicles_Applet) _Z).Render(_g2, TickCount);
 			}
 		}
 		
 	}
 	
 	
-	public void SpecialRender(Graphics2D _g2, AffineTransform _af, AffineTransform _af_translate_zoom, AffineTransform _af_shear_rotate, AffineTransform _af_none, int _x, int _y, BufferedImage[] _graphic, boolean drawingTopBar) {
+	public void SpecialRender(Graphics2D _g2, int _x, int _y, BufferedImage[] _graphic, boolean drawingTopBar) {
 		Point2D transform = null;
-		transform = _af_shear_rotate.transform(new Point(_x, _y), transform);
+		transform = theTransforms.af_shear_rotate.transform(new Point(_x, _y), transform);
 		final int __x = (int)Math.round(transform.getX());
 		final int __y = (int)Math.round(transform.getY());
 
@@ -202,7 +188,7 @@ public class SpriteManager_Applet extends SpriteManager {
 
 		if (_graphic == theBitmaps.X) {
 			if (drawingTopBar == false) {
-				_g2.setTransform(_af);
+				_g2.setTransform(theTransforms.af);
 			} else {
 				//_g2.setTransform(_af_none);
 			}
@@ -237,7 +223,7 @@ public class SpriteManager_Applet extends SpriteManager {
 		}
 
 		if (drawingTopBar == false) {
-			_g2.setTransform(_af_translate_zoom);
+			_g2.setTransform(theTransforms.af_translate_zoom);
 			if (_graphic != null) {
 				_g2.drawImage(_graphic[TickCount/2 % animSteps], __x - _r, __y - _r - _y_offset, null);
 			}
@@ -249,12 +235,10 @@ public class SpriteManager_Applet extends SpriteManager {
 	}
 	
 	
-	public boolean TryPlaceItem(BuildingType _bt, Graphics2D _g2,
-			AffineTransform _af, AffineTransform _af_translate_zoom, AffineTransform _af_shear_rotate, AffineTransform _af_none,
-			int _mouse_x, int _mouse_y, boolean _place_remove) {
+	public boolean TryPlaceItem(BuildingType _bt, Graphics2D _g2, int _mouse_x, int _mouse_y, boolean _place_remove) {
 		boolean closeToExisting = false;
 		_g2.setColor(Color.white);
-		_g2.setTransform(_af);
+		_g2.setTransform(theTransforms.af);
 		int radius_to_check = utility.buildingRadius;
 		boolean doDistanceCheck = true;
 		if (_bt == BuildingType.AttractorPaper
@@ -311,23 +295,23 @@ public class SpriteManager_Applet extends SpriteManager {
 
 			//Draw with player base, special method, for it has the render code
 			if (_bt == BuildingType.Woodshop) {
-				SpecialRender(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, _mouse_x, _mouse_y, theBitmaps.woodshop_player, false);
+				SpecialRender(_g2, _mouse_x, _mouse_y, theBitmaps.woodshop_player, false);
 			} else if (_bt == BuildingType.Rockery) {
-				SpecialRender(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, _mouse_x, _mouse_y, theBitmaps.rockery_player, false);
+				SpecialRender(_g2, _mouse_x, _mouse_y, theBitmaps.rockery_player, false);
 			} else if (_bt == BuildingType.Smelter) {
-				SpecialRender(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, _mouse_x, _mouse_y, theBitmaps.smelter_player, false);
+				SpecialRender(_g2, _mouse_x, _mouse_y, theBitmaps.smelter_player, false);
 			} else if (_bt == BuildingType.AttractorPaper) {
-				SpecialRender(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, _mouse_x, _mouse_y, theBitmaps.attractor_paper_player, false);
+				SpecialRender(_g2, _mouse_x, _mouse_y, theBitmaps.attractor_paper_player, false);
 			} else if (_bt == BuildingType.AttractorRock) {
-				SpecialRender(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, _mouse_x, _mouse_y, theBitmaps.attractor_rock_player, false);
+				SpecialRender(_g2, _mouse_x, _mouse_y, theBitmaps.attractor_rock_player, false);
 			} else if (_bt == BuildingType.AttractorScissors) {
-				SpecialRender(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, _mouse_x, _mouse_y, theBitmaps.attractor_scissors_player, false);
+				SpecialRender(_g2, _mouse_x, _mouse_y, theBitmaps.attractor_scissors_player, false);
 			}
 
 			//Draw circle of collection
 			if (doDistanceCheck == true) {
 				_g2.setColor(Color.white);
-				_g2.setTransform(_af);
+				_g2.setTransform(theTransforms.af);
 				for (int angle = (TickCount%utility.building_Place_degrees); angle <= utility.wg_DegInCircle; angle += utility.building_Place_degrees) {
 					_g2.drawArc(_mouse_x - utility.building_gather_radius, _mouse_y - utility.building_gather_radius,
 							utility.building_gather_radius * 2, utility.building_gather_radius * 2, angle, utility.building_Place_degrees_show);
@@ -335,7 +319,7 @@ public class SpriteManager_Applet extends SpriteManager {
 			}
 		} else {
 			//Not safe, show X
-			SpecialRender(_g2, _af, _af_translate_zoom, _af_shear_rotate, _af_none, _mouse_x, _mouse_y, theBitmaps.X, false);
+			SpecialRender(_g2, _mouse_x, _mouse_y, theBitmaps.X, false);
 		}
 		return false;
 	}

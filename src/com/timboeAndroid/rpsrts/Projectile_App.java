@@ -6,28 +6,25 @@ import android.graphics.Matrix;
 
 import com.timboe.rpsrts.Actor;
 import com.timboe.rpsrts.ActorType;
-import com.timboe.rpsrts.GameWorld;
 import com.timboe.rpsrts.ObjectOwner;
 import com.timboe.rpsrts.Projectile;
 import com.timboe.rpsrts.Sprite;
-import com.timboe.rpsrts.SpriteManager;
 
 public class Projectile_App extends Projectile {
 	Bitmap[] spriteGraphic;	
-	Bitmaps_App theBitmaps;
+	Bitmaps_App theBitmaps = Bitmaps_App.GetBitmaps_App();
 	
-	public Projectile_App(int _ID, Actor _source, int _r, GameWorld _gw,
-			Bitmaps_App _bm, SpriteManager _sm, Sprite _target) {
-		super(_ID, _source, _r, _gw, _sm, _target);
+	public Projectile_App(int _ID, Actor _source, int _r, Sprite _target) {
+		super(_ID, _source, _r, _target);
 
 		if (_source.GetOwner() == ObjectOwner.Player) {
-			if (_source.GetType() == ActorType.Paper) spriteGraphic = _bm.proj_paper_player;
-			else if (_source.GetType() == ActorType.Rock) spriteGraphic = _bm.proj_rock_player;
-			else if (_source.GetType() == ActorType.Scissors) spriteGraphic = _bm.proj_scissor_player;
+			if (_source.GetType() == ActorType.Paper) spriteGraphic = theBitmaps.proj_paper_player;
+			else if (_source.GetType() == ActorType.Rock) spriteGraphic = theBitmaps.proj_rock_player;
+			else if (_source.GetType() == ActorType.Scissors) spriteGraphic = theBitmaps.proj_scissor_player;
 		} else if (_source.GetOwner() == ObjectOwner.Enemy) {
-			if (_source.GetType() == ActorType.Paper) spriteGraphic = _bm.proj_paper_enemy;
-			else if (_source.GetType() == ActorType.Rock) spriteGraphic = _bm.proj_rock_enemy;
-			else if (_source.GetType() == ActorType.Scissors) spriteGraphic = _bm.proj_scissor_enemy;
+			if (_source.GetType() == ActorType.Paper) spriteGraphic = theBitmaps.proj_paper_enemy;
+			else if (_source.GetType() == ActorType.Rock) spriteGraphic = theBitmaps.proj_rock_enemy;
+			else if (_source.GetType() == ActorType.Scissors) spriteGraphic = theBitmaps.proj_scissor_enemy;
 		}
 	}
 	

@@ -21,8 +21,8 @@ public class Building extends Sprite {
 	int cost_rock;
 	int cost_iron;
 
-	protected Building(int _ID, int _x, int _y, int _r, GameWorld _gw, SpriteManager _sm, BuildingType _bt, ObjectOwner _oo) {
-		super(_ID, _x, _y, _r, _gw, _sm);
+	protected Building(int _ID, int _x, int _y, int _r, BuildingType _bt, ObjectOwner _oo) {
+		super(_ID, _x, _y, _r);
 		type = _bt;
 		owner = _oo;
 		//employees = 0;

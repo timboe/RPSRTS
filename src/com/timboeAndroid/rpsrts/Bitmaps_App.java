@@ -1,11 +1,15 @@
 package com.timboeAndroid.rpsrts;
 
-import java.io.IOException;
 import android.graphics.Bitmap;
 import com.timboe.rpsrts.Bitmaps;
 
-
 public class Bitmaps_App extends Bitmaps {
+	
+	private static Bitmaps_App singleton = new Bitmaps_App();
+	
+	public static Bitmaps_App GetBitmaps_App() {
+		return singleton;
+	}
 	
 	public Bitmap off[];
 	public Bitmap on[];
@@ -49,15 +53,18 @@ public class Bitmaps_App extends Bitmaps {
 
 	public Bitmap X[];
 	
-	public  Bitmaps_App(Bitmap resource_sheet,
+	private  Bitmaps_App() {
+		super();
+	}
+	
+	public void Init(Bitmap resource_sheet,
 			Bitmap resource_actors,
 			Bitmap resource_attractor,
 			Bitmap resource_trees,
 			Bitmap resource_on_off,
 			Bitmap resource_projectile,
 			Bitmap resource_mine,
-			Bitmap resouce_stone) throws IOException {
-		super();
+			Bitmap resouce_stone) {
 		
         X = new Bitmap[1];
         
@@ -177,5 +184,6 @@ public class Bitmaps_App extends Bitmaps {
 			mine[i] = Bitmap.createBitmap(resource_mine, i*6, 0, 6, 6);
 			stone[i] = Bitmap.createBitmap(resouce_stone, i*6, 0, 6, 6);
 		}
+		
 	}
 }

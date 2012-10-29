@@ -21,9 +21,8 @@ public class Spoogicles extends Sprite {
 	
 	protected float scale;	
 	
-	protected Spoogicles(int _ID, int _x, int _y, GameWorld _gw,
-			SpriteManager _sm, ObjectOwner _oo, int _spoogicles, float _scale) {
-		super(_ID, _x, _y, 1, _gw, _sm);
+	protected Spoogicles(int _ID, int _x, int _y, ObjectOwner _oo, int _spoogicles, float _scale) {
+		super(_ID, _x, _y, 1);
 	
 		scale = _scale;
 		floorLevel = _y;

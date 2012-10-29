@@ -5,55 +5,51 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
 import com.timboe.rpsrts.Actor;
 import com.timboe.rpsrts.ActorType;
-import com.timboe.rpsrts.GameWorld;
 import com.timboe.rpsrts.ObjectOwner;
 import com.timboe.rpsrts.WorldPoint;
 
 public class Actor_Applet extends Actor {
 	
 	BufferedImage[] spriteGraphic;	
-	Bitmaps_Applet theBitmaps;
+	protected Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();
+	protected TransformStore theTransforms = TransformStore.GetTransformStore();
 	RescaleOp colourChange;
 
-	public Actor_Applet(int _ID, int _x, int _y, int _r, GameWorld _gw, Bitmaps_Applet _bm,
-			SpriteManager_Applet _sm, ActorType _at, ObjectOwner _oo) {
-		super(_ID, _x, _y, _r, _gw, _sm, _at, _oo);
+	public Actor_Applet(int _ID, int _x, int _y, int _r, ActorType _at, ObjectOwner _oo) {
+		super(_ID, _x, _y, _r, _at, _oo);
 		
         colourChange = new RescaleOp(0.51f,1f,null);
-
-		theBitmaps = _bm;
 		
 		if (type == ActorType.Paper) {
 			if (_oo == ObjectOwner.Player) {
-				spriteGraphic = _bm.paper_player;
+				spriteGraphic = theBitmaps.paper_player;
 			} else {
-				spriteGraphic = _bm.paper_enemy;
+				spriteGraphic = theBitmaps.paper_enemy;
 			}
 		} else if (type == ActorType.Rock) {
 			if (_oo == ObjectOwner.Player) {
-				spriteGraphic = _bm.rock_player;
+				spriteGraphic = theBitmaps.rock_player;
 			} else {
-				spriteGraphic = _bm.rock_enemy;
+				spriteGraphic = theBitmaps.rock_enemy;
 			}
 		} else if (type == ActorType.Scissors) {
 			if (_oo == ObjectOwner.Player) {
-				spriteGraphic = _bm.scissor_player;
+				spriteGraphic = theBitmaps.scissor_player;
 			} else {
-				spriteGraphic = _bm.scissor_enemy;
+				spriteGraphic = theBitmaps.scissor_enemy;
 			}
 
 		}
 	}
 		
-	public void Render(Graphics2D _g2, AffineTransform _af, AffineTransform _af_translate_zoom, AffineTransform _af_shear_rotate, AffineTransform _af_none, int _tick_count) {
+	public void Render(Graphics2D _g2, int _tick_count) {
 		if (dead == true) return;
 		Point2D transform = null;
-		transform = _af_shear_rotate.transform(new Point(x, y), transform);
+		transform = theTransforms.af_shear_rotate.transform(new Point(x, y), transform);
 		final int _x = (int)Math.round(transform.getX());
 		final int _y = (int)Math.round(transform.getY());
 
@@ -63,7 +59,7 @@ public class Actor_Applet extends Actor {
 		
 		if (flashTicks > 0) --flashTicks;
 		
-		_g2.setTransform(_af_translate_zoom);
+		_g2.setTransform(theTransforms.af_translate_zoom);
 		_g2.drawImage(toDraw, _x - r, _y - r, null);
 
 		//Do carry capacity
@@ -84,7 +80,7 @@ public class Actor_Applet extends Actor {
 		}
 		_g2.fillRect(_x - r, _y - r - 2, (int) Math.round(r * 2 * ((float)health/(float)maxHealth) ), 1);
 
-		_g2.setTransform(_af);
+		_g2.setTransform(theTransforms.af);
 
 		if (utility.dbg == true && wander != null) {
 			_g2.setColor(Color.yellow);
@@ -128,7 +124,7 @@ public class Actor_Applet extends Actor {
 		}
 		
 		_g2.setColor(Color.white);
-		_g2.setTransform(_af);
+		_g2.setTransform(theTransforms.af);
 		_g2.fillOval(x - 1, y - 1 + r, 2, 2);
 	}
 	

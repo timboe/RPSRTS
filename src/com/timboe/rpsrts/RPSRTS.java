@@ -17,7 +17,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -28,6 +27,7 @@ import javax.imageio.ImageIO;
 import com.timboeWeb.rpsrts.Bitmaps_Applet;
 import com.timboeWeb.rpsrts.GameWorld_Applet;
 import com.timboeWeb.rpsrts.SpriteManager_Applet;
+import com.timboeWeb.rpsrts.TransformStore;
 
 public class RPSRTS extends Applet implements Runnable, MouseWheelListener, MouseMotionListener, MouseListener, KeyListener {
 
@@ -63,14 +63,6 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	
 	BufferedImage background_buffered;
 
-	//Display parameters
-	float ZOOM=0.7f;
-	float YSHEAR=0.5f;
-	float ROTATE = 0f;
-	float TRANSLATE_X = 0f;
-	float TRANSLATE_Y = 0f;
-	float TOP_ROTATE;
-
 	private Thread th;
 
 	//private final Color sea_blue = new Color(65,105,225);
@@ -83,27 +75,18 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	Utility utility = Utility.GetUtility();
 	GameWorld_Applet theWorld = GameWorld_Applet.GetGameWorld_Applet();
 	Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();
-	SpriteManager_Applet theSpriteManger;
+	SpriteManager_Applet theSpriteManger = SpriteManager_Applet.GetSpriteManager_Applet();
+	TransformStore theTransforms = TransformStore.GetTransformStore();
 	
 	public BufferedImage TopBar;
 	
-	//World parameters
-	int window_X = 1000;
-	int window_Y = 600;
-	int tiles_per_chunk = 8; //Used for coarse kT algo
-	int world_tiles = 176; //Number of tile elements on X
-	int tiles_size = 7; //Size of tile element in pixels
+
 
     RenderingHints aa_on = new RenderingHints(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
     RenderingHints aa_off = new RenderingHints(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);
     private boolean aa = true;
     private float last_zoom;
     private boolean disable_aa = true;
-    AffineTransform af_none = null;
-    AffineTransform af_backing = null;
-    AffineTransform af = null;
-    AffineTransform af_translate_zoom = null;
-    AffineTransform af_shear_rotate = null;
     //AffineTransform af_translate_zoom_counter_rotate = null;
     //AffineTransform af_anti_shear_rotate = null;
     Font myFont = new Font(Font.MONOSPACED, Font.BOLD, 12);
@@ -125,9 +108,9 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 //    	}
 //    }
 
-    private void ContentCreation(Graphics2D _g2, AffineTransform _af) {
+    private void ContentCreation(Graphics2D _g2) {
     	SetAA(_g2, false);
-    	ROTATE += 0.001;
+    	theTransforms.ROTATE += 0.001;
     	if (theWorld.GetWorldGenerated() == false) {
 	    	final int status = theWorld.GenerateWorld();
 	    	if (status == 1) { //Object made, circle island, plane grid
@@ -169,8 +152,8 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
     		DrawSea(_g2);
     		theWorld.DrawTiles(_g2,false,GetAA());
     		theWorld.DrawIslandEdge(_g2);
-    		theSpriteManger.Render(_g2, af, af_translate_zoom, af_shear_rotate, af_none);
-    		_g2.setTransform(af_none);
+    		theSpriteManger.Render(_g2);
+    		_g2.setTransform(theTransforms.af_none);
     		if (theSpriteManger.GetWorldSeeded() == false) {
     			TopText(_g2,"POPULATING THE ISLAND");
     		}
@@ -183,20 +166,20 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	private void DrawSea(Graphics2D _g2) {
 	    _g2.setColor(dsea_blue);
 	    final float M = 1;
-	    final float offset = world_tiles*tiles_size;
+	    final float offset = utility.world_tiles*utility.tiles_size;
 	    _g2.fillOval ((int)(-offset*M),(int)(-offset*M),(int)(offset*2*M),(int)(offset*2*M));
 	    _g2.setColor(Color.white);
 //	    _g2.fillOval ((int)(-offset*M*1.0001),(int)(-offset*M*1.0001),5,5);
 	}
 
 	private void DrawTopBar(Graphics2D _g2) {
-		_g2.setTransform(af_none);
+		_g2.setTransform(theTransforms.af_none);
 		_g2.setColor(backing_brown);
 		//_g2.fillRect(0, 0, window_X, y_height);
 		_g2.drawImage(TopBar, 0, 0, null);
 		_g2.setColor(front_blue);
 
-		TOP_ROTATE += 0.01;
+		theTransforms.TOP_ROTATE += 0.01;
 		if(buildingToPlace != null) {
 	    	if (buildingToPlace == BuildingType.Woodshop) {
 				_g2.translate(con_start_x + (0 * x_add), y_height/2);
@@ -213,78 +196,78 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			} else if(buildingToPlace == BuildingType.X) {
 				_g2.translate(con_start_x + (6 * x_add), y_height/2);
 			}
-    		_g2.rotate(TOP_ROTATE);
+    		_g2.rotate(theTransforms.TOP_ROTATE);
 			_g2.fillOval(-20, -20, 40, 40);
 			_g2.fillRect(-17, -17, 34, 34);
-	    	_g2.setTransform(af_none);
+	    	_g2.setTransform(theTransforms.af_none);
 	    }
 
 		_g2.drawString(theSpriteManger.resource_manager.GetResourceText(), 15, 20);
 		_g2.drawString(theSpriteManger.resource_manager.GetUnitText(), 15, 40);
 		_g2.drawString("SEED:"+utility.rndSeedTxt+" FPS:"+_FPS, 15, 60);
 
-    	_g2.setTransform(af_none);
+    	_g2.setTransform(theTransforms.af_none);
 		_g2.translate(con_start_x + (0 * x_add), y_height/2);
 		_g2.scale(2, 2);
-		theSpriteManger.SpecialRender(_g2, af, af_translate_zoom, af_shear_rotate, af_none, 0, 0, theBitmaps.woodshop_player, true);
-    	_g2.setTransform(af_none);
+		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.woodshop_player, true);
+    	_g2.setTransform(theTransforms.af_none);
 		_g2.translate(con_start_x + (1 * x_add), y_height/2);
 		_g2.scale(2, 2);
-		theSpriteManger.SpecialRender(_g2, af, af_translate_zoom, af_shear_rotate, af_none, 0, 0, theBitmaps.rockery_player, true);
-    	_g2.setTransform(af_none);
+		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.rockery_player, true);
+    	_g2.setTransform(theTransforms.af_none);
 		_g2.translate(con_start_x + (2 * x_add), y_height/2);
 		_g2.scale(2, 2);
-		theSpriteManger.SpecialRender(_g2, af, af_translate_zoom, af_shear_rotate, af_none, 0, 0, theBitmaps.smelter_player, true);
-    	_g2.setTransform(af_none);
+		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.smelter_player, true);
+    	_g2.setTransform(theTransforms.af_none);
 		_g2.translate(con_start_x + (3 * x_add), y_height/2 + 12);
 		_g2.scale(2, 2);
-		theSpriteManger.SpecialRender(_g2, af, af_translate_zoom, af_shear_rotate, af_none, 0, 0, theBitmaps.attractor_paper_player, true);
-    	_g2.setTransform(af_none);
+		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.attractor_paper_player, true);
+    	_g2.setTransform(theTransforms.af_none);
 		_g2.translate(con_start_x + (4 * x_add), y_height/2 + 12);
 		_g2.scale(2, 2);
-		theSpriteManger.SpecialRender(_g2, af, af_translate_zoom, af_shear_rotate, af_none, 0, 0, theBitmaps.attractor_rock_player, true);
-    	_g2.setTransform(af_none);
+		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.attractor_rock_player, true);
+    	_g2.setTransform(theTransforms.af_none);
 		_g2.translate(con_start_x + (5 * x_add), y_height/2 + 12);
 		_g2.scale(2, 2);
-		theSpriteManger.SpecialRender(_g2, af, af_translate_zoom, af_shear_rotate, af_none, 0, 0, theBitmaps.attractor_scissors_player, true);
-		_g2.setTransform(af_none);
+		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.attractor_scissors_player, true);
+		_g2.setTransform(theTransforms.af_none);
 		_g2.translate(con_start_x + (6 * x_add), y_height/2);
 		_g2.scale(2, 2);
-		theSpriteManger.SpecialRender(_g2, af, af_translate_zoom, af_shear_rotate, af_none, 0, 0, theBitmaps.X, true);
+		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.X, true);
 
-    	_g2.setTransform(af_none);
+    	_g2.setTransform(theTransforms.af_none);
 		_g2.translate(con_start_x + (7 * x_add), y_height/2);
 		_g2.scale(3, 3);
-		theSpriteManger.SpecialRender(_g2, af, af_translate_zoom, af_shear_rotate, af_none, 0, 0, theBitmaps.paper_player, true);
+		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.paper_player, true);
 		if (theSpriteManger.resource_manager.GEN_PAPER_PLAYER == true) {
-			theSpriteManger.SpecialRender(_g2, af, af_translate_zoom, af_shear_rotate, af_none, 0, 0, theBitmaps.on, true);
+			theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.on, true);
 		} else {
-			theSpriteManger.SpecialRender(_g2, af, af_translate_zoom, af_shear_rotate, af_none, 0, 0, theBitmaps.off, true);
+			theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.off, true);
 		}
-    	_g2.setTransform(af_none);
+    	_g2.setTransform(theTransforms.af_none);
 		_g2.translate(con_start_x + (8 * x_add), y_height/2);
 		_g2.scale(3, 3);
-		theSpriteManger.SpecialRender(_g2, af, af_translate_zoom, af_shear_rotate, af_none, 0, 0, theBitmaps.rock_player, true);
+		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.rock_player, true);
 		if (theSpriteManger.resource_manager.GEN_ROCK_PLAYER == true) {
-			theSpriteManger.SpecialRender(_g2, af, af_translate_zoom, af_shear_rotate, af_none, 0, 0, theBitmaps.on, true);
+			theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.on, true);
 		} else {
-			theSpriteManger.SpecialRender(_g2, af, af_translate_zoom, af_shear_rotate, af_none, 0, 0, theBitmaps.off, true);
+			theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.off, true);
 		}
-    	_g2.setTransform(af_none);
+    	_g2.setTransform(theTransforms.af_none);
 		_g2.translate(con_start_x + (9 * x_add), y_height/2);
 		_g2.scale(3, 3);
-		theSpriteManger.SpecialRender(_g2, af, af_translate_zoom, af_shear_rotate, af_none, 0, 0, theBitmaps.scissor_player, true);
+		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.scissor_player, true);
 		if (theSpriteManger.resource_manager.GEN_SCISSORS_PLAYER == true) {
-			theSpriteManger.SpecialRender(_g2, af, af_translate_zoom, af_shear_rotate, af_none, 0, 0, theBitmaps.on, true);
+			theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.on, true);
 		} else {
-			theSpriteManger.SpecialRender(_g2, af, af_translate_zoom, af_shear_rotate, af_none, 0, 0, theBitmaps.off, true);
+			theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.off, true);
 		}
 		
 		
 		
 		
 		if (buildingStatBox != 0) {
-			_g2.setTransform(af_none);
+			_g2.setTransform(theTransforms.af_none);
 			int _x = 0;
 			int _y = 0;
 			final int _os = 15;
@@ -409,14 +392,13 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	@Override
 	public void init() {
 		
-		if (world_tiles % tiles_per_chunk != 0 ) {
+		if (utility.world_tiles % utility.tiles_per_chunk != 0 ) {
 			System.out.println("FATAL: Chunks must divide evenly into tiles");
 		}
 
-		setSize(window_X, window_Y);
+		setSize(utility.window_X, utility.window_Y);
 
-		utility.wg_kT_R = 14 * tiles_size;
-		utility.biome_golbal_density_mod = tiles_size;
+
 		
 		try {
 			TopBar = ImageIO.read(Bitmaps.class.getResource("/resource/topbar.png"));
@@ -424,8 +406,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			e1.printStackTrace();
 		}
 		
-		theWorld.Init(world_tiles, tiles_size, tiles_per_chunk); //important!!!!
-		theSpriteManger = new SpriteManager_Applet(theWorld, theBitmaps);
+		theWorld.Init(); //important!!!!
 
 		addMouseWheelListener(this);
 		addMouseMotionListener(this);
@@ -483,26 +464,26 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		int bothMask = MouseEvent.BUTTON1_DOWN_MASK | MouseEvent.BUTTON3_DOWN_MASK;
 		if (e.getModifiers() == InputEvent.BUTTON2_MASK || (e.getModifiersEx() & bothMask) == bothMask) {
 			if (last_X > -1) {
-				System.out.println("zoom: "+ZOOM);
-				ZOOM = ZOOM + ((e.getY() - last_Y)/(float)window_Y);
-				if (ZOOM > 10f) {
-					ZOOM = 10f;
+				System.out.println("zoom: "+theTransforms.ZOOM);
+				theTransforms.ZOOM = theTransforms.ZOOM + ((e.getY() - last_Y)/(float)utility.window_Y);
+				if (theTransforms.ZOOM > 10f) {
+					theTransforms.ZOOM = 10f;
 				}
-				if (ZOOM < 0.1f) {
-					ZOOM = 0.1f;
+				if (theTransforms.ZOOM < 0.1f) {
+					theTransforms.ZOOM = 0.1f;
 				}
 			}
 		} else if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
 			if (last_X > -1) {
-				ROTATE = (float) (ROTATE + ((e.getX() - last_X)/(float)window_X)*Math.PI);
-				utility.rotateAngle = ROTATE;
+				theTransforms.ROTATE = (float) (theTransforms.ROTATE + ((e.getX() - last_X)/(float)utility.window_X)*Math.PI);
+				utility.rotateAngle = theTransforms.ROTATE;
 				//System.out.println("Rotation: "+ROTATE);
-				YSHEAR = YSHEAR + ((e.getY() - last_Y)/(float)window_Y);
-				if (YSHEAR > 1) {
-					YSHEAR = 1;
+				theTransforms.YSHEAR = theTransforms.YSHEAR + ((e.getY() - last_Y)/(float)utility.window_Y);
+				if (theTransforms.YSHEAR > 1) {
+					theTransforms.YSHEAR = 1;
 				}
-				if (YSHEAR < 0.05) {
-					YSHEAR = 0.05f;
+				if (theTransforms.YSHEAR < 0.05) {
+					theTransforms.YSHEAR = 0.05f;
 				}
 			}
 			last_X = e.getX();
@@ -511,8 +492,8 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			sendMouseDragPing = true;
 			mouseDrag = true;
 			if (last_X > -1) {
-				TRANSLATE_X = TRANSLATE_X + ((e.getX() - last_X)) * 2;
-				TRANSLATE_Y = TRANSLATE_Y + ((e.getY() - last_Y)) * 2;
+				theTransforms.TRANSLATE_X = theTransforms.TRANSLATE_X + ((e.getX() - last_X)) * 2;
+				theTransforms.TRANSLATE_Y = theTransforms.TRANSLATE_Y + ((e.getY() - last_Y)) * 2;
 	//			if (YSHEAR > 1) {
 	//				YSHEAR = 1;
 	//			}
@@ -609,71 +590,58 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		if (e.getWheelRotation() < 0) {
-			ZOOM = ZOOM * 1.2f;
+			theTransforms.ZOOM = theTransforms.ZOOM * 1.2f;
 		}
 		else {
-			ZOOM = ZOOM * 0.8f;
+			theTransforms.ZOOM = theTransforms.ZOOM * 0.8f;
 		}
-		if (ZOOM > 10.) ZOOM = 10.f;
-		if (ZOOM < 0.1) ZOOM = 0.1f;
+		if (theTransforms.ZOOM > 10.) theTransforms.ZOOM = 10.f;
+		if (theTransforms.ZOOM < 0.1) theTransforms.ZOOM = 0.1f;
 	}
 
 	@Override
 	public void paint (Graphics g) {
 		final Graphics2D g2 = (Graphics2D)g;
 		g2.setFont(myFont);
-		if (af_none == null) {
-			af_none = g2.getTransform();
+		if (theTransforms.af_none == null) {
+			theTransforms.af_none = g2.getTransform();
 		}
 		if (utility.wg == true) {
 			utility.wg = false;
 			theSpriteManger.Reset();
 			theWorld.Reset();
 		}
-		af = g2.getTransform();
-		af_translate_zoom = g2.getTransform();
-		af_shear_rotate = g2.getTransform();
-		af_backing = g2.getTransform();
+		theTransforms.af = g2.getTransform();
+		theTransforms.af_translate_zoom = g2.getTransform();
+		theTransforms.af_shear_rotate = g2.getTransform();
+		theTransforms.af_backing = g2.getTransform();
 		//af_translate_zoom_counter_rotate = g2.getTransform();
 		//af_anti_shear_rotate = g2.getTransform();
 
 		g2.setColor (Color.black);
-		g2.fillRect (0, 0, window_X, window_Y);
+		g2.fillRect (0, 0, utility.window_X, utility.window_Y);
 		
-		af.translate(((window_X+TRANSLATE_X)/2),((window_Y+TRANSLATE_Y)/2)); //*(1./ZOOM)
-		af.scale(1.5*ZOOM, 1.5*ZOOM);
-	    af.scale(1, YSHEAR);
-	    af.rotate(-ROTATE);
-	    g2.setTransform(af);
-	    
-		int halfWorldSize = (world_tiles * tiles_size)/2;
-	    af_backing.translate(-halfWorldSize + (window_X/2)+TRANSLATE_X,-halfWorldSize + (window_Y/2)+TRANSLATE_Y );
-	    af_backing.scale(ZOOM, ZOOM*YSHEAR);
-	    af_backing.rotate(ROTATE, halfWorldSize, halfWorldSize);
-
-	    af_translate_zoom.translate(((window_X+TRANSLATE_X)/2),((window_Y+TRANSLATE_Y)/2)); //*(1./ZOOM)
-	    af_translate_zoom.scale(1.5*ZOOM, 1.5*ZOOM);
-
-	    af_shear_rotate.scale(1, YSHEAR);
-	    af_shear_rotate.rotate(-ROTATE);
+		theTransforms.updateTransforms();
+		
+	    g2.setTransform(theTransforms.af);
 
 
 	    if (CurMouse != null) {
 			try {
-				MouseTF = af.inverseTransform(CurMouse, MouseTF);
+				MouseTF = theTransforms.af.inverseTransform(CurMouse, MouseTF);
 			} catch (final NoninvertibleTransformException e1) {
 				e1.printStackTrace();
 			}
 		}
 
-	    if (last_X > -1 || last_zoom != ZOOM) {
+	    if (last_X > -1 || last_zoom != theTransforms.ZOOM) {
 			SetAA(g2,false);
 		} else {
 			SetAA(g2,true);
 		}
 
 	    if (utility.gameMode == GameMode.titleScreen) {
-	    	ContentCreation(g2, af);
+	    	ContentCreation(g2);
 	    	if (utility.doWorldGen == false) {
 	    		drawTitleScreen(g2);
 	    	} else if (theSpriteManger.GetWorldSeeded() == true) {
@@ -683,13 +651,9 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	    	//DrawBufferedBackground(g2);
 		    theWorld.DrawTiles(g2, false, GetAA());
     		if (utility.dbg == true) theSpriteManger.PlaceSpooge(100, 200, ObjectOwner.Player, 5, 1f); //test
-		    theSpriteManger.Render(g2, 
-		    		af, 
-		    		af_translate_zoom, 
-		    		af_shear_rotate, 
-		    		af_none);
+		    theSpriteManger.Render(g2);
 		    if (buildingToPlace != null) {
-		    	final boolean placed = theSpriteManger.TryPlaceItem(buildingToPlace, g2, af, af_translate_zoom, af_shear_rotate, af_none, (int)MouseTF.getX(), (int)MouseTF.getY(), mouseClick);
+		    	final boolean placed = theSpriteManger.TryPlaceItem(buildingToPlace, g2, (int)MouseTF.getX(), (int)MouseTF.getY(), mouseClick);
 		    	if (placed == true) {
 		    		buildingToPlace = null;
 		    	}
@@ -717,19 +681,15 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			}
 	    } else if (utility.gameMode == GameMode.gameOverLost || utility.gameMode == GameMode.gameOverWon) {
 		    theWorld.DrawTiles(g2, false, GetAA());
-		    theSpriteManger.Render(g2, 
-		    		af, 
-		    		af_translate_zoom, 
-		    		af_shear_rotate, 
-		    		af_none);
+		    theSpriteManger.Render(g2);
 		    DrawTopBar(g2);
 		    theSpriteManger.Tick();
 		    if ( (System.currentTimeMillis() / 1000l) - utility.loose_time > 3) {
 				if (endGame == 1) {
-					g2.setTransform(af_none);
+					g2.setTransform(theTransforms.af_none);
 					g2.drawImage(theBitmaps.WIN,0,0,null);
 				} else if (endGame == 2) {
-					g2.setTransform(af_none);
+					g2.setTransform(theTransforms.af_none);
 					g2.drawImage(theBitmaps.LOOSE,0,0,null);
 				}
 		    }
@@ -738,12 +698,12 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 
 		mouseClick = false;
 		sendMouseDragPing = false;
-	    last_zoom = ZOOM;
-	    g2.setTransform(af_none);
+	    last_zoom = theTransforms.ZOOM;
+	    g2.setTransform(theTransforms.af_none);
 	}
 
 	private void drawStartPlayingOption(Graphics2D g2) {
-		g2.setTransform(af_none);
+		g2.setTransform(theTransforms.af_none);
 		g2.setFont(myMediumFont);
 		int x = 10;
 		int y = 10;
@@ -823,7 +783,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		Rectangle clip2 = new Rectangle(x+210, y, 210, 115);
 		g2.setFont(myBigFont);
 
-		g2.setTransform(af_none);
+		g2.setTransform(theTransforms.af_none);
 		g2.setClip(clip1);
 		g2.setColor(front_blue);
 		g2.fillRoundRect(x, y, 400, 100, 20, 20);
@@ -898,10 +858,10 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	
 	public void drawEndScreen(Graphics2D g2) {
 		if (utility.gameMode == GameMode.gameOverWon) {
-			g2.setTransform(af_none);
+			g2.setTransform(theTransforms.af_none);
 			g2.drawImage(theBitmaps.WIN,0,0,null);
 		} else {
-			g2.setTransform(af_none);
+			g2.setTransform(theTransforms.af_none);
 			g2.drawImage(theBitmaps.LOOSE,0,0,null);
 		}
 	}
@@ -956,7 +916,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	@Override
 	public void stop() { }
 	private void TopText(Graphics2D _g2, String _str) {
-		_g2.setTransform(af_none);
+		_g2.setTransform(theTransforms.af_none);
 		_g2.setColor(Color.white);
 		_g2.setFont(myMediumFont);
 		_g2.drawString(_str, 20, 580);

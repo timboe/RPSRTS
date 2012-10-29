@@ -38,8 +38,8 @@ public class Actor extends Sprite {
 	protected WorldPoint wander;
 	int tocks_since_quit;
 
-	protected Actor(int _ID, int _x, int _y, int _r, GameWorld _gw, SpriteManager _sm, ActorType _at, ObjectOwner _oo) {
-		super(_ID, _x, _y, _r, _gw, _sm);
+	protected Actor(int _ID, int _x, int _y, int _r, ActorType _at, ObjectOwner _oo) {
+		super(_ID, _x, _y, _r);
 		owner = _oo;
 		type = _at;
 		waypoint = null;

@@ -5,20 +5,15 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 
-import com.timboe.rpsrts.GameWorld;
 import com.timboe.rpsrts.Resource;
 import com.timboe.rpsrts.ResourceType;
-import com.timboe.rpsrts.SpriteManager;
 
 public class Resource_App extends Resource {
 	Bitmap[] spriteGraphic;	
-	Bitmaps_App theBitmaps;
+	Bitmaps_App theBitmaps = Bitmaps_App.GetBitmaps_App();
 	
-	public Resource_App(int _ID, int _x, int _y, int _r, GameWorld _gw,
-			Bitmaps_App _bm, SpriteManager _sm, ResourceType _type) {
-		super(_ID, _x, _y, _r, _gw, _sm, _type);
-		
-		theBitmaps = _bm;
+	public Resource_App(int _ID, int _x, int _y, int _r, ResourceType _type) {
+		super(_ID, _x, _y, _r, _type);
 	}
 	
 	public void Render(Canvas canvas, Matrix _af, Matrix _af_translate_zoom, Matrix _af_shear_rotate, Matrix _af_none, int _tick_count) {

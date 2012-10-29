@@ -5,8 +5,8 @@ public class Projectile extends Sprite {
 	int multiplier = 1;
 	int strength;
 	
-	protected Projectile(int _ID, Actor _source, int _r, GameWorld _gw, SpriteManager _sm, Sprite _target) {
-		super(_ID, _source.GetX(), _source.GetY(), _r, _gw, _sm);
+	protected Projectile(int _ID, Actor _source, int _r, Sprite _target) {
+		super(_ID, _source.GetX(), _source.GetY(), _r);
 		speed = 2;
 		target = _target;
 		strength = _source.GetStrength();

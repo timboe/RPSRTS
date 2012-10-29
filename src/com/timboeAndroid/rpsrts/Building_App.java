@@ -9,62 +9,57 @@ import android.graphics.Rect;
 
 import com.timboe.rpsrts.Building;
 import com.timboe.rpsrts.BuildingType;
-import com.timboe.rpsrts.GameWorld;
 import com.timboe.rpsrts.ObjectOwner;
-import com.timboe.rpsrts.SpriteManager;
 
 public class Building_App extends Building {
 	
 	Bitmap[] spriteGraphic;	
-	Bitmaps_App theBitmaps;
+	Bitmaps_App theBitmaps = Bitmaps_App.GetBitmaps_App();
 	
-	public Building_App(int _ID, int _x, int _y, int _r, GameWorld _gw,
-			Bitmaps_App _bm, SpriteManager _sm, BuildingType _bt, ObjectOwner _oo) {
-		super(_ID, _x, _y, _r, _gw, _sm, _bt, _oo);
-		
-		theBitmaps = _bm;
-		
+	public Building_App(int _ID, int _x, int _y, int _r, BuildingType _bt, ObjectOwner _oo) {
+		super(_ID, _x, _y, _r, _bt, _oo);
+				
 		if (type == BuildingType.Base) {
 			if (_oo == ObjectOwner.Player) {
-				spriteGraphic = _bm.base_player;
+				spriteGraphic = theBitmaps.base_player;
 			} else {
-				spriteGraphic = _bm.base_enemy;
+				spriteGraphic = theBitmaps.base_enemy;
 			}
 		} else if (type == BuildingType.AttractorPaper) {
 			if (_oo == ObjectOwner.Player) {
-				spriteGraphic = _bm.attractor_paper_player;
+				spriteGraphic = theBitmaps.attractor_paper_player;
 			} else {
-				spriteGraphic = _bm.attractor_paper_enemy;
+				spriteGraphic = theBitmaps.attractor_paper_enemy;
 			}
 		} else if (type == BuildingType.AttractorRock) {
 			if (_oo == ObjectOwner.Player) {
-				spriteGraphic = _bm.attractor_rock_player;
+				spriteGraphic = theBitmaps.attractor_rock_player;
 			} else {
-				spriteGraphic = _bm.attractor_rock_enemy;
+				spriteGraphic = theBitmaps.attractor_rock_enemy;
 			}
 		} else if (type == BuildingType.AttractorScissors) {
 			if (_oo == ObjectOwner.Player) {
-				spriteGraphic = _bm.attractor_scissors_player;
+				spriteGraphic = theBitmaps.attractor_scissors_player;
 			} else {
-				spriteGraphic = _bm.attractor_scissors_enemy;
+				spriteGraphic = theBitmaps.attractor_scissors_enemy;
 			}
 		} else if (type == BuildingType.Woodshop) {
 				if (_oo == ObjectOwner.Player) {
-					spriteGraphic = _bm.woodshop_player;
+					spriteGraphic = theBitmaps.woodshop_player;
 				} else {
-					spriteGraphic = _bm.woodshop_enemy;
+					spriteGraphic = theBitmaps.woodshop_enemy;
 				}
 		} else if (type == BuildingType.Rockery) {
 			if (_oo == ObjectOwner.Player) {
-				spriteGraphic = _bm.rockery_player;
+				spriteGraphic = theBitmaps.rockery_player;
 			} else {
-				spriteGraphic = _bm.rockery_enemy;
+				spriteGraphic = theBitmaps.rockery_enemy;
 			}
 		} else if (type == BuildingType.Smelter) {
 			if (_oo == ObjectOwner.Player) {
-				spriteGraphic = _bm.smelter_player;
+				spriteGraphic = theBitmaps.smelter_player;
 			} else {
-				spriteGraphic = _bm.smelter_enemy;
+				spriteGraphic = theBitmaps.smelter_enemy;
 			}
 		}
 	}

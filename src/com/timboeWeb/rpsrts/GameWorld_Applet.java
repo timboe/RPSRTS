@@ -15,15 +15,16 @@ public class GameWorld_Applet extends GameWorld {
 
 	public GameWorld_Applet() {
 		super();
+		this_object = (GameWorld)this; 
 	}
 	
 	@Override
-	public void Init(int _world_tiles, int _tiles_size, int _tiles_per_chunk) {
-		world_tiles = _world_tiles;
-		tiles_per_chunk = _tiles_per_chunk;
+	public void Init() {
+		world_tiles = utility.world_tiles;
+		tiles_per_chunk = utility.tiles_per_chunk;
 		world_chunks = world_tiles / tiles_per_chunk;
-		tiles_size = _tiles_size;
-		chunks_size = _tiles_size * _tiles_per_chunk;
+		tiles_size = utility.tiles_size;
+		chunks_size = utility.tiles_size * utility.tiles_per_chunk;
 		world_size = world_tiles * tiles_size;
 		island_size = (int) Math.round(utility.island_scale * world_size);
 		

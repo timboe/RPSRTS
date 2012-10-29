@@ -14,6 +14,12 @@ public class Utility {
 	public String rndSeedTxt = "Dave";
 	public final Random rnd = new Random(rndSeedTxt.hashCode());
 	
+	//World parameters
+	public int window_X = 1000;
+	public int window_Y = 600;
+	public int tiles_per_chunk = 8; //Used for coarse kT algo
+	public int world_tiles = 176; //Number of tile elements on X
+	public int tiles_size = 7; //Size of tile element in pixels
 	
 	public boolean dbg = false;
 	public boolean wg = false;
@@ -138,6 +144,9 @@ public class Utility {
 	public final int EXTRA_Scissors_PerSmelter = 6;
 	
 	private Utility() {
+		//calculated on fly
+		wg_kT_R = 14 * tiles_size;
+		biome_golbal_density_mod = tiles_size;
 	}
 
 	public WorldPoint PolarToCartesian(float _angle, float _radius) {
