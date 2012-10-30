@@ -4,9 +4,9 @@ import java.util.Vector;
 
 public class AI implements Runnable {
 	private final Utility utility = Utility.GetUtility();
-	ResourceManager resources;
-	GameWorld theWorld;
-	SpriteManager theSpriteManger;
+	private final ResourceManager resources = ResourceManager.GetResourceManager();
+	private final GameWorld theWorld = GameWorld.GetGameWorld();
+	private final SpriteManager theSpriteManger = SpriteManager.GetSpriteManager();
 	
 	int woodshop_countdown = 0;
 	int rockery_countdown = 0;
@@ -30,10 +30,7 @@ public class AI implements Runnable {
 	Vector<Building> attack_attractors = new Vector<Building>();
 	Vector<Building> defence_attractors = new Vector<Building>();
 
-	AI (GameWorld _gw, SpriteManager _sm, ResourceManager _re) {
-		resources = _re;
-		theWorld = _gw;
-		theSpriteManger = _sm;
+	AI () {
 	}
 
 	private WorldPoint FindBestLocationForBuilding(BuildingType _bt) {
@@ -48,8 +45,8 @@ public class AI implements Runnable {
 			if (_b.iAttract.size() > 0) { //Don't plant building near attractor
 				continue;
 			}
-			for (int x = _b.GetX() - utility.building_gather_radius; x < _b.GetX() + utility.building_gather_radius; x += utility.building_AI_GranularityToStudy*utility.rnd.nextInt(theWorld.tiles_size)) {
-				for (int y = _b.GetY() - utility.building_gather_radius; y < _b.GetY() + utility.building_gather_radius; y += utility.building_AI_GranularityToStudy*utility.rnd.nextInt(theWorld.tiles_size)) {
+			for (int x = _b.GetX() - utility.building_gather_radius; x < _b.GetX() + utility.building_gather_radius; x += utility.building_AI_GranularityToStudy*utility.rndI(theWorld.tiles_size)) {
+				for (int y = _b.GetY() - utility.building_gather_radius; y < _b.GetY() + utility.building_gather_radius; y += utility.building_AI_GranularityToStudy*utility.rndI(theWorld.tiles_size)) {
 					//Check we're near enough the building
 					if (utility.Seperation(new WorldPoint(x,y), _b.GetLoc()) > utility.building_gather_radius) {
 						continue;
@@ -136,26 +133,26 @@ public class AI implements Runnable {
 	void TryBuildResourceGathere() {
 		final Vector<BuildingType> toPlace = new Vector<BuildingType>();
 		if (resources.CanAffordBuy(BuildingType.Woodshop, ObjectOwner.Enemy, false, false) == true
-				&& utility.rnd.nextFloat() < 0.1
+				&& utility.rnd() < 0.1f
 				&& woodshop_countdown == 0
 				&& resources.ENEMY_PAPER >= resources.ENEMY_MAX_PAPER - utility.AI_NewUnitsWhenXClosetoCap) {
 				toPlace.add(BuildingType.Woodshop);
 
 		}
 		if (resources.CanAffordBuy(BuildingType.Smelter, ObjectOwner.Enemy, false, false) == true
-				&& utility.rnd.nextFloat() < 0.1
+				&& utility.rnd() < 0.1f
 				&& smelter_countdown == 0
 				&& resources.ENEMY_SCISSORS >= resources.ENEMY_MAX_SCISSORS - utility.AI_NewUnitsWhenXClosetoCap) {
 				toPlace.add(BuildingType.Smelter);
 		}
 		if (resources.CanAffordBuy(BuildingType.Rockery, ObjectOwner.Enemy, false, false) == true
-				&& utility.rnd.nextFloat() < 0.1
+				&& utility.rnd() < 0.1f
 				&& rockery_countdown == 0
 				&& resources.ENEMY_ROCK >= resources.ENEMY_MAX_ROCK - utility.AI_NewUnitsWhenXClosetoCap) {
 				toPlace.add(BuildingType.Rockery);
 		}
 		if (toPlace.size() > 0) {
-			int random = utility.rnd.nextInt(toPlace.size());
+			int random = utility.rndI(toPlace.size());
 			random = 0;
 			final WorldPoint location = FindBestLocationForBuilding(toPlace.elementAt(random));
 			//System.out.println("ToPlace:"+location);
@@ -241,7 +238,7 @@ public class AI implements Runnable {
 	
 	void CheckIfAttack() {
 		
-		if (utility.rnd.nextFloat() > 0.01) return; //only try attack 1% of tocks
+		if (utility.rnd() > 0.01f) return; //only try attack 1% of tocks
 		System.out.println("TRY ATTACK");
 
 		final Vector<Sprite> toKill = new Vector<Sprite>();
@@ -262,7 +259,7 @@ public class AI implements Runnable {
 		//grow to 50%, cap chance at 50%
 		float paper_chance = (((float) theSpriteManger.resource_manager.ENEMY_PAPER -2)/ (float)(utility.AI_TargetUnitMultipler * utility.EXTRA_Paper_PerWoodmill))/2f;
 		if (paper_chance > 0.5) paper_chance = 0.5f;
-		if (utility.rnd.nextFloat() < paper_chance 
+		if (utility.rnd() < paper_chance 
 				&& attack_paper == false 
 				&& theSpriteManger.resource_manager.CanAffordBuy(BuildingType.AttractorPaper,ObjectOwner.Enemy,false,false) == true) {
 			attack_paper = true;
@@ -272,7 +269,7 @@ public class AI implements Runnable {
 		
 		float rock_chance = (((float) theSpriteManger.resource_manager.ENEMY_ROCK -2)/ (float)(utility.AI_TargetUnitMultipler * utility.EXTRA_Rock_PerRockery))/2f;
 		if (rock_chance > 0.5) rock_chance = 0.5f;
-		if (utility.rnd.nextFloat() < rock_chance 
+		if (utility.rnd() < rock_chance 
 				&& attack_rock == false
 				&& theSpriteManger.resource_manager.CanAffordBuy(BuildingType.AttractorRock,ObjectOwner.Enemy,false,false) == true) {
 			attack_rock = true;
@@ -282,7 +279,7 @@ public class AI implements Runnable {
 		
 		float scissors_chance = (((float) theSpriteManger.resource_manager.ENEMY_SCISSORS -2)/ (float)(utility.AI_TargetUnitMultipler * utility.EXTRA_Scissors_PerSmelter))/2f;
 		if (scissors_chance > 0.5) scissors_chance = 0.5f;
-		if (utility.rnd.nextFloat() < scissors_chance 
+		if (utility.rnd() < scissors_chance 
 				&& attack_scissors == false 
 				&& theSpriteManger.resource_manager.CanAffordBuy(BuildingType.AttractorScissors,ObjectOwner.Enemy,false,false) == true) {
 			attack_scissors = true;
@@ -293,7 +290,7 @@ public class AI implements Runnable {
 		if (toAttackWith.size() > 0) {
 			//decide rush or careful
 			boolean rush = false;
-			if (utility.rnd.nextFloat() > 0.5) rush = true;
+			if (utility.rnd() > 0.5) rush = true;
 			
 			float _multiplier = 0.2f * utility.ticks_per_tock;
 			if (rush == true) { //everyone goes max speed
@@ -377,7 +374,7 @@ public class AI implements Runnable {
 	}
 	
 	void CheckIfDefence() {
-		if (utility.rnd.nextFloat() > 0.25f) return;
+		if (utility.rnd() > 0.25f) return;
 		
 		final Vector<Sprite> toKill = new Vector<Sprite>();
 		for (Building _b : defence_attractors) {

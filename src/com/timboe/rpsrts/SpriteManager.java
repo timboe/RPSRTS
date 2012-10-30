@@ -11,12 +11,12 @@ public class SpriteManager {
 	}
 	
 	protected final Utility utility = Utility.GetUtility();
-	protected GameWorld theWorld = GameWorld.GetGameWorld();
-	
+	protected final GameWorld theWorld = GameWorld.GetGameWorld();
+	protected final ResourceManager resource_manager = ResourceManager.GetResourceManager();
+
 	public PathfinderGrid thePathfinderGrid;
 	protected Thread thePathfinderGridThread;
 	
-	public ResourceManager resource_manager;
 	private int ws_step = 0;
 	private float ws_time_of_last_operation;
 	private boolean worldSeeded;
@@ -35,7 +35,6 @@ public class SpriteManager {
 	public Building enemy_base;
 
 	protected final HashSet<Sprite> CollisionObjects = new HashSet<Sprite>();
-	//protected final Set<Sprite> CollisionObjectsThreadSafe = Collections.synchronizedSet(CollisionObjects);
 	protected final HashSet<Actor> ActorObjects = new HashSet<Actor>();
 	protected final HashSet<Building> BuildingOjects = new HashSet<Building>();
 	protected final HashSet<Resource> ResourceObjects = new HashSet<Resource>();
@@ -46,12 +45,12 @@ public class SpriteManager {
 
 
 	protected SpriteManager() {
+		System.out.println("--- Sprite Manager spawned: "+this);
 		worldSeeded = false;
-		resource_manager = new ResourceManager(this);
 		GlobalSpriteCounter = 0;
 		ticks_per_tock = utility.ticks_per_tock;
 		//Start the AI
-		theAI = new AI(theWorld,this,resource_manager);
+		theAI = new AI();
 		AI_thread = new Thread(theAI);
 	}
 
@@ -225,8 +224,8 @@ public class SpriteManager {
 		//is_resource == true prevents function returning true in vicinity of home base
 		int loop = 0;
 		while (++loop < _search_size) {
-			final int _x = (int) Math.round(location.getX() + (utility.rnd.nextGaussian() * loop));
-			final int _y = (int) Math.round(location.getY() + (utility.rnd.nextGaussian() * loop));
+			final int _x = (int) Math.round(location.getX() + (utility.rndG(0f,loop)));
+			final int _y = (int) Math.round(location.getY() + (utility.rndG(0f,loop)));
 			if (CheckSafe(true, true, _x, _y, _r, 0, 0)) {
 				if (is_resource) {
 					if (utility.Seperation(_x, player_base.GetX(), _y, player_base.GetY() ) < utility.resources_kept_away_from_base) {
@@ -317,7 +316,7 @@ public class SpriteManager {
 					&& _a.GetCollects().contains(_r.GetType()) //Client can gather
 					&& utility.Seperation(_r.GetLoc(), _b.GetLoc()) < _dist //Is nearer
 					&& _r.GetRemaining() > 0 //Is not depleted
-					&& (r == null || utility.rnd.nextFloat() < 1)) { //50% random chance to change (if not first node found) //TODO change back to 50%
+					&& (r == null || utility.rnd() < 1f)) { //50% random chance to change (if not first node found) //TODO change back to 50%
 				_dist = utility.Seperation(_r.GetLoc(), _b.GetLoc());
 				r = _r;
 			}
@@ -350,7 +349,7 @@ public class SpriteManager {
 		BuildingOjects.clear();
 		ResourceObjects.clear();
 		ProjectileObjects.clear();
-		resource_manager = new ResourceManager(this);
+		resource_manager.Reset();
 		thePathfinderGrid = null;
 	}
 
@@ -363,10 +362,11 @@ public class SpriteManager {
 		if (ws_step == 0 && (timeNow-ws_time_of_last_operation) > utility.wg_seconds_to_wait) {
 			++ws_step;
 			ws_time_of_last_operation = (System.nanoTime() / 1000000) / 1000.0f;
+			System.out.println("STATE: START SEED " + ws_step + " RND_C:" + utility.rnd_count);
 
 			//Setup the pathfinding grid 
 			System.out.println("CONSTRUCT GRID");
-			thePathfinderGrid = new PathfinderGrid(theWorld.tiles_size, theWorld.world_tiles, this, theWorld);
+			thePathfinderGrid = new PathfinderGrid();
 			thePathfinderGridThread = new Thread(thePathfinderGrid);
 			thePathfinderGridThread.start();
 			
@@ -378,11 +378,13 @@ public class SpriteManager {
 			if (player_location != null) {
 				player_base = PlaceBuilding(player_location, BuildingType.Base, ObjectOwner.Player);
 			} else {
+				System.out.println("---- !!!! ---- PLAYER BASE LOCATION NOT FOUND");
 				return -1;
 			}
 			if (enemy_location != null) {
 				enemy_base = PlaceBuilding(enemy_location, BuildingType.Base, ObjectOwner.Enemy);
 			} else {
+				System.out.println("---- !!!! ---- ENEMY BASE LOCATION NOT FOUND");
 				return -1;
 			}
 			
@@ -401,9 +403,8 @@ public class SpriteManager {
 			else {
 				Vector<WorldPoint> waypoint_list = pathfinder.GetResult();
 				if (waypoint_list == null) {
-					System.out.println("BASES NON NAVAGABLE");
+					System.out.println("---- !!!! ---- BASES NON NAVAGABLE");
 					return -1; //FAILED
-					//++ws_step;
 				} else {
 					++ws_step;
 				}
@@ -411,6 +412,7 @@ public class SpriteManager {
 		}
 		
 		if (ws_step == 2 && (timeNow-ws_time_of_last_operation) > utility.wg_seconds_to_wait) {
+			System.out.println("STATE: RESOURCE " + ws_step + " RND_C:" + utility.rnd_count);
 			++ws_step;
 			ws_time_of_last_operation = (System.nanoTime() / 1000000) / 1000.0f;
 			//initial plant!
@@ -439,13 +441,14 @@ public class SpriteManager {
 				}
 				float resDensity = _t.GetOwner().GetResourceDensity();
 				if (toPlant == ResourceType.Rockpile || toPlant == ResourceType.Mine) resDensity /= (float) utility.place_res_gaussian; //Trees only come in one
-				if (utility.rnd.nextFloat() < resDensity) { //TODO check reduction factor here
-					final WorldPoint look_around = new WorldPoint(_t.GetX() + utility.rnd.nextInt(tile_size), _t.GetY() + utility.rnd.nextInt(tile_size));
+				if (utility.rnd() < resDensity) { //TODO check reduction factor here
+					final WorldPoint look_around = new WorldPoint(_t.GetX() + utility.rndI(tile_size), _t.GetY() + utility.rndI(tile_size));
 					WorldPoint ideal_resource_loation = FindSpotForResource(look_around);// FindGoodSpot(look_around, utility.resourceRadius, tile_size, true);
 					if (ideal_resource_loation != null) {
 						//Try placing resources around a gaussian centred on 5
-						int toPlace = (int) (utility.place_res_gaussian + (utility.rnd.nextGaussian() * utility.place_res_gaussian));
-						if (utility.rnd.nextFloat() < 0.75f && (toPlant == ResourceType.Cactus || toPlant == ResourceType.Tree)) toPlace = 1; //Trees only come in one
+						//int toPlace = (int) (utility.place_res_gaussian + (utility.rnd.nextGaussian() * utility.place_res_gaussian));
+						int toPlace = (int) (utility.rndG(utility.place_res_gaussian, utility.place_res_gaussian));
+						if (utility.rnd() < 0.75f && (toPlant == ResourceType.Cactus || toPlant == ResourceType.Tree)) toPlace = 1; //Trees only come in one
 						for (int place = 0; place < toPlace; ++place) {
 							if (ideal_resource_loation != null) PlaceResource(ideal_resource_loation, toPlant, false);
 							//get new location nearby
@@ -455,17 +458,17 @@ public class SpriteManager {
 				}
 			}
 			System.out.println("THERE IS IN THE WORLD: "+resource_manager.GLOBAL_WOOD+" WOOD, "+resource_manager.GLOBAL_IRON+" IRON AND "+resource_manager.GLOBAL_STONE+" STONE");
-			float avRes = (resource_manager.GLOBAL_WOOD+resource_manager.GLOBAL_IRON+resource_manager.GLOBAL_STONE)/3.f;
-			float resMult = utility.resource_desired_global / avRes;
-			for (Resource _r : ResourceObjects) {
-				int ToAdd = (int) (_r.GetRemaining() * (resMult - 1.));
-				//System.out.println("current:"+_r.GetRemaining()+" toAdd:"+ToAdd );
-				_r.Add( ToAdd ); //TODO broken fix me
-			}
-			System.out.println("AV Res:"+avRes+" multiplier:"+resMult);
-			System.out.println("THERE IS IN THE WORLD: "+resource_manager.GLOBAL_WOOD+" WOOD, "+resource_manager.GLOBAL_IRON+" IRON AND "+resource_manager.GLOBAL_STONE+" STONE");
-			avRes = (resource_manager.GLOBAL_WOOD+resource_manager.GLOBAL_IRON+resource_manager.GLOBAL_STONE)/3.f;
-			System.out.println("AV Res:"+avRes+" avRes Target:"+utility.resource_desired_global);
+//			float avRes = (resource_manager.GLOBAL_WOOD+resource_manager.GLOBAL_IRON+resource_manager.GLOBAL_STONE)/3.f;
+//			float resMult = utility.resource_desired_global / avRes;
+//			for (Resource _r : ResourceObjects) {
+//				int ToAdd = (int) (_r.GetRemaining() * (resMult - 1.));
+//				//System.out.println("current:"+_r.GetRemaining()+" toAdd:"+ToAdd );
+//				_r.Add( ToAdd ); //TODO broken fix me
+//			}
+//			System.out.println("AV Res:"+avRes+" multiplier:"+resMult);
+//			System.out.println("THERE IS IN THE WORLD: "+resource_manager.GLOBAL_WOOD+" WOOD, "+resource_manager.GLOBAL_IRON+" IRON AND "+resource_manager.GLOBAL_STONE+" STONE");
+//			avRes = (resource_manager.GLOBAL_WOOD+resource_manager.GLOBAL_IRON+resource_manager.GLOBAL_STONE)/3.f;
+//			System.out.println("AV Res:"+avRes+" avRes Target:"+utility.resource_desired_global);
 		}
 
 		if (ws_step == 3 && (timeNow-ws_time_of_last_operation) > utility.wg_seconds_to_wait) {
@@ -486,15 +489,24 @@ public class SpriteManager {
 					starting_troops = FindGoodSpot(starting, utility.actorRadius, utility.look_for_spot_radius, false);
 					if (starting_troops != null) {
 						PlaceActor(starting_troops, ActorType.Scissors, oo);
-					} else return -1;
+					} else {
+						System.out.println("---- !!!! ---- CANNOT PLACE STARTING SCISSOR ACTOR");
+						return -1;
+					}
 					starting_troops = FindGoodSpot(starting, utility.actorRadius, utility.look_for_spot_radius, false);
 					if (starting_troops != null) {
 						PlaceActor(starting_troops, ActorType.Rock, oo);
-					} else return -1; 
+					} else {
+						System.out.println("---- !!!! ---- CANNOT PLACE STARTING ROCK ACTOR");
+						return -1; 
+					}
 					starting_troops = FindGoodSpot(starting, utility.actorRadius, utility.look_for_spot_radius, false);
 					if (starting_troops != null) {
 						PlaceActor(starting_troops, ActorType.Paper, oo);
-					} else return -1;
+					} else {
+						System.out.println("---- !!!! ---- CANNOT PLACE STARTING PAPER ACTOR");
+						return -1;
+					}
 				}
 			}
 		}
@@ -503,6 +515,7 @@ public class SpriteManager {
 			++ws_step;
 			ws_time_of_last_operation = (System.nanoTime() / 1000000) / 1000.0f;
 			worldSeeded = true;
+			System.out.println("STATE: MAGIC FINAL NUMBER AT SPRITE STATE " + ws_step + " RND_C:" + utility.rnd_count);
 		}
 
 		return ws_step;

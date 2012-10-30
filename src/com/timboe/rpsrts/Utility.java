@@ -3,40 +3,66 @@ package com.timboe.rpsrts;
 import java.util.Random;
 
 public class Utility {
-	
 	private static Utility singleton = new Utility();
-	
 	public static Utility GetUtility() {
 		return singleton;
 	}
 
-	//Program configuration
+	//RANDOM NUMBER SOURCE
 	public String rndSeedTxt = "Dave";
-	public final Random rnd = new Random(rndSeedTxt.hashCode());
+	private final Random rndGen = new Random(rndSeedTxt.hashCode());
+	//public final Random rnd2 = new Random(0);
+	public boolean worldGenLock = false;
+	public int rnd_count = 0;
+	private boolean rand_off = true;
+	public float rnd() {
+		++rnd_count;
+		if (rand_off == true) return 0.3f;
+		else 
+		return rndGen.nextFloat();
+	}
+	public int rndI(int _n) {
+		++rnd_count;
+		if (rand_off == true) return 1;
+		else return rndGen.nextInt(_n);
+	}
+	public int rndI() {
+		++rnd_count;
+		if (rand_off == true) return 1;
+		else return rndGen.nextInt();
+	}
+	public float rndG(float _mean, float _sigma) {
+		++rnd_count;
+		if (rand_off == true) return (_mean + ( _sigma * 0.3f ));
+		else return (float) (_mean + ( _sigma * rndGen.nextGaussian() ));
+	}
+	public void setSeed() {
+		rndGen.setSeed(rndSeedTxt.hashCode());
+		rnd_count = 0;
+	}
+	
+	//Global variables
+	public boolean dbg = false; //debug flag
+	public float rotateAngle = 0f; //smooth rotation during world gen
+	public boolean doWorldGen = false; //proceed with building world
+	public int pathfind_counter = 0; //pathfinding counter
+	GameMode gameMode = GameMode.titleScreen; //what state is game currently in
+	long loose_time; //what time was game won/lost
+
+	//---------\\
+	// STATICS \\
+	//---------\\
 	
 	//World parameters
-	public int window_X = 1000;
-	public int window_Y = 600;
-	public int tiles_per_chunk = 8; //Used for coarse kT algo
-	public int world_tiles = 176; //Number of tile elements on X
-	public int tiles_size = 7; //Size of tile element in pixels
+	public final int window_X = 1000;
+	public final int window_Y = 600;
+	public final int tiles_per_chunk = 8; //Used for coarse kT algo
+	public final int world_tiles = 176; //Number of tile elements on X
+	public final int tiles_size = 7; //Size of tile element in pixels
 	
-	public boolean dbg = false;
-	public boolean wg = false;
-	
-	public float rotateAngle = 0f;
-	
-	public boolean doWorldGen = false;
-	
-	GameMode gameMode = GameMode.titleScreen;
-	long loose_time;
-
 	//time settings
 	public final int ticks_per_tock = 30;
-	
-	//pathfinding counter
-	public int pathfind_counter = 0;
-	
+
 	//world manager settings
 	public final float wg_seconds_to_wait = 0f; //Time to wait between steps
 	public final int wg_DegInCircle = 360;
@@ -45,7 +71,7 @@ public class Utility {
 	public final int wg_CrinkleCoarseness = 3; //Maximum gradient to smear under
 	public final float wg_kTStartPt = 1.f; //Min random chunk energy
 	public final float wg_kTEndPt = 10.f; //Max random chunk energy
-	public       float wg_kT_R = 70; //kT algorithm R parameter  (SET IN INIT)
+	public final float wg_kT_R =  14 * tiles_size; //kT algorithm R parameter  (derived)
 	public final int wg_MinBiomes = 15; //Min number of generated biomes
 	public final long wg_MaxBiomes = 65; //Max number of generated biomes
 	public final float wg_MainBaseRadius = 0.8f; //How far out the main bases are placed
@@ -57,8 +83,7 @@ public class Utility {
 
 	//sprite manager settings
 	public final int pathfinding_max_depth = 100000; //kill pathfinding early in the 500-2000 range
-	//Current code assumes that pathfinding accuracy == tile size
-	public final int pathfinding_accuracy = 7; //MASSIVE performance hit for reducing this
+//	public final int pathfinding_accuracy = 7; //Current code assumes that pathfinding accuracy == tile size
 	public final int look_for_spot_radius = 200; //loops to look for safe place location around point, search increasing each time
 	public final int buildingRadius = 8;
 	public final int attractorRadius = 4;
@@ -66,7 +91,7 @@ public class Utility {
 	public final int projectileRadius = 2;
 	public final int resourceRadius = 3;
 	public final int resources_kept_away_from_base = 50; //clear area around main bases
-	public int place_res_gaussian = 2;
+	public final int place_res_gaussian = 2;
 
 	//actor settings
 	public final int starting_actors = 2;
@@ -78,7 +103,7 @@ public class Utility {
 	public final int actor_aggro_radius = 60;
 
 	//biome settings
-	public       int biome_golbal_density_mod = 0; //set in init
+	public final int biome_golbal_density_mod = tiles_size; //derived
 	public final float biome_colour_range = 10; //smear of colours in biome
 	public final int biome_desert_min_density = 2 + biome_golbal_density_mod;
 	public final int biome_desert_rnd_density = 2 + biome_golbal_density_mod;
@@ -88,8 +113,7 @@ public class Utility {
 	public final int biome_forest_rnd_density = 6 + biome_golbal_density_mod;
 
 	//resource settings
-	public final int not_reachable_penelty_tocks = 20; //if an actor fails to pathfind to this as a target, how long to quarantine for.
-	//This floats with every fail.
+	public final int not_reachable_penelty_tocks = 20; //if an actor fails to pathfind to this as a target, how long to quarantine for. This floats with every fail.
 	public final int resource_rnd = 20;
 	public final int resource_min = 10;
 	public final int resource_desired_global = 4000;
@@ -118,35 +142,37 @@ public class Utility {
 	
 	//COSTS
 	public final int StartingResources = 500;
+	public final int COST_Building_Base = 100;
+	public final int COST_Attractor_Base = 25;
+	public final int COST_Actor_Base = 20;
+	public final int EXTRA_Base = 6;
 	//0_0\\
 	public final int COST_Woodshop_Wood = 0; //sec
-	public final int COST_Woodshop_Iron = 100; //pri
+	public final int COST_Woodshop_Iron = COST_Building_Base; //pri
 	public final int COST_Woodshop_Stone = 0; //ter
 	//0_0\\
 	public final int COST_Smelter_Wood = 0; //ter
 	public final int COST_Smelter_Iron = 0; //sec
-	public final int COST_Smelter_Stone = 100; //pri
+	public final int COST_Smelter_Stone = COST_Building_Base; //pri
 	//0_0\\
-	public final int COST_Rockery_Wood = 100; //pri
+	public final int COST_Rockery_Wood = COST_Building_Base; //pri
 	public final int COST_Rockery_Iron = 0; //ter
 	public final int COST_Rockery_Stone = 0; //sec
 	//0_0\\
-	public final int COST_Paper_Wood = 10;
-	public final int COST_Scissors_Iron = 20;
-	public final int COST_Rock_Stone = 40;
+	public final int COST_Paper_Wood = COST_Actor_Base/2;
+	public final int COST_Scissors_Iron = COST_Actor_Base;
+	public final int COST_Rock_Stone = COST_Actor_Base*2;
 
-	public final int COST_AttractorPaper_Wood = 25;
-	public final int COST_AttractorRock_Stone = 25;
-	public final int COST_AttractorScissors_Iron = 25;
+	public final int COST_AttractorPaper_Wood = COST_Attractor_Base;
+	public final int COST_AttractorRock_Stone = COST_Attractor_Base;
+	public final int COST_AttractorScissors_Iron = COST_Attractor_Base;
 
-	public final int EXTRA_Paper_PerWoodmill = 12;
-	public final int EXTRA_Rock_PerRockery = 3;
-	public final int EXTRA_Scissors_PerSmelter = 6;
+	public final int EXTRA_Paper_PerWoodmill = EXTRA_Base*2;
+	public final int EXTRA_Rock_PerRockery = EXTRA_Base/2;
+	public final int EXTRA_Scissors_PerSmelter = EXTRA_Base;
 	
 	private Utility() {
-		//calculated on fly
-		wg_kT_R = 14 * tiles_size;
-		biome_golbal_density_mod = tiles_size;
+		System.out.println("--- Utility spawned: "+this);
 	}
 
 	public WorldPoint PolarToCartesian(float _angle, float _radius) {
@@ -173,7 +199,10 @@ public class Utility {
 				&& _ID < _world_tiles*_world_tiles
 				&& Math.abs(_x) <= ((tiles_size*_world_tiles)/2)
 				&& Math.abs(_y) <= ((tiles_size*_world_tiles)/2)) return _ID;
-		else return -1; //if not legit
+		else {
+			System.out.println("--- Illigitimate ID requested in XYtoID");
+			return -1; //if not legit
+		}
 	}
 
 }

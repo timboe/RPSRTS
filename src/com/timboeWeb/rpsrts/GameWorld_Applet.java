@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.HashSet;
 
+import com.timboe.rpsrts.Biome;
 import com.timboe.rpsrts.GameWorld;
 import com.timboe.rpsrts.WorldTile;
 
@@ -31,6 +32,7 @@ public class GameWorld_Applet extends GameWorld {
 		tiles = new WorldTile_Applet[world_tiles*world_tiles];
 		chunks = new WorldChunk_Applet[world_chunks*world_chunks];
 		render_tiles = new HashSet<WorldTile>();
+		biomes = new HashSet<Biome>();
 		
 		int ID = 0;
 	    for (int x = -(world_size/2); x < (world_size/2); x = x + tiles_size) {

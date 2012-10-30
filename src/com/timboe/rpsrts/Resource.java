@@ -13,13 +13,13 @@ public class Resource extends Sprite {
 	public Resource(int _ID, int _x, int _y, int _r, ResourceType _type) {
 		super(_ID, _x, _y, _r);
 		type = _type;
-		int _start_stuff = utility.rnd.nextInt(utility.resource_rnd)
+		int _start_stuff = utility.rndI(utility.resource_rnd)
 				+ utility.resource_min;
 		
 		penalty_size = utility.not_reachable_penelty_tocks;
 		Add(_start_stuff);
 		
-		toDraw = utility.rnd.nextInt(4); //for mines and rockpiles
+		toDraw = utility.rndI(4); //for mines and rockpiles
 		
 		//snap me to the world grid
 		WeightedPoint _my_snap = theSpriteManager.ClipToGrid(this.GetLoc());
@@ -99,10 +99,10 @@ public class Resource extends Sprite {
 		if (not_reachable_penalty > 0) {
 			--not_reachable_penalty;
 		}
-		if (utility.rnd.nextFloat() < utility.resource_chance_grow 
+		if (utility.rnd() < utility.resource_chance_grow 
 				&& stuff < utility.resource_max_stuff ) {
 			++stuff;
-		} else if (utility.rnd.nextFloat() < utility.resource_change_spawn) {
+		} else if (utility.rnd() < utility.resource_change_spawn) {
 			WorldPoint spawn_loc = theSpriteManager.FindSpotForResource(this.loc);// theSpriteManagerFindGoodSpot(loc, theSpriteManager.utility.resourceRadius, theSpriteManager.theWorld.GetTileSize(), true);
 			if (spawn_loc != null) {
 				theSpriteManager.PlaceResource(spawn_loc, this.GetType(), true);

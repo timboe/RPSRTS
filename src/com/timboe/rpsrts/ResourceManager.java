@@ -1,9 +1,13 @@
 package com.timboe.rpsrts;
 
 public class ResourceManager {
+	private static ResourceManager singleton = new ResourceManager();
+	public static ResourceManager GetResourceManager() {
+		return singleton;
+	}
+	
 	private final Utility utility = Utility.GetUtility();
-
-	SpriteManager theSpriteManager;
+	private final SpriteManager theSpriteManager = SpriteManager.GetSpriteManager();
 
 	//
 	public boolean GEN_PAPER_PLAYER = true;
@@ -122,9 +126,11 @@ public class ResourceManager {
 		return amount_per_attractor;
 	}
 
-	public ResourceManager(SpriteManager _sm) {
-		theSpriteManager = _sm;
-
+	private ResourceManager() {
+		Reset();
+	}
+	
+	public void Reset() {
 		PLAYER_IRON = utility.StartingResources;
 		PLAYER_STONE = utility.StartingResources;
 		PLAYER_WOOD = utility.StartingResources;

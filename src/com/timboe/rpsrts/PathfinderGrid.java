@@ -5,25 +5,21 @@ import java.util.HashSet;
 
 public class PathfinderGrid implements Runnable {
 	private final Utility utility = Utility.GetUtility();
-
+	private final GameWorld theWorld = GameWorld.GetGameWorld();
+	
 	public HashSet<WeightedPoint> point_collection = new HashSet<WeightedPoint>();
 	public HashMap<WorldPoint,WeightedPoint> point_collection_map = new HashMap<WorldPoint,WeightedPoint>();
-	SpriteManager theSpriteManager;	
-	int step;
 	
-	PathfinderGrid(int _tile_size, int _world_tiles, SpriteManager _sm, GameWorld _gw) {
-		theSpriteManager = _sm;
-		step = utility.pathfinding_accuracy;
-		
-		int world_size = (_world_tiles*_tile_size);
+	PathfinderGrid() {
+		int world_size = (utility.world_tiles*utility.tiles_size);
 
 		int ID = 0;
-		for (int x = -(world_size/2); x < (world_size/2); x = x + _tile_size) {
-			for (int y = -(world_size/2); y < (world_size/2); y = y + _tile_size) {
-				if (_gw.tiles[ID++].GetWalkable() == false) continue; //unreachable
-				WeightedPoint WP = new WeightedPoint(x+(_tile_size/2), y+(_tile_size/2));
+		for (int x = -(world_size/2); x < (world_size/2); x = x + utility.tiles_size) {
+			for (int y = -(world_size/2); y < (world_size/2); y = y + utility.tiles_size) {
+				if (theWorld.tiles[ID++].GetWalkable() == false) continue; //unreachable
+				WeightedPoint WP = new WeightedPoint(x+(utility.tiles_size/2), y+(utility.tiles_size/2));
 				point_collection.add(WP);
-				point_collection_map.put(new WorldPoint(x+(_tile_size/2),y+(_tile_size/2)), WP);
+				point_collection_map.put(new WorldPoint(x+(utility.tiles_size/2),y+(utility.tiles_size/2)), WP);
 			}
 		}
 		
@@ -33,15 +29,15 @@ public class PathfinderGrid implements Runnable {
 				int neighbour_x = 0;
 				int neighbour_y = 0;
 				switch (neighbour) {
-					case 4: neighbour_x = _P.GetX() + _tile_size; neighbour_y = _P.GetY() + _tile_size; break;
-					case 5: neighbour_x = _P.GetX() - _tile_size; neighbour_y = _P.GetY() + _tile_size; break;
-					case 6: neighbour_x = _P.GetX() + _tile_size; neighbour_y = _P.GetY() - _tile_size; break;
-					case 7: neighbour_x = _P.GetX() - _tile_size; neighbour_y = _P.GetY() - _tile_size; break;
+					case 4: neighbour_x = _P.GetX() + utility.tiles_size; neighbour_y = _P.GetY() + utility.tiles_size; break;
+					case 5: neighbour_x = _P.GetX() - utility.tiles_size; neighbour_y = _P.GetY() + utility.tiles_size; break;
+					case 6: neighbour_x = _P.GetX() + utility.tiles_size; neighbour_y = _P.GetY() - utility.tiles_size; break;
+					case 7: neighbour_x = _P.GetX() - utility.tiles_size; neighbour_y = _P.GetY() - utility.tiles_size; break;
 					
-					case 0: neighbour_x = _P.GetX() + _tile_size; neighbour_y = _P.GetY(); break;
-					case 1: neighbour_x = _P.GetX() - _tile_size; neighbour_y = _P.GetY(); break;
-					case 2: neighbour_x = _P.GetX(); neighbour_y = _P.GetY() + _tile_size; break;
-					case 3: neighbour_x = _P.GetX(); neighbour_y = _P.GetY() - _tile_size; break;
+					case 0: neighbour_x = _P.GetX() + utility.tiles_size; neighbour_y = _P.GetY(); break;
+					case 1: neighbour_x = _P.GetX() - utility.tiles_size; neighbour_y = _P.GetY(); break;
+					case 2: neighbour_x = _P.GetX(); neighbour_y = _P.GetY() + utility.tiles_size; break;
+					case 3: neighbour_x = _P.GetX(); neighbour_y = _P.GetY() - utility.tiles_size; break;
 				}
 
 				WeightedPoint _n = point_collection_map.get(new WorldPoint(neighbour_x, neighbour_y));

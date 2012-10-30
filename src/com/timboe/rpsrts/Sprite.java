@@ -31,12 +31,12 @@ public class Sprite implements Comparable<Sprite> {
 		ID = _ID;
 		x= _x;
 		y = _y;
-		x_prec = _x + utility.rnd.nextFloat() - .5f;
-		y_prec = _y + utility.rnd.nextFloat() - .5f;
+		x_prec = _x + utility.rnd() - .5f;
+		y_prec = _y + utility.rnd() - .5f;
 		r = _r;
 		loc = new WorldPoint();
 		ticks_per_tock = utility.ticks_per_tock;
-		tick_offset = utility.rnd.nextInt(ticks_per_tock);
+		tick_offset = utility.rndI(ticks_per_tock);
 		animSteps = 4;
 		animStep = 0;
 		flashTicks = 0;

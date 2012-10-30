@@ -5,7 +5,6 @@ import java.util.HashSet;
 public class Biome {
 	private final Utility utility = Utility.GetUtility();
 
-	GameWorld theWorld;
 	int ID = 0;
 	BiomeType type;
 	HashSet<WorldTile> ownedTiles;
@@ -21,8 +20,7 @@ public class Biome {
 	int set_b;
 
 
-	public Biome(int _ID, GameWorld _gw) {
-		theWorld = _gw;
+	public Biome(int _ID) {
 		ID = _ID;
 		ownedTiles = new HashSet<WorldTile>();
 		type = BiomeType.NONE;
@@ -38,20 +36,20 @@ public class Biome {
 	public void AssignBiomeType(BiomeType _type) {
 		type = _type;
 		if (type == BiomeType.DESERT) {
-			r = (int) (218 + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
-			g = (int) (165 + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
-			b = (int) (32 + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
-			resourceDensity = (float) ((utility.rnd.nextInt(utility.biome_desert_rnd_density) + utility.biome_desert_min_density) / 100.);
+			r = (int) (218 + Math.round(utility.rndG(0, utility.biome_colour_range)));  //XXX RND BUG
+			g = (int) (165 + Math.round(utility.rndG(0, utility.biome_colour_range)));
+			b = (int) (32 + Math.round(utility.rndG(0, utility.biome_colour_range)));
+			resourceDensity = (float) ((utility.rndI(utility.biome_desert_rnd_density) + utility.biome_desert_min_density) / 100.);
 		} else if (type == BiomeType.FORREST) {
-			r = (int) (46 + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
-			g = (int) (139 + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
-			b = (int) (87 + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
-			resourceDensity = (float) ((utility.rnd.nextInt(utility.biome_forest_rnd_density) + utility.biome_forest_min_density) / 100.);
+			r = (int) (46 + Math.round(utility.rndG(0, utility.biome_colour_range)));  //XXX RND BUG
+			g = (int) (139 + Math.round(utility.rndG(0, utility.biome_colour_range)));
+			b = (int) (87 + Math.round(utility.rndG(0, utility.biome_colour_range)));
+			resourceDensity = (float) ((utility.rndI(utility.biome_forest_rnd_density) + utility.biome_forest_min_density) / 100.);
 		} else if (type == BiomeType.GRASS) {
-			r = (int) (154 + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
-			g = (int) (205 + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
-			b = (int) (50 + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
-			resourceDensity = (float) ((utility.rnd.nextInt(utility.biome_grass_rnd_density) + utility.biome_grass_min_density) / 100.);
+			r = (int) (154 + Math.round(utility.rndG(0, utility.biome_colour_range)));  //XXX RND BUG
+			g = (int) (205 + Math.round(utility.rndG(0, utility.biome_colour_range)));
+			b = (int) (50 + Math.round(utility.rndG(0, utility.biome_colour_range)));
+			resourceDensity = (float) ((utility.rndI(utility.biome_grass_rnd_density) + utility.biome_grass_min_density) / 100.);
 		} else if (type == BiomeType.WATER) {
 			r = 65;
 			g = 105;
@@ -75,7 +73,7 @@ public class Biome {
 		}
 		centre_x /= ownedTiles.size();
 		centre_y /= ownedTiles.size();
-		//System.out.println("centre of cluster "+ID+" is:("+centre_x+","+centre_y+")");
+		//System.out.println("centre of cluster "+ID+" is:("+centre_x+","+centre_y+")"); 
 	}
 
 	private int Constrain(int _c) {
@@ -106,15 +104,14 @@ public class Biome {
 		else
 			return true;
 	}
-
+	
 	private void RandomColour() {
-		int _r = (int) (r + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
-		int _g = (int) (g + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
-		int _b = (int) (b + Math.round(utility.rnd.nextGaussian() * utility.biome_colour_range));
+		int _r = Math.round(0 + utility.rndG(0, utility.biome_colour_range));  //XXX RND BUG
+		int _g = 50;//Math.round(g + utility.rndG(0, utility.biome_colour_range));
+		int _b = 50;//Math.round(b + utility.rndG(0, utility.biome_colour_range));
 		set_r = Constrain(_r);
 		set_g = Constrain(_g);
 		set_b = Constrain(_b);
-		//return new Color(_r,_g,_b);
 	}
 
 	public void RemoveTile(WorldTile _t){

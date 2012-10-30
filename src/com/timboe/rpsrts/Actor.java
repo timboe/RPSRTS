@@ -70,7 +70,7 @@ public class Actor extends Sprite {
 
 		
 		health = maxHealth;
-		animStep = utility.rnd.nextInt(animSteps);
+		animStep = utility.rndI(animSteps);
 	}
 
 	private boolean AttemptMove(float _suggest_new_x, float _suggest_new_y) {
@@ -194,7 +194,7 @@ public class Actor extends Sprite {
 		if (tick == true) {
 			if (wander != null
 					|| utility.Seperation(GetLoc(), attack_target.GetLoc()) > attack_range
-					|| utility.rnd.nextFloat() < (0.05 * RPS)) { //TODO tweak this range, currently paper wander 20% tick
+					|| utility.rnd() < (0.05f * RPS)) { //TODO tweak this range, currently paper wander 20% tick
 				//if (wander == null) wander = theSpriteManager.FindGoodSpot(attack_target.GetLoc(), r, attack_range, false);
 				WanderAbout(attack_target, attack_range, attack_range/2);
 			}
@@ -353,7 +353,7 @@ public class Actor extends Sprite {
 			float radiusToAchieve = 1f; //If pathfinding to pathfind node
 			if (waypoint_list == null || waypoint_list.size() == 0)
 			 {
-				radiusToAchieve = utility.pathfinding_accuracy + r + destination.GetR(); //If final target
+				radiusToAchieve = utility.tiles_size + r + destination.GetR(); //If final target (pathfinding accuracy now tiles_size)
 			}
 			if (_hypotenuse <= radiusToAchieve) { //At waypoint?
 				//Is there another waypoint?
@@ -514,8 +514,8 @@ public class Actor extends Sprite {
 
 	public void WanderAbout (Sprite _target, int _wander_radius, int _pull) { //target optional - random walk towards target
 		if (wander == null) {
-			int pull_x = (int) (x_prec - _wander_radius + utility.rnd.nextInt(_wander_radius*2));
-			int pull_y = (int) (y_prec - _wander_radius + utility.rnd.nextInt(_wander_radius*2));
+			int pull_x = (int) (x_prec - _wander_radius + utility.rndI(_wander_radius*2));
+			int pull_y = (int) (y_prec - _wander_radius + utility.rndI(_wander_radius*2));
 			if (_target != null) {
 				if (x_prec > _target.GetX()) {
 					pull_x -= _pull;

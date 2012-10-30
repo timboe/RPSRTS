@@ -1,7 +1,7 @@
 package com.timboe.rpsrts;
 
 import java.util.HashSet;
-import java.util.Vector;
+import java.util.LinkedList;
 
 public class GameWorld {
 	protected final Utility utility = Utility.GetUtility();
@@ -21,10 +21,10 @@ public class GameWorld {
 
 	protected WorldTile tiles[];
 	protected WorldChunk chunks[];
-	private final HashSet<Biome> biomes;
+	protected HashSet<Biome> biomes = null;
 	protected HashSet<WorldTile> render_tiles;
 	protected final long island_offset[];
-	private Biome ocean;
+	protected Biome ocean;
 
 	private boolean wg_finished;
 	private int wg_state;
@@ -33,7 +33,7 @@ public class GameWorld {
 
 
 	protected GameWorld() {
-		biomes = new HashSet<Biome>();
+		System.out.println("--- Game World spawned: "+this);
 		island_offset = new long[utility.wg_DegInCircle];
 		wg_finished = false;
 		wg_state = 0;
@@ -70,30 +70,34 @@ public class GameWorld {
 	}
 
 	public int GenerateWorld() {
-		final float timeNow = (System.nanoTime() / 1000000) / 1000.0f;
+		final float timeNow = (System.nanoTime() / 10000000000f);
 
+		if (utility.doWorldGen == false) return 1; //Stop until player clicks GO
+		
 		if (wg_state == 0) {
 			Reset();
-			wg_time_of_last_operation = (System.nanoTime() / 1000000) / 1000.0f;
+			wg_time_of_last_operation = (System.nanoTime() / 10000000000f);
 			wg_state = 1;
+			System.out.println("STATE: reset " + wg_state + " RND_C:" + utility.rnd_count);
 		}
-		
-		if (utility.doWorldGen == false) return 1; //Stop until player clicks GO
 
 		if (wg_state == 1 && (timeNow-wg_time_of_last_operation) > utility.wg_seconds_to_wait ) {
 			GenerateWorld_CrinkleIslandEdge();
-			wg_time_of_last_operation = (System.nanoTime() / 1000000) / 1000.0f;
+			wg_time_of_last_operation = (System.nanoTime() / 10000000000f);
 			++wg_state;
+			System.out.println("STATE: crinkle " + wg_state + " RND_C:" + utility.rnd_count);
 		}
 
 		if (wg_state == 2 && (timeNow-wg_time_of_last_operation) > utility.wg_seconds_to_wait ) {
 			GenerateWorld_RandomSeed();
-			wg_time_of_last_operation = (System.nanoTime() / 1000000) / 1000.0f;
+			wg_time_of_last_operation = (System.nanoTime() / 10000000000f);
 			++wg_state;
+			System.out.println("STATE: RND SEED " + wg_state + " RND_C:" + utility.rnd_count);
 		}
 
 		if (wg_state == 3 && (timeNow-wg_time_of_last_operation) > utility.wg_seconds_to_wait ) {
 			++wg_state;
+			System.out.println("STATE: WAIT " + wg_state + " RND_C:" + utility.rnd_count);
 			return wg_state;
 		}
 
@@ -104,32 +108,37 @@ public class GameWorld {
 			else if (nBiomes < utility.wg_MinBiomes || nBiomes > utility.wg_MaxBiomes) {
 				wg_state = 1;
 			} else {
-				wg_time_of_last_operation = (System.nanoTime() / 1000000) / 1000.0f;
+				wg_time_of_last_operation = (System.nanoTime() / 10000000000f);
 				++wg_state;
+				System.out.println("STATE: KT (CHECK BIOME N)  " + wg_state + " RND_C:" + utility.rnd_count);
 			}
 		}
 
 		if (wg_state == 5 && (timeNow-wg_time_of_last_operation) > utility.wg_seconds_to_wait ) {
 			final boolean allGood = GenerateWorld_AssignBiomes();
 			if (allGood == false) {
+				System.out.println("--WORLD GEN FAILS ON ASSIGN BIOMES");
 				wg_state = 1;
 			} else {
-				wg_time_of_last_operation = (System.nanoTime() / 1000000) / 1000.0f;
+				wg_time_of_last_operation = (System.nanoTime() / 10000000000f);
 				++wg_state;
+				System.out.println("STATE: ASSIGN BIOME " + wg_state + " RND_C:" + utility.rnd_count);
 			}
 		}
 
 		if (wg_state == 6 && (timeNow-wg_time_of_last_operation) > utility.wg_seconds_to_wait ) {
 			GenerateWorld_ErodeEdges();
-			wg_time_of_last_operation = (System.nanoTime() / 1000000) / 1000.0f;
+			wg_time_of_last_operation = (System.nanoTime() / 10000000000f);
 			++wg_state;
+			System.out.println("STATE: ERODE " + wg_state + " RND_C:" + utility.rnd_count);
 		}
 
 		if (wg_state == 7 && (timeNow-wg_time_of_last_operation) > utility.wg_seconds_to_wait ) {
 			++wg_times_erroded;
-			wg_time_of_last_operation = (System.nanoTime() / 1000000) / 1000.0f;
+			wg_time_of_last_operation = (System.nanoTime() / 10000000000f);
 			if (wg_times_erroded == utility.wg_ErrodeIterations)  {
 				++wg_state;
+				System.out.println("STATE:" + wg_state + " RND_C:" + utility.rnd_count);
 			} else {
 				GenerateWorld_ErodeEdges();
 			}
@@ -138,6 +147,7 @@ public class GameWorld {
 		if (wg_state == 8) {
 			//Remove un-neaded water
 			GenerateWorld_TrimWater();
+			System.out.println("STATE: WATER TRIM " + wg_state + " RND_C:" + utility.rnd_count);
 			wg_finished = true;
 		}
 
@@ -219,9 +229,11 @@ public class GameWorld {
 	}
 
 	private boolean GenerateWorld_AssignBiomes() {
+		//System.out.println("STATE: ENTER BIOME CODE " + wg_state + " RND_C:" + utility.rnd_count);
+
 		//Create Biome objects
 		biomes.clear();
-		ocean = new Biome(1, this);
+		ocean = new Biome(1);
 		ocean.AssignBiomeType(BiomeType.WATER);
 		for (final WorldChunk c : chunks) {
 			Biome _b = null;
@@ -237,7 +249,7 @@ public class GameWorld {
 			}
 			if (_b == null) {
 				//System.out.println("make biome with ID:"+BiomeID);
-				_b = new Biome(BiomeID, this);
+				_b = new Biome(BiomeID);
 				biomes.add(_b);
 			}
 			//Now loop over tiles which belong to this chunk, add them to the biome
@@ -258,11 +270,14 @@ public class GameWorld {
 				}
 			}
 		}
+		
+//		System.out.println("STATE: MID 1  BIOME " + wg_state + " RND_C:" + utility.rnd_count);
 
 	    //Each biome can now work out its centre of gravity
 		for (final Biome b : biomes) {
 			b.CalculateCentre();
 		}
+//		System.out.println("STATE: MID 2  BIOME " + wg_state + " RND_C:" + utility.rnd_count);
 
 		//Now biomes own their base tiles, need to assign biome types.
 		//First populate nearest to home base of teams.
@@ -273,6 +288,7 @@ public class GameWorld {
 		final int home_enemy = (int) -Math.round( Math.sqrt(Math.pow(enemy_radius * utility.wg_MainBaseRadius, 2) / 2) );
 
 		//System.out.println("homePlayer:"+home_player+" homeEnemy:"+home_enemy);
+//		System.out.println("STATE: MID 3  BIOME " + wg_state + " RND_C:" + utility.rnd_count);
 
 		BiomeType toAssign_type = null;
 		for (int toAssign = 0; toAssign < 7; ++toAssign) {
@@ -312,13 +328,16 @@ public class GameWorld {
 			toAssign_payer.AssignBiomeType(toAssign_type);
 			toAssign_enemy.AssignBiomeType(toAssign_type);
 		}
+		
+//		System.out.println("STATE: MID 4  BIOME " + wg_state + " RND_C:" + utility.rnd_count);
+
 
 		//Assign rest at random
 		for (final Biome b : biomes) {
 			if (b.GetBiomeType() != BiomeType.NONE) {
 				continue;
 			}
-			final int toAssign = utility.rnd.nextInt(7);
+			final int toAssign = utility.rndI(7);//utility.rnd.nextInt(7); //XXX RND BUG
 			switch (toAssign) {
 				case 0: case 1:	toAssign_type = BiomeType.GRASS;
 				break;
@@ -331,18 +350,25 @@ public class GameWorld {
 			}
 			b.AssignBiomeType(toAssign_type);
 		}
+//		System.out.println("STATE: MID 5  BIOME " + wg_state + " RND_C:" + utility.rnd_count);
+
 
 		//Assign outside water
 		GenerateWorld_PopulateOcean();
+//		System.out.println("STATE: EXIT BIOME CODE " + wg_state + " RND_C:" + utility.rnd_count);
 		return true;
 	}
 
 	public void GenerateWorld_CrinkleIslandEdge() {
 		//Seed edges
+		System.out.println("STATE: before loop RND_C:" + utility.rnd_count);
+
 		for (int current = 0; current < utility.wg_DegInCircle; ++current) {
 			//System.out.println("-ANGLE "+current+" 100*cosAngle:"+100*Math.cos(Math.toRadians(current))+" 100*sinAngle:"+100*-Math.sin(Math.toRadians(current)));
-			island_offset[current] = Math.round( utility.rnd.nextGaussian() * tiles_size * utility.wg_CrinkleScale );
+			island_offset[current] = Math.round( utility.rndG(0, tiles_size * utility.wg_CrinkleScale));
 		}
+		System.out.println("STATE: after loop RND_C:" + utility.rnd_count);
+
 		//Smooth edges
 		boolean changes = true;
 		while (changes == true) {
@@ -378,23 +404,26 @@ public class GameWorld {
 	}
 
 	public void GenerateWorld_ErodeEdges() {
+	System.out.println("STATE: ERRODE START " + wg_state + " RND_C:" + utility.rnd_count);
 		for (final WorldTile t : render_tiles) {
 			final Biome myOwner = t.GetOwner();
-			final Vector<WorldTile> neighbours = GetNeighbour(t,false);
-			final Vector<WorldTile> possibleSwaps = new Vector<WorldTile>();
+			final LinkedList<WorldTile> neighbours = GetNeighbour(t,false);
+			final LinkedList<WorldTile> possibleSwaps = new LinkedList<WorldTile>();
 			for (final WorldTile n : neighbours) {
 				if (n.GetOwner() != myOwner) {
 					possibleSwaps.add(n);
 				}
 			}
-			if (possibleSwaps.size() > 0 && utility.rnd.nextFloat() > 0.5) {
+			if (possibleSwaps.size() > 0 && true) {//) { //XXX RND BUG
 				//Give this tile to the other biome
-				final WorldTile tile_to_give = possibleSwaps.elementAt( utility.rnd.nextInt(possibleSwaps.size()) );
-				//Biome OwnerBiome = tile_to_give.GetOwner(); //TODO STILL NOT WORKINg
-				//OwnerBiome.RemoveTile(tile_to_give);
+				//int location = 0;//utility.rnd.nextInt(possibleSwaps.size())
+				final WorldTile tile_to_give = possibleSwaps.removeFirst();//utility.rnd.nextInt(possibleSwaps.size()) );  //XXX RND BUG
+				Biome OwnerBiome = tile_to_give.GetOwner(); //TODO STILL NOT WORKINg (isn't  it?) 
+				OwnerBiome.RemoveTile(tile_to_give);
 				myOwner.AddTile(tile_to_give);
 			}
 		}
+		System.out.println("STATE:  ERRODE END " + wg_state + " RND_C:" + utility.rnd_count);
 	}
 
 	private void GenerateWorld_PopulateOcean() {
@@ -409,14 +438,14 @@ public class GameWorld {
 	private void GenerateWorld_TrimWater() {
 		for (final WorldTile t : tiles) {
 			if (t.GetPartOfBiome() == true && t.GetBiomeType() == BiomeType.WATER) {
-				final Vector<WorldTile> neighbours = GetNeighbour(t,true);
+				final LinkedList<WorldTile> neighbours = GetNeighbour(t,true);
 				int nLand = 0;
 				for (final WorldTile n : neighbours) {
 					if (n.GetPartOfBiome() == true && n.GetBiomeType() != BiomeType.WATER) {
 						++nLand;
 					}
 				}
-				if (nLand == 0 && utility.rnd.nextFloat() > utility.wg_PercChanceKeepWater) {
+				if (nLand == 0 && utility.rnd() > utility.wg_PercChanceKeepWater) { //XXX RND DBUG // ) {
 					render_tiles.remove(t);
 				}
 			}
@@ -433,7 +462,7 @@ public class GameWorld {
 			final float radius = (island_size/2) + island_offset[angle];
 			//System.out.println("RandSeed angle:"+angle+" has dev:"+island_offset[angle]+" and tot radius:"+radius);
 			if (c.GetDistanceFromPoint(0,0) < radius + chunks_size ) { //Only leaves the corners
-				c.SetState((utility.rnd.nextFloat()*(utility.wg_kTEndPt-utility.wg_kTStartPt))+utility.wg_kTStartPt);
+				c.SetState((utility.rnd()*(utility.wg_kTEndPt-utility.wg_kTStartPt))+utility.wg_kTStartPt);
 				c.SetBiomeID(++BiomeID);
 				//System.out.println("state:"+c.GetState()+" ID:"+c.GetBiomeID());
 			}
@@ -455,12 +484,12 @@ public class GameWorld {
 	}
 
 
-	private Vector<WorldTile> GetNeighbour(WorldTile _t, boolean _nnn) {
+	private LinkedList<WorldTile> GetNeighbour(WorldTile _t, boolean _nnn) {
 		int toGet = 4;
 		if (_nnn == true) {
 			toGet = 8;
 		}
-		final Vector<WorldTile> _n_tiles = new Vector<WorldTile>();
+		final LinkedList<WorldTile> _n_tiles = new LinkedList<WorldTile>();
 		for (int _neighbour = 0; _neighbour < toGet; ++_neighbour) {
 			int _x = _t.GetX();
 			int _y = _t.GetY();
@@ -521,54 +550,18 @@ public class GameWorld {
 	}
 
 	public void Reset() {
-		for (final WorldChunk c : chunks) {
-			c.Reset();
-		}
-		for (final WorldTile t : tiles) {
-			t.Reset();
-		}
+		tiles = null;
+		chunks = null;
+		biomes = null;
+		render_tiles = null;
+		ocean = null;
 		for (int current = 0; current < utility.wg_DegInCircle; ++current) {
 			island_offset[current] = 0;
 		}
-		render_tiles.clear();
-		biomes.clear();
 		wg_times_erroded = 0;
 		wg_finished = false;
 		wg_state = 0;
+		Init();
 	}
-
-//	public Vector<Base> GenerateWorld_AddStartingUnits() {
-//		//Find somewhere to put player base
-//		Vector<Base> bases = new Vector<Base>();
-//		float player_radius = (island_size + (2 * island_offset[315])) / 2;
-//		float enemy_radius = (island_size + (2 * island_offset[135])) / 2;
-//		int home_player = (int) Math.round( Math.sqrt(Math.pow(player_radius * wg_MainBaseRadius, 2) / 2) );
-//		int home_enemy = (int) Math.round( Math.sqrt(Math.pow(enemy_radius * wg_MainBaseRadius, 2) / 2) );
-//		int loop = 0;
-//		Point location_payer = PolarToCartesian(315, home_player);
-//		while (++loop < 200) {
-//			int _x = (int) Math.round(location_payer.getX() + (rnd.nextGaussian() * loop));
-//			int _y = (int) Math.round(location_payer.getY() + (rnd.nextGaussian() * loop));
-//			if (CheckSafeToPlace(_x, _y, 8)) {
-//				System.out.println("PLACED PLAYER AT X:"+_x+" Y:"+_y);
-//				bases.add( new Base(_x, _y, 8, Sprite.PLAYER) );
-//				break;
-//			} else System.out.println("FAILED TO PLACED PLAYER AT X:"+_x+" Y:"+_y);
-//		}
-//		loop = 0;
-//		Point location_enemy = PolarToCartesian(135, home_enemy);
-//		while (++loop < 200) {
-//			int _x = (int) Math.round(location_enemy.getX() + (rnd.nextGaussian() * loop));
-//			int _y = (int) Math.round(location_enemy.getY() + (rnd.nextGaussian() * loop));
-//			if (CheckSafeToPlace(_x, _y, 8)) {
-//				System.out.println("PLACED ENEMY AT X:"+_x+" Y:"+_y);
-//				bases.add( new Base(_x, _y, 8, Sprite.ENEMY) );
-//				break;
-//			} else System.out.println("FAILED TO PLACED ENEMY AT X:"+_x+" Y:"+_y);
-//		}
-//		if (bases.size() == 2) return bases;
-//		System.out.println("COULD NOT PLACE PLAYER AND ENEMY");
-//		return null;
-//	}
 
 }

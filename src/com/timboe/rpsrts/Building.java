@@ -69,7 +69,7 @@ public class Building extends Sprite {
 				iCollect.add(ResourceType.Mine);
 			}
 		}
-		animStep = utility.rnd.nextInt(animSteps);
+		animStep = utility.rndI(animSteps);
 	}
 
 	private void GridRegister() {

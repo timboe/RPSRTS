@@ -52,8 +52,6 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	Point CurMouse;
 	Point2D MouseTF;
 	
-	int endGame = 0;
-
 	BuildingType buildingToPlace;
 	Building buildingToMove;
 	int buildingStatBox;
@@ -109,6 +107,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 //    }
 
     private void ContentCreation(Graphics2D _g2) {
+
     	SetAA(_g2, false);
     	theTransforms.ROTATE += 0.001;
     	if (theWorld.GetWorldGenerated() == false) {
@@ -397,8 +396,6 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		}
 
 		setSize(utility.window_X, utility.window_Y);
-
-
 		
 		try {
 			TopBar = ImageIO.read(Bitmaps.class.getResource("/resource/topbar.png"));
@@ -441,7 +438,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			} else if (e.getKeyChar() == 'd') {
 				utility.dbg = !utility.dbg;
 			} else if (e.getKeyChar() == 'w') {
-				utility.wg = !utility.wg;
+				genNewWorld();
 			} else if (e.getKeyChar() == 'c') {
 				theSpriteManger.resource_manager.AddResources(ResourceType.Cactus, 100, ObjectOwner.Player);
 				theSpriteManger.resource_manager.AddResources(ResourceType.Rockpile, 100, ObjectOwner.Player);
@@ -543,7 +540,6 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	@Override
 	public void mousePressed(MouseEvent e) {
 		if (e.getButton() == MouseEvent.BUTTON1) {
-			if (endGame == 1 || endGame == 2) endGame = 3;
 		    if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (0 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (0 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 				if (buildingToPlace == BuildingType.Woodshop) buildingToPlace = null;
 				else buildingToPlace = BuildingType.Woodshop;
@@ -598,6 +594,14 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		if (theTransforms.ZOOM > 10.) theTransforms.ZOOM = 10.f;
 		if (theTransforms.ZOOM < 0.1) theTransforms.ZOOM = 0.1f;
 	}
+	
+	public void genNewWorld() {
+		utility.doWorldGen = true;
+		utility.setSeed();
+		theSpriteManger.Reset();
+		theWorld.Reset();
+		_TICK = 0;
+	}
 
 	@Override
 	public void paint (Graphics g) {
@@ -606,11 +610,15 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		if (theTransforms.af_none == null) {
 			theTransforms.af_none = g2.getTransform();
 		}
-		if (utility.wg == true) {
-			utility.wg = false;
-			theSpriteManger.Reset();
-			theWorld.Reset();
+
+		if (utility.worldGenLock == true) {
+			System.out.println("LOCK!!!!!");
+			return;
 		}
+		utility.worldGenLock = true;
+		
+		//System.out.println(utility.rnd2.nextInt());
+		
 		theTransforms.af = g2.getTransform();
 		theTransforms.af_translate_zoom = g2.getTransform();
 		theTransforms.af_shear_rotate = g2.getTransform();
@@ -685,10 +693,10 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		    DrawTopBar(g2);
 		    theSpriteManger.Tick();
 		    if ( (System.currentTimeMillis() / 1000l) - utility.loose_time > 3) {
-				if (endGame == 1) {
+				if (utility.gameMode == GameMode.gameOverWon) {
 					g2.setTransform(theTransforms.af_none);
 					g2.drawImage(theBitmaps.WIN,0,0,null);
-				} else if (endGame == 2) {
+				} else {
 					g2.setTransform(theTransforms.af_none);
 					g2.drawImage(theBitmaps.LOOSE,0,0,null);
 				}
@@ -700,6 +708,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		sendMouseDragPing = false;
 	    last_zoom = theTransforms.ZOOM;
 	    g2.setTransform(theTransforms.af_none);
+		utility.worldGenLock = false;
 	}
 
 	private void drawStartPlayingOption(Graphics2D g2) {
@@ -730,12 +739,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			c1 = backing_brown;
 			c2 = front_blue;
 			if (mouseClick == true) {
-				//utility.rndSeedTxt = ((Integer) utility.rnd.nextInt(10000000)).toString();
-				int rnd = utility.rndSeedTxt.hashCode();
-				System.out.print("RND:"+rnd);
-				utility.rnd.setSeed(rnd);
-				theSpriteManger.Reset();
-				theWorld.Reset();				
+				genNewWorld();
 			}
 		}
 		g2.setColor(c1);
@@ -822,8 +826,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			c1 = backing_brown;
 			c2 = front_blue;
 			if (mouseClick == true) {
-				utility.rnd.setSeed(utility.rndSeedTxt.hashCode());
-				utility.doWorldGen = true;
+				genNewWorld();
 			}
 		}
 		g2.setColor(c1);
@@ -882,13 +885,13 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			}
 			_TIME_OF_NEXT_TICK = System.currentTimeMillis()
 					+ Math.round(1000f / _DESIRED_TPS);
-			++_TICK;
 
 			if (_TICK % _DO_FPS_EVERY_X_TICKS == 0) {
 				_FPS = Math.round(1. / (System.currentTimeMillis() - _TIME_OF_LAST_TICK)
 								  * 1000. * _DO_FPS_EVERY_X_TICKS);
 				_TIME_OF_LAST_TICK = System.currentTimeMillis();
 			}
+			++_TICK;
 			repaint();
 			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		}

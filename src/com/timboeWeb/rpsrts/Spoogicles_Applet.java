@@ -49,7 +49,7 @@ public class Spoogicles_Applet extends Spoogicles {
 			
 			//check height
 			if (Y + y.get(s).value > floorLevel) {
-				if (utility.rnd.nextFloat() < 0.75f) {
+				if (utility.rnd() < 0.75f) {
 					isDead.get(s).value = 1;
 					++nDead;
 				}
