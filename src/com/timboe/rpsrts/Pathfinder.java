@@ -6,17 +6,17 @@ import java.util.Vector;
 
 public class Pathfinder implements Runnable {
 	private final Utility utility = Utility.GetUtility();
-
-	private final SpriteManager theSpriteManager;
+	private final SpriteManager theSpriteManager = SpriteManager.GetSpriteManager();
+	private final PathfinderGrid thePathfinderGrid = PathfinderGrid.GetPathfinderGrid();
+	
 	private Vector<WorldPoint> result = null; //TODO make me something better
 	private final Sprite fromSprite;
 	private final Sprite toSprite;
 	private Boolean killMe = false;
 	
-    Pathfinder(Sprite _from, Sprite _to, SpriteManager _sm) {
+    Pathfinder(Sprite _from, Sprite _to) {
     	fromSprite = _from;
     	toSprite = _to;
-    	theSpriteManager = _sm;
     }
 
     public Vector<WorldPoint> GetResult() {
@@ -91,7 +91,7 @@ public class Pathfinder implements Runnable {
 			
 			//Is this the soloution?
 			if ( (++loop > utility.pathfinding_max_depth)
-					|| utility.Seperation(A_loc, toSprite.GetLoc()) < (theSpriteManager.theWorld.tiles_size + fromSprite.GetR() + toSprite.GetR())) {
+					|| utility.Seperation(A_loc, toSprite.GetLoc()) < (utility.tiles_size + fromSprite.GetR() + toSprite.GetR())) {
 					//|| (Math.abs(A.GetX() - _to.GetX()) <= pathfinding_accuracy && Math.abs(A.GetY() - _to.GetY()) <= pathfinding_accuracy) ) {
 				soloution = A;
 				break;
@@ -100,7 +100,7 @@ public class Pathfinder implements Runnable {
 			_closed_set.put(A_loc,A);
 			_open_set.remove(A_loc);
 
-			WeightedPoint a = theSpriteManager.thePathfinderGrid.point_collection_map.get(A_loc);
+			WeightedPoint a = thePathfinderGrid.point_collection_map.get(A_loc);
 //System.out.println("LOK ARND ("+A_loc.x+","+A_loc.y+") W F_MIN:"+_min_f+", G:"+A.g_score+" H:"+A.h_score+" AND NGNBRS "+a.GetNieghbours().size()+", OPEN SET SIZE:"+_open_set.size()+" C.S SIZE:"+_closed_set.size() );
 			HashSet<WeightedPoint> myNeighbours = a.GetNieghbours();
 			for (WeightedPoint b : myNeighbours) {

@@ -30,7 +30,7 @@ public class Building extends Sprite {
 		y_offset = 0;
 		underConstruction = false;
 		maxHealth = utility.building_max_health;
-		theSpriteManager.resource_manager.AddBuildingToTally(_oo, _bt);
+		resource_manager.AddBuildingToTally(_oo, _bt);
 		no_local_resource_counter = 0;
 		
 		GridRegister();
@@ -100,7 +100,7 @@ public class Building extends Sprite {
 		if (health >= maxHealth) { //BUILT
 			health = maxHealth;
 			underConstruction = false;
-			theSpriteManager.resource_manager.IncreaseMaxUnits(type, owner);
+			resource_manager.IncreaseMaxUnits(type, owner);
 		}
 	}
 
@@ -172,9 +172,9 @@ public class Building extends Sprite {
 	@Override
 	public void Kill() {
 		if (dead == true) return;
-		theSpriteManager.resource_manager.RemoveBuildingFromTally(owner, type);
+		resource_manager.RemoveBuildingFromTally(owner, type);
 		if (underConstruction == false) {
-			theSpriteManager.resource_manager.DecreaseMaxUnits(type, owner);
+			resource_manager.DecreaseMaxUnits(type, owner);
 			if (type == BuildingType.Base) theSpriteManager.PlaceSpooge(x, y, GetOwner(), 800, 2f);
 			else if (iAttract.size() == 0) theSpriteManager.PlaceSpooge(x, y, GetOwner(), 400, 1.2f);
 			else theSpriteManager.PlaceSpooge(x, y, GetOwner(), 20, 1f);
@@ -218,9 +218,9 @@ public class Building extends Sprite {
 		if (health < maxHealth) ++health;
 		
 		if (iCollect.size() > 0) {
-			theSpriteManager.resource_manager.TryToSpawnUnit(this); //If a gather
+			resource_manager.TryToSpawnUnit(this); //If a gather
 		} else if (iAttract.size() > 0 && GetEmployees() > 0) { //if attractor w employees
-			if (GetEmployees() > theSpriteManager.resource_manager.GetActorsPerAttractor(owner, type)) {
+			if (GetEmployees() > resource_manager.GetActorsPerAttractor(owner, type)) {
 				//Fire unit
 				employees.elementAt(0).QuitJob(true);
 			}

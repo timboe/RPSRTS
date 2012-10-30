@@ -52,11 +52,11 @@ public class Resource extends Sprite {
 	public void Add(int _n) {
 		stuff += _n;
 		if (type == ResourceType.Mine) {
-			theSpriteManager.resource_manager.GLOBAL_IRON += GetRemaining();
+			resource_manager.GLOBAL_IRON += GetRemaining();
 		} else if (type == ResourceType.Rockpile) {
-			theSpriteManager.resource_manager.GLOBAL_STONE += GetRemaining();
+			resource_manager.GLOBAL_STONE += GetRemaining();
 		} else { //cactus or tree
-			theSpriteManager.resource_manager.GLOBAL_WOOD += GetRemaining();
+			resource_manager.GLOBAL_WOOD += GetRemaining();
 		}
 	}
 

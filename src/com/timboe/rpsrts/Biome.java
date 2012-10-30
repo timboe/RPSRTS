@@ -106,7 +106,7 @@ public class Biome {
 	}
 	
 	private void RandomColour() {
-		int _r = Math.round(0 + utility.rndG(0, utility.biome_colour_range));  //XXX RND BUG
+		int _r = 50;//Math.round(0 + utility.rndG(0, utility.biome_colour_range));  //XXX RND BUG
 		int _g = 50;//Math.round(g + utility.rndG(0, utility.biome_colour_range));
 		int _b = 50;//Math.round(b + utility.rndG(0, utility.biome_colour_range));
 		set_r = Constrain(_r);

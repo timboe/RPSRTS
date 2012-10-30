@@ -191,16 +191,16 @@ public class Utility {
 		//return (float) Math.sqrt( (a.getX()-b.getX())*(a.getX()-b.getX()) + (a.getY()-b.getY())*(a.getY()-b.getY()) );
 	}
 
-	public int XYtoID(int _x, int _y, int _world_tiles, int tiles_size) {
+	public int XYtoID(int _x, int _y) {
 		_x -= (_x % tiles_size);
 		_y -= (_y % tiles_size);
-		final int _ID = (((_x + ((tiles_size*_world_tiles)/2)) * _world_tiles) + (_y + ((tiles_size*_world_tiles)/2)))/tiles_size;
+		final int _ID = (((_x + ((tiles_size*world_tiles)/2)) * world_tiles) + (_y + ((tiles_size*world_tiles)/2)))/tiles_size;
 		if (_ID >= 0
-				&& _ID < _world_tiles*_world_tiles
-				&& Math.abs(_x) <= ((tiles_size*_world_tiles)/2)
-				&& Math.abs(_y) <= ((tiles_size*_world_tiles)/2)) return _ID;
+				&& _ID < world_tiles*world_tiles
+				&& Math.abs(_x) <= ((tiles_size*world_tiles)/2)
+				&& Math.abs(_y) <= ((tiles_size*world_tiles)/2)) return _ID;
 		else {
-			System.out.println("--- Illigitimate ID requested in XYtoID");
+			//System.out.println("--- Illigitimate ID requested in XYtoID ("+_x+","+_y+")");
 			return -1; //if not legit
 		}
 	}

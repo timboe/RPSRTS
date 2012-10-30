@@ -4,7 +4,7 @@ import java.util.Vector;
 
 public class AI implements Runnable {
 	private final Utility utility = Utility.GetUtility();
-	private final ResourceManager resources = ResourceManager.GetResourceManager();
+	private final ResourceManager resource_manager = ResourceManager.GetResourceManager();
 	private final GameWorld theWorld = GameWorld.GetGameWorld();
 	private final SpriteManager theSpriteManger = SpriteManager.GetSpriteManager();
 	
@@ -132,23 +132,23 @@ public class AI implements Runnable {
 	
 	void TryBuildResourceGathere() {
 		final Vector<BuildingType> toPlace = new Vector<BuildingType>();
-		if (resources.CanAffordBuy(BuildingType.Woodshop, ObjectOwner.Enemy, false, false) == true
+		if (resource_manager.CanAffordBuy(BuildingType.Woodshop, ObjectOwner.Enemy, false, false) == true
 				&& utility.rnd() < 0.1f
 				&& woodshop_countdown == 0
-				&& resources.ENEMY_PAPER >= resources.ENEMY_MAX_PAPER - utility.AI_NewUnitsWhenXClosetoCap) {
+				&& resource_manager.ENEMY_PAPER >= resource_manager.ENEMY_MAX_PAPER - utility.AI_NewUnitsWhenXClosetoCap) {
 				toPlace.add(BuildingType.Woodshop);
 
 		}
-		if (resources.CanAffordBuy(BuildingType.Smelter, ObjectOwner.Enemy, false, false) == true
+		if (resource_manager.CanAffordBuy(BuildingType.Smelter, ObjectOwner.Enemy, false, false) == true
 				&& utility.rnd() < 0.1f
 				&& smelter_countdown == 0
-				&& resources.ENEMY_SCISSORS >= resources.ENEMY_MAX_SCISSORS - utility.AI_NewUnitsWhenXClosetoCap) {
+				&& resource_manager.ENEMY_SCISSORS >= resource_manager.ENEMY_MAX_SCISSORS - utility.AI_NewUnitsWhenXClosetoCap) {
 				toPlace.add(BuildingType.Smelter);
 		}
-		if (resources.CanAffordBuy(BuildingType.Rockery, ObjectOwner.Enemy, false, false) == true
+		if (resource_manager.CanAffordBuy(BuildingType.Rockery, ObjectOwner.Enemy, false, false) == true
 				&& utility.rnd() < 0.1f
 				&& rockery_countdown == 0
-				&& resources.ENEMY_ROCK >= resources.ENEMY_MAX_ROCK - utility.AI_NewUnitsWhenXClosetoCap) {
+				&& resource_manager.ENEMY_ROCK >= resource_manager.ENEMY_MAX_ROCK - utility.AI_NewUnitsWhenXClosetoCap) {
 				toPlace.add(BuildingType.Rockery);
 		}
 		if (toPlace.size() > 0) {
@@ -159,7 +159,7 @@ public class AI implements Runnable {
 
 			if (location != null) {
 				theSpriteManger.PlaceBuilding(location,toPlace.elementAt(random),ObjectOwner.Enemy);
-				resources.CanAffordBuy(toPlace.elementAt(random), ObjectOwner.Enemy, true, false);
+				resource_manager.CanAffordBuy(toPlace.elementAt(random), ObjectOwner.Enemy, true, false);
 				if (toPlace.elementAt(random) == BuildingType.Rockery) rockery_countdown += utility.AI_BuildCooldown;
 				if (toPlace.elementAt(random) == BuildingType.Smelter) smelter_countdown += utility.AI_BuildCooldown;
 				if (toPlace.elementAt(random) == BuildingType.Woodshop) woodshop_countdown += utility.AI_BuildCooldown;
@@ -180,25 +180,25 @@ public class AI implements Runnable {
 	
 	void DoUnitProduction() {
 		//if we're not _really_ short on people then turn off unit production if peeps too low
-		if (theSpriteManger.resource_manager.ENEMY_WOOD - utility.COST_Paper_Wood < utility.COST_AttractorPaper_Wood 
-				&& theSpriteManger.resource_manager.ENEMY_PAPER > 3) {
-			theSpriteManger.resource_manager.GEN_PAPER_ENEMY = false;
+		if (resource_manager.ENEMY_WOOD - utility.COST_Paper_Wood < utility.COST_AttractorPaper_Wood 
+				&& resource_manager.ENEMY_PAPER > 3) {
+			resource_manager.GEN_PAPER_ENEMY = false;
 		} else {
-			theSpriteManger.resource_manager.GEN_PAPER_ENEMY = true;
+			resource_manager.GEN_PAPER_ENEMY = true;
 		}
 		//if we're not _really_ short on people then turn off unit production if peeps too low
-		if (theSpriteManger.resource_manager.ENEMY_IRON - utility.COST_Scissors_Iron < utility.COST_AttractorScissors_Iron 
-				&& theSpriteManger.resource_manager.ENEMY_SCISSORS > 3) {
-			theSpriteManger.resource_manager.GEN_SCISSORS_ENEMY = false;
+		if (resource_manager.ENEMY_IRON - utility.COST_Scissors_Iron < utility.COST_AttractorScissors_Iron 
+				&& resource_manager.ENEMY_SCISSORS > 3) {
+			resource_manager.GEN_SCISSORS_ENEMY = false;
 		} else {
-			theSpriteManger.resource_manager.GEN_SCISSORS_ENEMY = true;
+			resource_manager.GEN_SCISSORS_ENEMY = true;
 		}
 		//if we're not _really_ short on people then turn off unit production if peeps too low
-		if (theSpriteManger.resource_manager.ENEMY_STONE - utility.COST_Rock_Stone < utility.COST_AttractorRock_Stone 
-				&& theSpriteManger.resource_manager.ENEMY_ROCK > 3) {
-			theSpriteManger.resource_manager.GEN_ROCK_ENEMY = false;
+		if (resource_manager.ENEMY_STONE - utility.COST_Rock_Stone < utility.COST_AttractorRock_Stone 
+				&& resource_manager.ENEMY_ROCK > 3) {
+			resource_manager.GEN_ROCK_ENEMY = false;
 		} else {
-			theSpriteManger.resource_manager.GEN_ROCK_ENEMY = true;
+			resource_manager.GEN_ROCK_ENEMY = true;
 		}
 	}
 	
@@ -257,31 +257,31 @@ public class AI implements Runnable {
 		Vector<ActorType> toAttackWith = new Vector<ActorType>();
 		
 		//grow to 50%, cap chance at 50%
-		float paper_chance = (((float) theSpriteManger.resource_manager.ENEMY_PAPER -2)/ (float)(utility.AI_TargetUnitMultipler * utility.EXTRA_Paper_PerWoodmill))/2f;
+		float paper_chance = (((float) resource_manager.ENEMY_PAPER -2)/ (float)(utility.AI_TargetUnitMultipler * utility.EXTRA_Paper_PerWoodmill))/2f;
 		if (paper_chance > 0.5) paper_chance = 0.5f;
 		if (utility.rnd() < paper_chance 
 				&& attack_paper == false 
-				&& theSpriteManger.resource_manager.CanAffordBuy(BuildingType.AttractorPaper,ObjectOwner.Enemy,false,false) == true) {
+				&& resource_manager.CanAffordBuy(BuildingType.AttractorPaper,ObjectOwner.Enemy,false,false) == true) {
 			attack_paper = true;
 			toAttackWith.add(ActorType.Paper);
 			System.out.println("ATTACK WITH: PAPER");
 		}
 		
-		float rock_chance = (((float) theSpriteManger.resource_manager.ENEMY_ROCK -2)/ (float)(utility.AI_TargetUnitMultipler * utility.EXTRA_Rock_PerRockery))/2f;
+		float rock_chance = (((float) resource_manager.ENEMY_ROCK -2)/ (float)(utility.AI_TargetUnitMultipler * utility.EXTRA_Rock_PerRockery))/2f;
 		if (rock_chance > 0.5) rock_chance = 0.5f;
 		if (utility.rnd() < rock_chance 
 				&& attack_rock == false
-				&& theSpriteManger.resource_manager.CanAffordBuy(BuildingType.AttractorRock,ObjectOwner.Enemy,false,false) == true) {
+				&& resource_manager.CanAffordBuy(BuildingType.AttractorRock,ObjectOwner.Enemy,false,false) == true) {
 			attack_rock = true;
 			toAttackWith.add(ActorType.Rock);
 			System.out.println("ATTACK WITH: ROCK");
 		}
 		
-		float scissors_chance = (((float) theSpriteManger.resource_manager.ENEMY_SCISSORS -2)/ (float)(utility.AI_TargetUnitMultipler * utility.EXTRA_Scissors_PerSmelter))/2f;
+		float scissors_chance = (((float) resource_manager.ENEMY_SCISSORS -2)/ (float)(utility.AI_TargetUnitMultipler * utility.EXTRA_Scissors_PerSmelter))/2f;
 		if (scissors_chance > 0.5) scissors_chance = 0.5f;
 		if (utility.rnd() < scissors_chance 
 				&& attack_scissors == false 
-				&& theSpriteManger.resource_manager.CanAffordBuy(BuildingType.AttractorScissors,ObjectOwner.Enemy,false,false) == true) {
+				&& resource_manager.CanAffordBuy(BuildingType.AttractorScissors,ObjectOwner.Enemy,false,false) == true) {
 			attack_scissors = true;
 			toAttackWith.add(ActorType.Scissors);
 			System.out.println("ATTACK WITH: SCISSORS");
@@ -336,7 +336,7 @@ public class AI implements Runnable {
 				WorldPoint starting_location = theSpriteManger.FindGoodSpot(theSpriteManger.enemy_base.GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
 				if (destination_location != null && starting_location != null) {
 					Building attackor = theSpriteManger.PlaceBuilding(starting_location, toBuild, ObjectOwner.Enemy);
-					resources.CanAffordBuy(toBuild, ObjectOwner.Enemy, true, false);
+					resource_manager.CanAffordBuy(toBuild, ObjectOwner.Enemy, true, false);
 					attack_attractors.add(attackor);
 					if (_t == ActorType.Paper) {
 						attack_paper_dest = destination_location;
@@ -369,7 +369,7 @@ public class AI implements Runnable {
 	}
 	
 	void Refund(Building _b) {
-		theSpriteManger.resource_manager.CanAffordBuy(_b.GetType(), ObjectOwner.Enemy, false, true);
+		resource_manager.CanAffordBuy(_b.GetType(), ObjectOwner.Enemy, false, true);
 		_b.Kill();
 	}
 	
@@ -418,13 +418,13 @@ public class AI implements Runnable {
 					}
 				}
 				
-				if (haveOne == false && resources.CanAffordBuy(_bt, ObjectOwner.Enemy, false, false)) {
+				if (haveOne == false && resource_manager.CanAffordBuy(_bt, ObjectOwner.Enemy, false, false)) {
 					//place new attractor
 					WorldPoint loc = theSpriteManger.FindGoodSpot(_a.GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
 					if (loc == null) break;					
 					Building defendor = theSpriteManger.PlaceBuilding(loc, _bt, ObjectOwner.Enemy);
 					defence_attractors.add(defendor);
-					resources.CanAffordBuy(_bt, ObjectOwner.Enemy, true, false);
+					resource_manager.CanAffordBuy(_bt, ObjectOwner.Enemy, true, false);
 				}
 			}
 		}

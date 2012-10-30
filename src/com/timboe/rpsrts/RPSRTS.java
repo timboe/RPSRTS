@@ -70,11 +70,12 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	private Image dbImage;
 	private Graphics dbg;
 
-	Utility utility = Utility.GetUtility();
-	GameWorld_Applet theWorld = GameWorld_Applet.GetGameWorld_Applet();
-	Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();
-	SpriteManager_Applet theSpriteManger = SpriteManager_Applet.GetSpriteManager_Applet();
-	TransformStore theTransforms = TransformStore.GetTransformStore();
+	private final Utility utility = Utility.GetUtility();
+	private final GameWorld_Applet theWorld = GameWorld_Applet.GetGameWorld_Applet();
+	private final Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();
+	private final SpriteManager_Applet theSpriteManger = SpriteManager_Applet.GetSpriteManager_Applet();
+	private final TransformStore theTransforms = TransformStore.GetTransformStore();
+	private final ResourceManager resource_manager = ResourceManager.GetResourceManager();
 	
 	public BufferedImage TopBar;
 	
@@ -201,8 +202,8 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	    	_g2.setTransform(theTransforms.af_none);
 	    }
 
-		_g2.drawString(theSpriteManger.resource_manager.GetResourceText(), 15, 20);
-		_g2.drawString(theSpriteManger.resource_manager.GetUnitText(), 15, 40);
+		_g2.drawString(resource_manager.GetResourceText(), 15, 20);
+		_g2.drawString(resource_manager.GetUnitText(), 15, 40);
 		_g2.drawString("SEED:"+utility.rndSeedTxt+" FPS:"+_FPS, 15, 60);
 
     	_g2.setTransform(theTransforms.af_none);
@@ -238,7 +239,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		_g2.translate(con_start_x + (7 * x_add), y_height/2);
 		_g2.scale(3, 3);
 		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.paper_player, true);
-		if (theSpriteManger.resource_manager.GEN_PAPER_PLAYER == true) {
+		if (resource_manager.GEN_PAPER_PLAYER == true) {
 			theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.on, true);
 		} else {
 			theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.off, true);
@@ -247,7 +248,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		_g2.translate(con_start_x + (8 * x_add), y_height/2);
 		_g2.scale(3, 3);
 		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.rock_player, true);
-		if (theSpriteManger.resource_manager.GEN_ROCK_PLAYER == true) {
+		if (resource_manager.GEN_ROCK_PLAYER == true) {
 			theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.on, true);
 		} else {
 			theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.off, true);
@@ -256,7 +257,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		_g2.translate(con_start_x + (9 * x_add), y_height/2);
 		_g2.scale(3, 3);
 		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.scissor_player, true);
-		if (theSpriteManger.resource_manager.GEN_SCISSORS_PLAYER == true) {
+		if (resource_manager.GEN_SCISSORS_PLAYER == true) {
 			theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.on, true);
 		} else {
 			theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.off, true);
@@ -440,9 +441,9 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			} else if (e.getKeyChar() == 'w') {
 				genNewWorld();
 			} else if (e.getKeyChar() == 'c') {
-				theSpriteManger.resource_manager.AddResources(ResourceType.Cactus, 100, ObjectOwner.Player);
-				theSpriteManger.resource_manager.AddResources(ResourceType.Rockpile, 100, ObjectOwner.Player);
-				theSpriteManger.resource_manager.AddResources(ResourceType.Mine, 100, ObjectOwner.Player);
+				resource_manager.AddResources(ResourceType.Cactus, 100, ObjectOwner.Player);
+				resource_manager.AddResources(ResourceType.Rockpile, 100, ObjectOwner.Player);
+				resource_manager.AddResources(ResourceType.Mine, 100, ObjectOwner.Player);
 			}
 		}
 	}
@@ -562,11 +563,11 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 				if (buildingToPlace == BuildingType.X) buildingToPlace = null;
 				else buildingToPlace = BuildingType.X;
 			} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (7 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (7 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
-				theSpriteManger.resource_manager.GEN_PAPER_PLAYER = !theSpriteManger.resource_manager.GEN_PAPER_PLAYER;
+				resource_manager.GEN_PAPER_PLAYER = !resource_manager.GEN_PAPER_PLAYER;
 			} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (8 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (8 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
-				theSpriteManger.resource_manager.GEN_ROCK_PLAYER = !theSpriteManger.resource_manager.GEN_ROCK_PLAYER;
+				resource_manager.GEN_ROCK_PLAYER = !resource_manager.GEN_ROCK_PLAYER;
 			} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (9 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (9 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
-				theSpriteManger.resource_manager.GEN_SCISSORS_PLAYER = !theSpriteManger.resource_manager.GEN_SCISSORS_PLAYER;
+				resource_manager.GEN_SCISSORS_PLAYER = !resource_manager.GEN_SCISSORS_PLAYER;
 			} else {
 				mouseClick = true;
 			}

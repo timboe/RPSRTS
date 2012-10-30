@@ -76,7 +76,8 @@ public class WeightedPoint {
 	@Override
 	public int hashCode() {
 		//System.out.println("<HASHCODE CALLED>");
-		return (100000*x)+y;
+		return (104527*x)+(103573*y);
+		//return new HashCode(83) .append(x).append(y).toHashCode();
 	}
 
 

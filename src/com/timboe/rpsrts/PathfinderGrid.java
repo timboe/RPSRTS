@@ -3,14 +3,22 @@ package com.timboe.rpsrts;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class PathfinderGrid implements Runnable {
+public class PathfinderGrid {
 	private final Utility utility = Utility.GetUtility();
 	private final GameWorld theWorld = GameWorld.GetGameWorld();
+	
+	private static PathfinderGrid singleton = new PathfinderGrid();
+	public static PathfinderGrid GetPathfinderGrid() {
+		return singleton;
+	}
 	
 	public HashSet<WeightedPoint> point_collection = new HashSet<WeightedPoint>();
 	public HashMap<WorldPoint,WeightedPoint> point_collection_map = new HashMap<WorldPoint,WeightedPoint>();
 	
-	PathfinderGrid() {
+	private PathfinderGrid() {
+	}
+	
+	public void Init() {
 		int world_size = (utility.world_tiles*utility.tiles_size);
 
 		int ID = 0;
@@ -48,22 +56,4 @@ public class PathfinderGrid implements Runnable {
 			}
 		}
 	}
-
-	@Override
-	public void run() {
-//		while (theSpriteManager.thePathfinderGrid != null) { //While I'm not dead
-//			int pruned = 0;
-//			for (WeightedPoint _p : point_collection) {
-//				pruned += _p.PruneBelow(theSpriteManager.GlobalSpriteCounter - 100); //keep last 20's pathfinding efforts
-//			}
-//			System.out.println("PRUNED "+pruned+" PTWeights, sprite PT counter :"+theSpriteManager.GlobalSpriteCounter);
-//			try {
-//				Thread.sleep(1000);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		}
-	}
-
-
 }

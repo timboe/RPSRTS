@@ -11,11 +11,9 @@ public class SpriteManager {
 	}
 	
 	protected final Utility utility = Utility.GetUtility();
-	protected final GameWorld theWorld = GameWorld.GetGameWorld();
+	private   final GameWorld theWorld = GameWorld.GetGameWorld();
 	protected final ResourceManager resource_manager = ResourceManager.GetResourceManager();
-
-	public PathfinderGrid thePathfinderGrid;
-	protected Thread thePathfinderGridThread;
+	private   final PathfinderGrid thePathfinderGrid = PathfinderGrid.GetPathfinderGrid();
 	
 	private int ws_step = 0;
 	private float ws_time_of_last_operation;
@@ -350,7 +348,6 @@ public class SpriteManager {
 		ResourceObjects.clear();
 		ProjectileObjects.clear();
 		resource_manager.Reset();
-		thePathfinderGrid = null;
 	}
 
 	public int SeedWorld() {
@@ -366,10 +363,9 @@ public class SpriteManager {
 
 			//Setup the pathfinding grid 
 			System.out.println("CONSTRUCT GRID");
-			thePathfinderGrid = new PathfinderGrid();
-			thePathfinderGridThread = new Thread(thePathfinderGrid);
-			thePathfinderGridThread.start();
-			
+			thePathfinderGrid.Init();
+			//thePathfinderGridThread = new Thread(thePathfinderGrid);
+			//thePathfinderGridThread.start();
 			System.out.println("DONE CONSTRUCT GRID");
 			
 			final WorldPoint player_location = FindGoodSpot(player_starting, utility.buildingRadius, utility.look_for_spot_radius, false);
@@ -392,7 +388,7 @@ public class SpriteManager {
 
 			
 			//get passable route?
-			pathfinder = new Pathfinder(player_base, enemy_base, this);
+			pathfinder = new Pathfinder(player_base, enemy_base);
 			pathfinding_thread = new Thread(pathfinder);
 			pathfinding_thread.start();
 

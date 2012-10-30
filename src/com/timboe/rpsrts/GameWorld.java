@@ -11,32 +11,29 @@ public class GameWorld {
 		return this_object;  //set by inherited Applet or Web 
 	}
 
-	protected int world_tiles;
-	protected int world_chunks;
-	protected int tiles_per_chunk;
-	public int tiles_size;
-	protected int chunks_size;
-	protected int world_size;
-	protected int island_size;
+	protected int world_tiles = 0;
+	protected int world_chunks = 0;
+	protected int tiles_per_chunk = 0;
+	public int tiles_size = 0;
+	protected int chunks_size = 0;
+	protected int world_size = 0;
+	protected int island_size = 0;
 
-	protected WorldTile tiles[];
-	protected WorldChunk chunks[];
+	protected WorldTile tiles[] = null;
+	protected WorldChunk chunks[] = null;
 	protected HashSet<Biome> biomes = null;
-	protected HashSet<WorldTile> render_tiles;
-	protected final long island_offset[];
-	protected Biome ocean;
+	protected HashSet<WorldTile> render_tiles = null;
+	protected final long island_offset[] = new long[utility.wg_DegInCircle];
+	protected Biome ocean = null;
 
-	private boolean wg_finished;
-	private int wg_state;
-	private int wg_times_erroded;
-	private float wg_time_of_last_operation;
+	private boolean wg_finished = false;
+	private int wg_state = 0;
+	private int wg_times_erroded = 0;
+	private float wg_time_of_last_operation = 0;
 
 
 	protected GameWorld() {
 		System.out.println("--- Game World spawned: "+this);
-		island_offset = new long[utility.wg_DegInCircle];
-		wg_finished = false;
-		wg_state = 0;
 	}
 	
 	public void Init() {
@@ -51,10 +48,10 @@ public class GameWorld {
 		//HACK!
 		for (int dir = 0; dir < 4; ++dir) {
 			switch (dir) {
-				case 0: _ID = utility.XYtoID((int) Math.round(_x - _pice_radius), (int) Math.round(_y), world_tiles, tiles_size); break;
-				case 1: _ID = utility.XYtoID((int) Math.round(_x + _pice_radius), (int) Math.round(_y), world_tiles, tiles_size); break;
-				case 2: _ID = utility.XYtoID((int) Math.round(_x), (int)  Math.round(_y - _pice_radius), world_tiles, tiles_size); break;
-				case 3: _ID = utility.XYtoID((int) Math.round(_x), (int)  Math.round(_y + _pice_radius), world_tiles, tiles_size); break;
+				case 0: _ID = utility.XYtoID((int) Math.round(_x - _pice_radius), (int) Math.round(_y)); break;
+				case 1: _ID = utility.XYtoID((int) Math.round(_x + _pice_radius), (int) Math.round(_y)); break;
+				case 2: _ID = utility.XYtoID((int) Math.round(_x), (int)  Math.round(_y - _pice_radius)); break;
+				case 3: _ID = utility.XYtoID((int) Math.round(_x), (int)  Math.round(_y + _pice_radius)); break;
 			}
 			//_ID = utility.XYtoID((int)_x, (int)_y, world_tiles, tiles_size);
 			if (_ID != -1) {
@@ -257,7 +254,7 @@ public class GameWorld {
 			final int y_offset = c.GetY();
 		    for (int x = x_offset; x < x_offset + chunks_size; x = x + tiles_size) {
 			    for (int y = y_offset; y < y_offset + chunks_size; y = y + tiles_size) {
-					final int tileID = utility.XYtoID(x, y, world_tiles, tiles_size);
+					final int tileID = utility.XYtoID(x, y);
 					//ystem.out.println("want:("+x+","+y+") TileID:"+tileID);
 					//System.out.println("   Got:("+tiles[tileID].GetX()+","+tiles[tileID].GetY()+")");
 					final WorldTile t = tiles[tileID];
@@ -515,7 +512,7 @@ public class GameWorld {
 				_x -= tiles_size;
 				_y += tiles_size; break;
 			}
-			final int _ID = utility.XYtoID(_x, _y, world_tiles, tiles_size);
+			final int _ID = utility.XYtoID(_x, _y);
 			if (_ID != -1) {
 				_n_tiles.add(tiles[_ID]);
 			}

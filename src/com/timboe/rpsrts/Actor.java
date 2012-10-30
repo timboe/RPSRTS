@@ -3,7 +3,6 @@ package com.timboe.rpsrts;
 import java.util.HashSet;
 import java.util.Vector;
 
-
 public class Actor extends Sprite {
 	protected ObjectOwner owner;
 	protected ActorType type;
@@ -158,7 +157,7 @@ public class Actor extends Sprite {
 		theSpriteManager.PlaceSpooge(x, y, GetOwner(), 20, 0.8f);
 		QuitJob(true);
 		dead = true;
-		theSpriteManager.resource_manager.UnitDeath(type,owner);
+		resource_manager.UnitDeath(type,owner);
 	}
 	
 	private void Job_Build() {
@@ -324,11 +323,11 @@ public class Actor extends Sprite {
 		} else if (tock == true && behaviour == ActorBehaviour.DroppingOffGoods) {
 			if (carryAmount > utility.amount_collect_per_tock) {
 				//System.out.println("Dropping off "+amount_collect_per_tock);
-				theSpriteManager.resource_manager.AddResources(carrying, utility.amount_collect_per_tock, owner);
+				resource_manager.AddResources(carrying, utility.amount_collect_per_tock, owner);
 				carryAmount -= utility.amount_collect_per_tock;
 				++animStep;
 			} else if (carryAmount > 0) {
-				theSpriteManager.resource_manager.AddResources(carrying, carryAmount, owner);
+				resource_manager.AddResources(carrying, carryAmount, owner);
 				carryAmount = 0;
 			} else {
 				target = null;
@@ -420,7 +419,7 @@ public class Actor extends Sprite {
 		wander = null;
 		navagate_status = PathfindStatus.NotRun;
 
-		pathfinder = new Pathfinder(this, _d, theSpriteManager);
+		pathfinder = new Pathfinder(this, _d);
 		pathfinding_thread = new Thread(pathfinder);
 		pathfinding_thread.start();
 

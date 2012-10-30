@@ -2,8 +2,9 @@ package com.timboe.rpsrts;
 
 public class Sprite implements Comparable<Sprite> {
 	protected final Utility utility = Utility.GetUtility();
-	protected GameWorld theWorld = GameWorld.GetGameWorld();
-	protected SpriteManager theSpriteManager = SpriteManager.GetSpriteManager();
+	protected final GameWorld theWorld = GameWorld.GetGameWorld();
+	protected final SpriteManager theSpriteManager = SpriteManager.GetSpriteManager();
+	protected final ResourceManager resource_manager = ResourceManager.GetResourceManager();
 
 	int ID;
 	protected int x;
