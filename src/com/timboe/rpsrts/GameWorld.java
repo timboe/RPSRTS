@@ -33,7 +33,7 @@ public class GameWorld {
 
 
 	protected GameWorld() {
-		System.out.println("--- Game World spawned: "+this);
+		//OVERRIDDEN
 	}
 	
 	public void Init() {

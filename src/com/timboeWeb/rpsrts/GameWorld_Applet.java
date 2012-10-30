@@ -17,6 +17,7 @@ public class GameWorld_Applet extends GameWorld {
 	public GameWorld_Applet() {
 		super();
 		this_object = (GameWorld)this; 
+		System.out.println("--- World Manager spawned (depends on Util) : "+this);
 	}
 	
 	@Override

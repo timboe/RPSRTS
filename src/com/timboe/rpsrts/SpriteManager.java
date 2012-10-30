@@ -12,14 +12,13 @@ public class SpriteManager {
 	
 	protected final Utility utility = Utility.GetUtility();
 	private   final GameWorld theWorld = GameWorld.GetGameWorld();
-	protected final ResourceManager resource_manager = ResourceManager.GetResourceManager();
+	protected ResourceManager resource_manager = null; //Note, due to inter-dependence, we need to pick up this pointer after SpriteManager is made
 	private   final PathfinderGrid thePathfinderGrid = PathfinderGrid.GetPathfinderGrid();
 	
 	private int ws_step = 0;
-	private float ws_time_of_last_operation;
-	private boolean worldSeeded;
+	private float ws_time_of_last_operation = 0;
+	private boolean worldSeeded = false;
 	protected int TickCount = 0;
-	int ticks_per_tock;
 	
 	Thread pathfinding_thread;
 	Pathfinder pathfinder;
@@ -34,7 +33,7 @@ public class SpriteManager {
 
 	protected final HashSet<Sprite> CollisionObjects = new HashSet<Sprite>();
 	protected final HashSet<Actor> ActorObjects = new HashSet<Actor>();
-	protected final HashSet<Building> BuildingOjects = new HashSet<Building>();
+	public final HashSet<Building> BuildingOjects = new HashSet<Building>();
 	protected final HashSet<Resource> ResourceObjects = new HashSet<Resource>();
 	protected final HashSet<Projectile> ProjectileObjects = new HashSet<Projectile>();
 	protected final HashSet<Spoogicles> SpoogicleObjects = new HashSet<Spoogicles>();
@@ -43,13 +42,6 @@ public class SpriteManager {
 
 
 	protected SpriteManager() {
-		System.out.println("--- Sprite Manager spawned: "+this);
-		worldSeeded = false;
-		GlobalSpriteCounter = 0;
-		ticks_per_tock = utility.ticks_per_tock;
-		//Start the AI
-		theAI = new AI();
-		AI_thread = new Thread(theAI);
 	}
 
 	public WeightedPoint ClipToGrid(WorldPoint _P) {
@@ -340,14 +332,20 @@ public class SpriteManager {
 		player_base = null;
 		enemy_base = null;
 		worldSeeded = false;
-		//synchronized (CollisionObjectsThreadSafe) {
-			CollisionObjects.clear();
-		//}
+		CollisionObjects.clear();
 		ActorObjects.clear();
 		BuildingOjects.clear();
 		ResourceObjects.clear();
 		ProjectileObjects.clear();
+		//now _this_ singleton is fully spawned. Is safe to fetch the resourceManager (inter-depencence)
+		 if (resource_manager == null) {
+			 resource_manager = ResourceManager.GetResourceManager();
+		 }
 		resource_manager.Reset();
+		//Start the AI
+		theAI = new AI();
+		AI_thread = new Thread(theAI);
+
 	}
 
 	public int SeedWorld() {
@@ -383,9 +381,6 @@ public class SpriteManager {
 				System.out.println("---- !!!! ---- ENEMY BASE LOCATION NOT FOUND");
 				return -1;
 			}
-			
-
-
 			
 			//get passable route?
 			pathfinder = new Pathfinder(player_base, enemy_base);
@@ -546,7 +541,7 @@ public class SpriteManager {
 
 	public void Tick() {
 		++TickCount;
-		if (TickCount % ticks_per_tock/2 == 0) Tock();
+		if (TickCount % utility.ticks_per_tock/2 == 0) Tock();
 		for (final Actor _a : ActorObjects) {
 			_a.Tick(TickCount);
 		}

@@ -29,7 +29,8 @@ public class SpriteManager_Applet extends SpriteManager {
 
 	private SpriteManager_Applet() {
 		super();
-		this_object = (SpriteManager)this; 
+		this_object = (SpriteManager)this;
+		System.out.println("--- Sprite Manager spawned (depends on Util,World,Path,Resource[linked on Reset()]) : "+this);
 	}
 	
 	Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();

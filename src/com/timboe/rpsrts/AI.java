@@ -4,9 +4,10 @@ import java.util.Vector;
 
 public class AI implements Runnable {
 	private final Utility utility = Utility.GetUtility();
-	private final ResourceManager resource_manager = ResourceManager.GetResourceManager();
 	private final GameWorld theWorld = GameWorld.GetGameWorld();
-	private final SpriteManager theSpriteManger = SpriteManager.GetSpriteManager();
+	protected final SpriteManager theSpriteManager = SpriteManager.GetSpriteManager();
+	private final ResourceManager resource_manager = ResourceManager.GetResourceManager();
+
 	
 	int woodshop_countdown = 0;
 	int rockery_countdown = 0;
@@ -38,7 +39,7 @@ public class AI implements Runnable {
 		WorldPoint chosenLocation = null;
 
 		//for buildings
-		for (final Building _b : theSpriteManger.GetBuildingOjects()) {
+		for (final Building _b : theSpriteManager.GetBuildingOjects()) {
 			if (_b.GetOwner() == ObjectOwner.Player) {
 				continue;
 			}
@@ -52,12 +53,12 @@ public class AI implements Runnable {
 						continue;
 					}
 					//check we can place here (RESOURCE/BUILDING and ACTOR)
-					if (theSpriteManger.CheckSafe(true,true,x, y, utility.buildingRadius, 0, 0) == false) {
+					if (theSpriteManager.CheckSafe(true,true,x, y, utility.buildingRadius, 0, 0) == false) {
 						continue;
 					}
 					//check is open
 					boolean isOpen = true;
-					for (final Sprite _s : theSpriteManger.GetCollisionObjects()) {
+					for (final Sprite _s : theSpriteManager.GetCollisionObjects()) {
 						if (utility.Seperation(new WorldPoint(x,y), _s.GetLoc()) < utility.building_AI_openSpace * utility.buildingRadius) {
 							isOpen = false;
 							break;
@@ -68,7 +69,7 @@ public class AI implements Runnable {
 					}
 					//Count resources.
 					int resourcesHere = 0;
-					for (final Resource _r : theSpriteManger.GetResourceObjects()) {
+					for (final Resource _r : theSpriteManager.GetResourceObjects()) {
 						if (_bt == BuildingType.Smelter && _r.GetType() != ResourceType.Mine) {
 							continue;
 						} else if (_bt == BuildingType.Rockery && _r.GetType() != ResourceType.Rockpile) {
@@ -158,7 +159,7 @@ public class AI implements Runnable {
 			//System.out.println("ToPlace:"+location);
 
 			if (location != null) {
-				theSpriteManger.PlaceBuilding(location,toPlace.elementAt(random),ObjectOwner.Enemy);
+				theSpriteManager.PlaceBuilding(location,toPlace.elementAt(random),ObjectOwner.Enemy);
 				resource_manager.CanAffordBuy(toPlace.elementAt(random), ObjectOwner.Enemy, true, false);
 				if (toPlace.elementAt(random) == BuildingType.Rockery) rockery_countdown += utility.AI_BuildCooldown;
 				if (toPlace.elementAt(random) == BuildingType.Smelter) smelter_countdown += utility.AI_BuildCooldown;
@@ -168,7 +169,7 @@ public class AI implements Runnable {
 	}
 	
 	void RemoveOldBuildings() {
-		for (final Building _b : theSpriteManger.GetBuildingOjects()) {
+		for (final Building _b : theSpriteManager.GetBuildingOjects()) {
 			if (_b.GetOwner() == ObjectOwner.Player) {
 				continue;
 			}
@@ -330,12 +331,12 @@ public class AI implements Runnable {
 				//find a place to attack
 				Building toAttack = getWhatToAttack(toAttackType);
 				//since 1st attack then if this comes back nill, go for base!
-				if (toAttack == null) toAttack = theSpriteManger.player_base;
+				if (toAttack == null) toAttack = theSpriteManager.player_base;
 
-				WorldPoint destination_location = theSpriteManger.FindGoodSpot(toAttack.GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
-				WorldPoint starting_location = theSpriteManger.FindGoodSpot(theSpriteManger.enemy_base.GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
+				WorldPoint destination_location = theSpriteManager.FindGoodSpot(toAttack.GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
+				WorldPoint starting_location = theSpriteManager.FindGoodSpot(theSpriteManager.enemy_base.GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
 				if (destination_location != null && starting_location != null) {
-					Building attackor = theSpriteManger.PlaceBuilding(starting_location, toBuild, ObjectOwner.Enemy);
+					Building attackor = theSpriteManager.PlaceBuilding(starting_location, toBuild, ObjectOwner.Enemy);
 					resource_manager.CanAffordBuy(toBuild, ObjectOwner.Enemy, true, false);
 					attack_attractors.add(attackor);
 					if (_t == ActorType.Paper) {
@@ -356,10 +357,10 @@ public class AI implements Runnable {
 	Building getWhatToAttack(BuildingType toAttackType) {
 		Building toAttack = null;
 		float distanceToTarget = utility.minimiser_start;
-		for (Building _b : theSpriteManger.BuildingOjects) {
+		for (Building _b : theSpriteManager.BuildingOjects) {
 			if (_b.GetOwner() == ObjectOwner.Enemy) continue;
 			if (_b.type != toAttackType) continue;
-			float sep = utility.Seperation(theSpriteManger.enemy_base.GetLoc(), _b.GetLoc());
+			float sep = utility.Seperation(theSpriteManager.enemy_base.GetLoc(), _b.GetLoc());
 			if (sep < distanceToTarget) {
 				distanceToTarget = sep;
 				toAttack = _b;
@@ -383,7 +384,7 @@ public class AI implements Runnable {
 		for (Sprite _s : toKill) defence_attractors.remove(_s);
 		
 		//look at my actors, are any of them under attack?
-		for (Actor _a : theSpriteManger.ActorObjects) {
+		for (Actor _a : theSpriteManager.ActorObjects) {
 			if (_a.GetOwner() == ObjectOwner.Enemy) continue;
 			if (_a.attack_target == null) continue;
 			//Get if close to a target.
@@ -420,9 +421,9 @@ public class AI implements Runnable {
 				
 				if (haveOne == false && resource_manager.CanAffordBuy(_bt, ObjectOwner.Enemy, false, false)) {
 					//place new attractor
-					WorldPoint loc = theSpriteManger.FindGoodSpot(_a.GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
+					WorldPoint loc = theSpriteManager.FindGoodSpot(_a.GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
 					if (loc == null) break;					
-					Building defendor = theSpriteManger.PlaceBuilding(loc, _bt, ObjectOwner.Enemy);
+					Building defendor = theSpriteManager.PlaceBuilding(loc, _bt, ObjectOwner.Enemy);
 					defence_attractors.add(defendor);
 					resource_manager.CanAffordBuy(_bt, ObjectOwner.Enemy, true, false);
 				}
@@ -442,7 +443,7 @@ public class AI implements Runnable {
 			}
 			
 			boolean aOK = false;
-			for (Building _bb : theSpriteManger.BuildingOjects) {
+			for (Building _bb : theSpriteManager.BuildingOjects) {
 				if (_bb.GetOwner() == ObjectOwner.Enemy) continue;
 				if (utility.Seperation(_b.GetLoc(), _bb.GetLoc()) < 2 * utility.wander_radius) {
 					aOK = true;
@@ -465,7 +466,7 @@ public class AI implements Runnable {
 			WorldPoint destination_location= null;
 			
 			if (toAttack != null) {
-				destination_location = theSpriteManger.FindGoodSpot(toAttack.GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
+				destination_location = theSpriteManager.FindGoodSpot(toAttack.GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
 			}
 			
 			if (toAttack == null || destination_location == null) {
@@ -483,7 +484,7 @@ public class AI implements Runnable {
 		for (Building _b : defence_attractors) {
 			boolean player_nearby = false;
 			boolean enemy_nearby = false;
-			for (Actor _a : theSpriteManger.ActorObjects) {
+			for (Actor _a : theSpriteManager.ActorObjects) {
 				if (utility.Seperation(_b.GetLoc(), _a.GetLoc()) < 2 *  utility.wander_radius) {
 					if (_a.GetOwner() == ObjectOwner.Player) player_nearby = true;
 					else if (_a.GetOwner() == ObjectOwner.Enemy) enemy_nearby = true;

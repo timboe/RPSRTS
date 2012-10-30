@@ -16,9 +16,12 @@ public class PathfinderGrid {
 	public HashMap<WorldPoint,WeightedPoint> point_collection_map = new HashMap<WorldPoint,WeightedPoint>();
 	
 	private PathfinderGrid() {
+		System.out.println("--- PathfinderGrid Manager spawned (depends on Util,World) : "+this);
 	}
 	
 	public void Init() {
+		point_collection.clear();
+		point_collection_map.clear();
 		int world_size = (utility.world_tiles*utility.tiles_size);
 
 		int ID = 0;

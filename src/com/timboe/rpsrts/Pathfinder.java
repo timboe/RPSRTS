@@ -101,7 +101,9 @@ public class Pathfinder implements Runnable {
 			_open_set.remove(A_loc);
 
 			WeightedPoint a = thePathfinderGrid.point_collection_map.get(A_loc);
+			
 //System.out.println("LOK ARND ("+A_loc.x+","+A_loc.y+") W F_MIN:"+_min_f+", G:"+A.g_score+" H:"+A.h_score+" AND NGNBRS "+a.GetNieghbours().size()+", OPEN SET SIZE:"+_open_set.size()+" C.S SIZE:"+_closed_set.size() );
+			
 			HashSet<WeightedPoint> myNeighbours = a.GetNieghbours();
 			for (WeightedPoint b : myNeighbours) {
 				//Bad tile?
@@ -156,7 +158,7 @@ public class Pathfinder implements Runnable {
 				}
 				result.add(p.GetLoc());
 			}
-//System.out.println("INFO Took "+loop+" alg loops: PATH FINDING MINIMISED, WE CAN GET TO ("+soloution.X+","+soloution.Y+") in "+result.size()+" steps! ");
+System.out.println("INFO Took "+loop+" alg loops: PATH FINDING MINIMISED, WE CAN GET TO ("+soloution.X+","+soloution.Y+") in "+result.size()+" steps! ");
 		} else {
 			System.out.println("FATAL Took "+loop+" alg loops : PATH FINDING EPIC FAIL!");
 			result = null;

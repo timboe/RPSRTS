@@ -128,6 +128,7 @@ public class ResourceManager {
 
 	private ResourceManager() {
 		Reset();
+		System.out.println("--- Resource Manager spawned (depends on Util,Sprite) : "+this);
 	}
 	
 	public void Reset() {

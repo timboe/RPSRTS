@@ -14,7 +14,7 @@ public class TransformStore {
 
 	
 	private TransformStore() {
-		
+		System.out.println("--- Transform Manager spawned (depends on Util) : "+this);
 	}
 	
     public AffineTransform af_none = null;

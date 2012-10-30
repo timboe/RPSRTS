@@ -14,7 +14,7 @@ public class Utility {
 	//public final Random rnd2 = new Random(0);
 	public boolean worldGenLock = false;
 	public int rnd_count = 0;
-	private boolean rand_off = true;
+	private boolean rand_off = false;
 	public float rnd() {
 		++rnd_count;
 		if (rand_off == true) return 0.3f;
@@ -172,7 +172,7 @@ public class Utility {
 	public final int EXTRA_Scissors_PerSmelter = EXTRA_Base;
 	
 	private Utility() {
-		System.out.println("--- Utility spawned: "+this);
+		System.out.println("--- Utility spawned (depends on nothing): "+this);
 	}
 
 	public WorldPoint PolarToCartesian(float _angle, float _radius) {
