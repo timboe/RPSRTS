@@ -23,8 +23,7 @@ public class Spoogicles_Applet extends Spoogicles {
 		}
 		
 		for (int s = 0; s < nSpooge; ++s) {
-			if (isDead.get(s).booleanValue()  == true) continue;
-			float tempF = 0;
+			if (isDead.get(s).get()  == true) continue;
 			
 			Point2D transform = null;
 			final int X = Math.round(x_start.get(s).floatValue());
@@ -42,37 +41,20 @@ public class Spoogicles_Applet extends Spoogicles {
 			}
 			_g2.setTransform(theTransforms.af_translate_zoom);
 			_g2.fillRect((int) (_x + x.get(s).floatValue()), (int) (_y + y.get(s).floatValue()), 1, 1);
-			
-			tempF = spooge_y_vel.get(s).floatValue();
-			spooge_y_vel.remove(s);
-			spooge_y_vel.add( new Float( tempF + (0.4f * scale) ) );
-			
-			tempF = x.get(s).floatValue();
-			x.remove(s);
-			x.add( new Float( tempF + spooge_x_vel.get(s).floatValue() ));
-			tempF = y.get(s).floatValue();
-			y.remove(s);
-			y.add( new Float( tempF + spooge_y_vel.get(s).floatValue() ));
-			
+
+			spooge_y_vel.get(s).mod(0.4f * scale);
+
+			x.get(s).mod( spooge_x_vel.get(s).floatValue() );
+			y.get(s).mod( spooge_y_vel.get(s).floatValue() );
+
 			//check height
 			if (Y + y.get(s).floatValue() > floorLevel) {
 				if (utility.rnd() < 0.75f) {
-					isDead.remove(s);
-					isDead.add(new Boolean(true) );
+					isDead.get(s).set(true);
 					++nDead;
 				}
-				//spooge_y_vel.get(s).floatValue() = );
-				
-				tempF = spooge_y_vel.get(s).floatValue();
-				spooge_y_vel.remove(s);
-				spooge_y_vel.add( new Float( -Math.abs(tempF) ) );
-				
+				y.get(s).set( -Math.abs(spooge_y_vel.get(s).floatValue()) );
 			}
-			
-		}
-		
-		
-		
+		}	
 	}
-
 }

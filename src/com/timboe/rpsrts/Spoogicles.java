@@ -1,19 +1,20 @@
 package com.timboe.rpsrts;
 
 import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Spoogicles extends Sprite {
 
 	protected int nSpooge;
 	protected int nDead;
 	
-	protected LinkedList<Float> x_start = new LinkedList<Float>();
-	protected LinkedList<Float> y_start = new LinkedList<Float>();
-	protected LinkedList<Float> x = new LinkedList<Float>();
-	protected LinkedList<Float> y = new LinkedList<Float>();
-	protected LinkedList<Float> spooge_x_vel = new LinkedList<Float>();
-	protected LinkedList<Float> spooge_y_vel = new LinkedList<Float>();
-	protected LinkedList<Boolean> isDead = new LinkedList<Boolean>();
+	protected LinkedList<AtomicFloat> x_start = new LinkedList<AtomicFloat>();
+	protected LinkedList<AtomicFloat> y_start = new LinkedList<AtomicFloat>();
+	protected LinkedList<AtomicFloat> x = new LinkedList<AtomicFloat>();
+	protected LinkedList<AtomicFloat> y = new LinkedList<AtomicFloat>();
+	protected LinkedList<AtomicFloat> spooge_x_vel = new LinkedList<AtomicFloat>();
+	protected LinkedList<AtomicFloat> spooge_y_vel = new LinkedList<AtomicFloat>();
+	protected LinkedList<AtomicBoolean> isDead = new LinkedList<AtomicBoolean>();
 	protected float floorLevel;
 	//protected int lifetime;
 	
@@ -32,14 +33,14 @@ public class Spoogicles extends Sprite {
 		
 		nSpooge = _spoogicles;
 		for (int s = 0; s < _spoogicles; ++s) {
-			x.add( new Float( 0f ) );
-			y.add( new Float( 0f ) );
-			x_start.add( new Float( (float) _x ) );
-			y_start.add( new Float( (float) _y ) );
-			spooge_x_vel.add( new Float( (float) (utility.rndG(0f, 0.5f * scale) )) );
-			spooge_y_vel.add( new Float( (float) (-2.5 - Math.abs(utility.rndG(0f, 2f * scale))) ));
+			x.add( new AtomicFloat( 0f ) );
+			y.add( new AtomicFloat( 0f ) );
+			x_start.add( new AtomicFloat( (float) _x ) );
+			y_start.add( new AtomicFloat( (float) _y ) );
+			spooge_x_vel.add( new AtomicFloat( (float) (utility.rndG(0f, 0.5f * scale) )) );
+			spooge_y_vel.add( new AtomicFloat( (float) (-2.5 - Math.abs(utility.rndG(0f, 2f * scale))) ));
 			
-			isDead.add(false);
+			isDead.add(new AtomicBoolean(false));
 
 		}
 	
