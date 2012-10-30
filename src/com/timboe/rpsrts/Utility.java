@@ -42,12 +42,18 @@ public class Utility {
 	}
 	
 	//Global variables
+	public RPSRTS _RPSRTS;
 	public boolean dbg = true; //debug flag
 	public float rotateAngle = 0f; //copied here as ROTATE stored in Transform(awt) or Matrix(andorid) classes
 	public boolean doWorldGen = false; //proceed with building world
 	public int pathfind_counter = 0; //pathfinding counter
-	GameMode gameMode = GameMode.titleScreen; //what state is game currently in
-	long loose_time; //what time was game won/lost
+	public GameMode gameMode = GameMode.titleScreen; //what state is game currently in
+	public long loose_time; //what time was game won/lost
+	public long FPS = 0;
+	public boolean mouseClick = false;
+	public boolean mouseDrag = false;
+	public boolean sendMouseDragPing = false;
+
 
 	//---------\\
 	// STATICS \\
