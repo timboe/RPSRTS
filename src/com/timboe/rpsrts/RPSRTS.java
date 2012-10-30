@@ -3,6 +3,7 @@ package com.timboe.rpsrts;
 import java.applet.Applet;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -20,7 +21,7 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-
+import java.util.HashSet;
 import javax.imageio.ImageIO;
 
 import com.timboeWeb.rpsrts.Bitmaps_Applet;
@@ -59,11 +60,13 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	boolean sendMouseDragPing = false;
 	
 	BufferedImage background_buffered;
-
+	private HashSet<Point> background_stars = new HashSet<Point>();
+	
 	private Thread th;
 
 	//private final Color sea_blue = new Color(65,105,225);
 	private final Color dsea_blue = new Color(53,85,183);
+//	private final Color lsea_blue = new Color(121,144,216);
 	private final Color backing_brown = new Color(92,50,38);
 	private final Color front_blue = new Color(99,189,200);
 	private Image dbImage;
@@ -82,17 +85,16 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
     Font myBigFont = new Font(Font.MONOSPACED, Font.BOLD, 100);
     Font myMediumFont = new Font(Font.MONOSPACED, Font.BOLD, 50);
 
-    
     private void DrawBufferedBackground(Graphics2D _g2) {
     	if (background_buffered == null) {
     		background_buffered = new BufferedImage(utility.world_tiles*utility.tiles_size, utility.world_tiles*utility.tiles_size, BufferedImage.TYPE_3BYTE_BGR);
     		Graphics2D gc = background_buffered.createGraphics();
     		gc.translate((utility.world_tiles * utility.tiles_size)/2,(utility.world_tiles * utility.tiles_size)/2);
-			DrawSea(gc);
+			DrawSea(gc,false);
     		theWorld.DrawTiles(gc,false,true);
 			DrawBufferedBackground(_g2); //recurse to actually draw
     	} else {
-			DrawSea(_g2);
+			DrawSea(_g2,true);
 			_g2.setTransform(theTransforms.af_backing);
 			_g2.drawImage(background_buffered, null, 0, 0);
 			_g2.setTransform(theTransforms.af);
@@ -125,12 +127,12 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	    		theWorld.DrawIslandEdge(_g2);
 	    		TopText(_g2,"RUNNING KT ALGORITHM");
 	    	} else if (status == 6) { //Doing biomes
-	    		DrawSea(_g2);
+	    		DrawSea(_g2,true);
 	    		theWorld.DrawTiles(_g2,false,theTransforms.GetAA());
 	    		theWorld.DrawIslandEdge(_g2);
 	    		TopText(_g2,"ASSIGNING LANDMASSES");
 	    	} else { //Eroding
-	    		DrawSea(_g2);
+	    		DrawSea(_g2,true);
 	    		theWorld.DrawTiles(_g2,false,theTransforms.GetAA());
 	    		theWorld.DrawIslandEdge(_g2);
 	    		TopText(_g2,"WEATHERING TERRAIN");
@@ -141,13 +143,15 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
     			theSpriteManger.Reset();
     			theWorld.Reset();
     		}
-    		DrawSea(_g2);
+    		DrawSea(_g2,true);
     		DrawBufferedBackground(_g2);
     		theWorld.DrawIslandEdge(_g2);
     		theSpriteManger.Render(_g2);
     		_g2.setTransform(theTransforms.af_none);
     		if (theSpriteManger.GetWorldSeeded() == false) {
     			TopText(_g2,"POPULATING THE ISLAND");
+    		} else if (utility.dbg == true) {
+    			utility.gameMode = GameMode.gameOn;
     		}
     	}
 	}
@@ -155,13 +159,57 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
     @Override
 	public void destroy() { }
 
-	private void DrawSea(Graphics2D _g2) {
+	private void DrawSea(Graphics2D _g2, boolean doStars) {
+	    final float M = 0.71f;
+	    final float offset = utility.world_size;
+	    if (doStars == true) {
+		    float D = M*utility.world_size;
+		    //Bezier approximation to circle
+//		    float xValueInset = D * 0.1f;
+		    float yValueOffset = D * theTransforms.getShear() * 4.0f / 3.0f;
+		    float size = utility.window_Y*5f;// * theTransforms.getShearPercentage();
+//	    	GeneralPath waterfall = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+//	    	waterfall.moveTo( -D,0f);
+//	    	waterfall.curveTo(-D,D*1.34,        D,D*1.34,        D,0f);
+//	    	waterfall.curveTo(	-D + xValueInset, yValueOffset,
+//	    						 D - xValueInset, yValueOffset,
+//	    						 D, 0f);
+//	    	waterfall.lineTo(D, size);
+//	    	waterfall.curveTo( 	 D - xValueInset, yValueOffset + size,
+//	    						-D + xValueInset, yValueOffset + size,
+//	    						-D, size);
+//	    	waterfall.closePath();
+		    _g2.setTransform(theTransforms.af_translate_zoom);
+		    GradientPaint gradient = new GradientPaint(new Point(0,0), dsea_blue, new Point(0,(int) ((yValueOffset + size)*0.5)), Color.black);
+		    _g2.setPaint(gradient);
+		    _g2.fillRect((int)-D, (int)0f, (int)(2*D), (int)size); //Draw Col
+		    _g2.setTransform(theTransforms.af);
+	    }
 	    _g2.setColor(dsea_blue);
-	    final float M = 1;
-	    final float offset = utility.world_tiles*utility.tiles_size;
 	    _g2.fillOval ((int)(-offset*M),(int)(-offset*M),(int)(offset*2*M),(int)(offset*2*M));
-	    _g2.setColor(Color.white); //possibility to add stars
-	    _g2.fillOval ((int)(-offset*M*1.0001),(int)(-offset*M*1.0001),5,5);
+	    if (background_stars.size() == 0) { //get some stars!
+	    	for (int s=0; s<100; ++s) {
+	    		int radius = Math.round((utility.world_size) + utility.rndI(utility.world_size*4));
+	    		float angle = (float) (utility.rnd() * Math.PI * 2);
+	    		background_stars.add(new Point( (int)Math.round(radius*Math.cos(angle)) , (int)Math.round(radius*Math.sin(angle)) ));
+	    	}
+	    }
+	    if (doStars == true) {
+		    _g2.setTransform(theTransforms.af_translate_zoom);
+		    _g2.setColor(Color.white); //possibility to add stars
+		    for (Point _p : background_stars) {
+		    	//if (Math.abs((System.currentTimeMillis() / 1000) % _p.x ) < 2) {
+		    		//System.out.println("TWINKLE");
+		    	//	return;
+		    	//}
+				Point2D transform = null;
+				transform = theTransforms.af_shear_rotate.transform(new Point(_p.x,_p.y), transform);
+				final int _x = (int)Math.round(transform.getX());
+				final int _y = (int)Math.round(transform.getY());
+		    	_g2.fillOval(_x,_y,3,3);
+		    }
+		    _g2.setTransform(theTransforms.af);
+		}
 	}
 
 	private void DrawTopBar(Graphics2D _g2) {
@@ -399,6 +447,9 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		addMouseListener(this);
 		addKeyListener(this);
 
+		if (utility.dbg == true) {
+			genNewWorld();
+		}
 	}
 
 	@Override
@@ -660,6 +711,10 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		    
 	    }
 
+    	//
+
+	    //
+	    
 		mouseClick = false;
 		sendMouseDragPing = false;
 	    g2.setTransform(theTransforms.af_none);
@@ -863,6 +918,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	}
 	@Override
 	public void stop() { }
+	
 	private void TopText(Graphics2D _g2, String _str) {
 		_g2.setTransform(theTransforms.af_none);
 		_g2.setColor(Color.white);

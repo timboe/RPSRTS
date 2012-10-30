@@ -42,7 +42,7 @@ public class Utility {
 	}
 	
 	//Global variables
-	public boolean dbg = false; //debug flag
+	public boolean dbg = true; //debug flag
 	public float rotateAngle = 0f; //copied here as ROTATE stored in Transform(awt) or Matrix(andorid) classes
 	public boolean doWorldGen = false; //proceed with building world
 	public int pathfind_counter = 0; //pathfinding counter

@@ -40,10 +40,14 @@ public class TransformStore {
 	private float TRANSLATE_Y = 0f;
 	public float TOP_ROTATE; //keep this here 
 	
+	private final float YSHEAR_MIN = 0.15f;
+	private final float YSHEAR_MAX = 0.85f;
+	
 	private boolean updateNeeded = true;
 	
 	public void updateTransforms() {
 		if (updateNeeded == false) return;
+		System.out.println("shear% : "+getShearPercentage());
 				
 		final float trans_X = (utility.window_X+TRANSLATE_X)/2f;
 		final float trans_Y = (utility.window_Y+TRANSLATE_Y)/2f;
@@ -58,12 +62,12 @@ public class TransformStore {
 		//Second half
 		af_shear_rotate.setToIdentity();
 		af_shear_rotate.scale(1, YSHEAR);
-		af_shear_rotate.rotate(-ROTATE);
+		af_shear_rotate.rotate(ROTATE);
 		
 		//Both halves
 		af.setTransform(af_translate_zoom);
 		af.scale(1, YSHEAR);
-		af.rotate(-ROTATE);
+		af.rotate(ROTATE);
 	    
 		af_backing.setTransform(af);
 		af_backing.translate(-(utility.world_tiles * utility.tiles_size)/2,-(utility.world_tiles * utility.tiles_size)/2);
@@ -88,17 +92,17 @@ public class TransformStore {
 	public void modifyShear(float _mod) {
 		updateNeeded = true;
 		YSHEAR += _mod;
-		if (YSHEAR > 1) {
-			YSHEAR = 1;
+		if (YSHEAR > YSHEAR_MAX) {
+			YSHEAR = YSHEAR_MAX;
 		}
-		if (YSHEAR < 0.05) {
-			YSHEAR = 0.05f;
+		if (YSHEAR < YSHEAR_MIN) {
+			YSHEAR = YSHEAR_MIN;
 		}
 	}
 	
 	public void modifyRotate(float _mod) {
 		updateNeeded = true;
-		ROTATE += _mod / ZOOM;
+		ROTATE -= _mod / ZOOM;
 		utility.rotateAngle = ROTATE; //Coppied for Z ordering sake
 	}
 	
@@ -121,8 +125,8 @@ public class TransformStore {
 		} else {
 			 ZOOM = ZOOM * 0.8f;
 		}
-		if (ZOOM <= 0.1f) {
-			ZOOM = 0.1f;
+		if (ZOOM <= 0.3f) {
+			ZOOM = 0.3f;
 		}
 	}
 	
@@ -147,4 +151,16 @@ public class TransformStore {
 	public boolean GetAA() {
     	return aa;
     }
+	
+	public float getShear() {
+		return YSHEAR;
+	}
+	
+	public float getShearPercentage() {
+		return (YSHEAR_MAX - YSHEAR) * (1f/(1f-YSHEAR_MIN));
+	}
+	
+	public float getRotate() {
+		return ROTATE;
+	}
 }
