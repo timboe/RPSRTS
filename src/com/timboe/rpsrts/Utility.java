@@ -43,7 +43,7 @@ public class Utility {
 	
 	//Global variables
 	public boolean dbg = false; //debug flag
-	public float rotateAngle = 0f; //smooth rotation during world gen
+	public float rotateAngle = 0f; //copied here as ROTATE stored in Transform(awt) or Matrix(andorid) classes
 	public boolean doWorldGen = false; //proceed with building world
 	public int pathfind_counter = 0; //pathfinding counter
 	GameMode gameMode = GameMode.titleScreen; //what state is game currently in
@@ -59,6 +59,9 @@ public class Utility {
 	public final int tiles_per_chunk = 8; //Used for coarse kT algo
 	public final int world_tiles = 176; //Number of tile elements on X
 	public final int tiles_size = 7; //Size of tile element in pixels
+	public final int world_size = world_tiles*tiles_size;
+	public final int world_size2 = world_size/2;
+
 	
 	//time settings
 	public final int ticks_per_tock = 30;

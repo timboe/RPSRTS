@@ -442,7 +442,7 @@ public class GameWorld {
 						++nLand;
 					}
 				}
-				if (nLand == 0 && utility.rnd() > utility.wg_PercChanceKeepWater) { //XXX RND DBUG // ) {
+				if ( (nLand == 0 && utility.rnd() > utility.wg_PercChanceKeepWater) || t.GetDistanceFromPoint(0, 0) > utility.world_size2) { 
 					render_tiles.remove(t);
 				}
 			}

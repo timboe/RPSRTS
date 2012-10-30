@@ -43,7 +43,7 @@ public class Spoogicles_Applet extends Spoogicles {
 			_g2.fillRect((int) (_x + x.get(s).floatValue()), (int) (_y + y.get(s).floatValue()), 1, 1);
 
 			spooge_y_vel.get(s).mod(0.4f * scale);
-
+			
 			x.get(s).mod( spooge_x_vel.get(s).floatValue() );
 			y.get(s).mod( spooge_y_vel.get(s).floatValue() );
 
@@ -53,7 +53,7 @@ public class Spoogicles_Applet extends Spoogicles {
 					isDead.get(s).set(true);
 					++nDead;
 				}
-				y.get(s).set( -Math.abs(spooge_y_vel.get(s).floatValue()) );
+				spooge_y_vel.get(s).set( -Math.abs(spooge_y_vel.get(s).floatValue()) );
 			}
 		}	
 	}

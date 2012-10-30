@@ -16,7 +16,6 @@ public class Spoogicles extends Sprite {
 	protected LinkedList<AtomicFloat> spooge_y_vel = new LinkedList<AtomicFloat>();
 	protected LinkedList<AtomicBoolean> isDead = new LinkedList<AtomicBoolean>();
 	protected float floorLevel;
-	//protected int lifetime;
 	
 	protected ObjectOwner oo;
 	
@@ -28,9 +27,7 @@ public class Spoogicles extends Sprite {
 		scale = _scale;
 		floorLevel = _y;
 		oo = _oo;
-		
-		//lifetime = 30;
-		
+				
 		nSpooge = _spoogicles;
 		for (int s = 0; s < _spoogicles; ++s) {
 			x.add( new AtomicFloat( 0f ) );
@@ -39,7 +36,6 @@ public class Spoogicles extends Sprite {
 			y_start.add( new AtomicFloat( (float) _y ) );
 			spooge_x_vel.add( new AtomicFloat( (float) (utility.rndG(0f, 0.5f * scale) )) );
 			spooge_y_vel.add( new AtomicFloat( (float) (-2.5 - Math.abs(utility.rndG(0f, 2f * scale))) ));
-			
 			isDead.add(new AtomicBoolean(false));
 
 		}
@@ -51,9 +47,4 @@ public class Spoogicles extends Sprite {
 	public boolean GetIsSpoogicle() {
 		return true;
 	}
-	
-
-	
-	
-
 }
