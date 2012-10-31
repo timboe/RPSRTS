@@ -21,6 +21,7 @@ import com.timboe.rpsrts.GameMode;
 import com.timboe.rpsrts.ObjectOwner;
 import com.timboe.rpsrts.ResourceManager;
 import com.timboe.rpsrts.Utility;
+import com.timboe.rpsrts.WaterfallSplash;
 
 public class SceneRenderer_Applet {
 	private static SceneRenderer_Applet singleton = new SceneRenderer_Applet();
@@ -37,10 +38,12 @@ public class SceneRenderer_Applet {
 	
 //  private final Color sea_blue = new Color(65,105,225);
 	private final Color dsea_blue = new Color(53,85,183);
-//	private final Color lsea_blue = new Color(121,144,216);
+	private final Color lsea_blue = new Color(121,144,216);
 	private final Color backing_brown = new Color(92,50,38);
 	private final Color front_blue = new Color(99,189,200);
-	
+	private final GradientPaint dark_gradient  = new GradientPaint(new Point(0,0), dsea_blue, new Point(0,(int)(utility.waterfall_size*0.5)), Color.black);
+	private final GradientPaint light_gradient = new GradientPaint(new Point(0,0), lsea_blue, new Point(0,(int)(utility.waterfall_size*0.5)), Color.black);
+
 	public BufferedImage background_buffered;
 	private HashSet<Point> background_stars = new HashSet<Point>();
 	
@@ -459,153 +462,110 @@ public class SceneRenderer_Applet {
 		
 		if (buildingStatBox != 0) {
 			_g2.setTransform(theTransforms.af_none);
-			int _x = 0;
-			int _y = 0;
-			final int _os = 15;
-			final int box_w = 500;
-			final int box_h = 70;
 	    	if(buildingStatBox == 1) {
-	    		_x = (int)CurMouse.getX() - con_start_x/2 - x_add*0;
-	    		_y = (int)CurMouse.getY() + x_add/2;
-				_g2.setColor(backing_brown);
-				_g2.fillRect(_x, _y, box_w, box_h);
-				_g2.setColor(Color.white);
-				_g2.drawRect(_x, _y, box_w, box_h);
-				_g2.setColor(front_blue);
-	    		_g2.drawString("The Woodshop costs "+utility.COST_Woodshop_Iron+" Iron.", _x + _os, _y + (_os * 1));
-	    		_g2.drawString("Nearby wood is collected by Scissors and brought to the Woodshop.", _x + _os, _y + (_os * 2));
-	    		_g2.drawString("The woodshop converts "+utility.COST_Paper_Wood+" wood into Paper.", _x + _os, _y + (_os * 3));
-	    		_g2.drawString("Each additional Woodshop can support "+utility.EXTRA_Paper_PerWoodmill+" Paper.", _x + _os, _y + (_os * 4));
+	    		drawStatBox(_g2, 
+	    				"The Woodshop costs "+utility.COST_Woodshop_Iron+" Iron.", 
+	    				"Nearby wood is collected by Scissors and brought to the Woodshop.",
+	    				"The woodshop converts "+utility.COST_Paper_Wood+" wood into Paper.",
+	    				"Each additional Woodshop can support "+utility.EXTRA_Paper_PerWoodmill+" Paper.");
 	    	} else if(buildingStatBox == 2) {
-	    		_x = (int)CurMouse.getX() - con_start_x/2 - x_add*1;
-	    		_y = (int)CurMouse.getY() + x_add/2;
-				_g2.setColor(backing_brown);
-				_g2.fillRect(_x, _y, box_w, box_h);
-				_g2.setColor(Color.white);
-				_g2.drawRect(_x, _y, box_w, box_h);
-				_g2.setColor(front_blue);
-	    		_g2.drawString("The Rockery costs "+utility.COST_Rockery_Wood+" Wood to build.",  _x + _os, _y + (_os * 1));
-	    		_g2.drawString("Nearby Stone is collected by Paper and brought to the Rockery.",  _x + _os, _y + (_os * 2));
-	    		_g2.drawString("The Rockery converts "+utility.COST_Rock_Stone+" Stone into Rock.",  _x + _os, _y + (_os * 3));
-	    		_g2.drawString("Each additional Rockery can support "+utility.EXTRA_Rock_PerRockery+" Rocks.",  _x + _os, _y + (_os * 4));
+	    		drawStatBox(_g2, 
+	    				"The Rockery costs "+utility.COST_Rockery_Wood+" Wood to build.", 
+	    				"Nearby Stone is collected by Paper and brought to the Rockery.",
+	    				"The Rockery converts "+utility.COST_Rock_Stone+" Stone into Rock.",
+	    				"Each additional Rockery can support "+utility.EXTRA_Rock_PerRockery+" Rocks.");
 			} else if(buildingStatBox == 3) {
-	    		_x = (int)CurMouse.getX() - con_start_x/2 - x_add*2;
-	    		_y = (int)CurMouse.getY() + x_add/2;
-				_g2.setColor(backing_brown);
-				_g2.fillRect(_x, _y, box_w, box_h);
-				_g2.setColor(Color.white);
-				_g2.drawRect(_x, _y, box_w, box_h);
-				_g2.setColor(front_blue);
-	    		_g2.drawString("The Smelter costs "+utility.COST_Smelter_Stone+" Stone to build.",  _x + _os, _y + (_os * 1));
-	    		_g2.drawString("Nearby Iron is collected by Rocks and brought to the Smelter.",  _x + _os, _y + (_os * 2));
-	    		_g2.drawString("The Smelter converts "+utility.COST_Scissors_Iron+" Iron into Scissors.",  _x + _os, _y + (_os * 3));
-	    		_g2.drawString("Each additional Smelter can support "+utility.EXTRA_Scissors_PerSmelter+" Scissors.",  _x + _os, _y + (_os * 4));
+	    		drawStatBox(_g2, 
+	    				"The Smelter costs "+utility.COST_Smelter_Stone+" Stone to build.", 
+	    				"Nearby Iron is collected by Rocks and brought to the Smelter.",
+	    				"The Smelter converts "+utility.COST_Scissors_Iron+" Iron into Scissors.",
+	    				"Each additional Smelter can support "+utility.EXTRA_Scissors_PerSmelter+" Scissors.");
 			} else if(buildingStatBox == 4) {
-	    		_x = (int)CurMouse.getX() - con_start_x/2 - x_add*3;
-	    		_y = (int)CurMouse.getY() + x_add/2;
-				_g2.setColor(backing_brown);
-				_g2.fillRect(_x, _y, box_w, box_h/2);
-				_g2.setColor(Color.white);
-				_g2.drawRect(_x, _y, box_w, box_h/2);
-				_g2.setColor(front_blue);
-	    		_g2.drawString("The Totem of Paper Costs "+utility.COST_AttractorPaper_Wood+" Wood to build.",  _x + _os, _y + (_os * 1));
-	    		_g2.drawString("It attracks your Paper towards it.",  _x + _os, _y + (_os * 2));
+	    		drawStatBox(_g2, 
+	    				"The Totem of Paper Costs "+utility.COST_AttractorPaper_Wood+" Wood to build.", 
+	    				"It attracks your Paper towards it.",
+	    				"",
+	    				"");
 			} else if(buildingStatBox == 5) {
-	    		_x = (int)CurMouse.getX() - con_start_x/2 - x_add*4;
-	    		_y = (int)CurMouse.getY() + x_add/2;
-				_g2.setColor(backing_brown);
-				_g2.fillRect(_x, _y, box_w, box_h/2);
-				_g2.setColor(Color.white);
-				_g2.drawRect(_x, _y, box_w, box_h/2);
-				_g2.setColor(front_blue);
-	    		_g2.drawString("The Totem of Rocks Costs "+utility.COST_AttractorRock_Stone+" Stone to build.",  _x + _os, _y + (_os * 1));
-	    		_g2.drawString("It attracks your Rocks towards it.",  _x + _os, _y + (_os * 2));
+	    		drawStatBox(_g2, 
+	    				"The Totem of Rocks Costs "+utility.COST_AttractorRock_Stone+" Stone to build.", 
+	    				"It attracks your Rocks towards it.",
+	    				"",
+	    				"");
 			} else if(buildingStatBox == 6) {
-	    		_x = (int)CurMouse.getX() - con_start_x/2 - x_add*5;
-	    		_y = (int)CurMouse.getY() + x_add/2;
-				_g2.setColor(backing_brown);
-				_g2.fillRect(_x, _y, box_w, box_h/2);
-				_g2.setColor(Color.white);
-				_g2.drawRect(_x, _y, box_w, box_h/2);
-				_g2.setColor(front_blue);
-	    		_g2.drawString("The Totem of Scissors Costs "+utility.COST_AttractorScissors_Iron+" Iron to build.",  _x + _os, _y + (_os * 1));
-	    		_g2.drawString("It attracks your Scissors towards it.",  _x + _os, _y + (_os * 2));
+	    		drawStatBox(_g2, 
+	    				"The Totem of Scissors Costs "+utility.COST_AttractorScissors_Iron+" Iron to build.", 
+	    				"It attracks your Scissors towards it.",
+	    				"",
+	    				"");
 			} else if(buildingStatBox == 7) {
-	    		_x = (int)CurMouse.getX() - con_start_x/2 - x_add*6;
-	    		_y = (int)CurMouse.getY() + x_add/2;
-				_g2.setColor(backing_brown);
-				_g2.fillRect(_x, _y, box_w, box_h/2);
-				_g2.setColor(Color.white);
-				_g2.drawRect(_x, _y, box_w, box_h/2);
-				_g2.setColor(front_blue);
-	    		_g2.drawString("Remove a building.",  _x + _os, _y + (_os * 1));
-	    		_g2.drawString("This will return 50% of the building costs.",  _x + _os, _y + (_os * 2));
+	    		drawStatBox(_g2, 
+	    				"Remove a building.", 
+	    				"This will return "+(utility.building_refund_amount*100)+"% of the building costs.",
+	    				"",
+	    				"");
 			} else if(buildingStatBox == 8) {
-	    		_x = (int)CurMouse.getX() - con_start_x/2 - x_add*6;
-	    		_y = (int)CurMouse.getY() + x_add/2;
-				_g2.setColor(backing_brown);
-				_g2.fillRect(_x, _y, box_w, box_h/2);
-				_g2.setColor(Color.white);
-				_g2.drawRect(_x, _y, box_w, box_h/2);
-				_g2.setColor(front_blue);
-	    		_g2.drawString("Toggle Paper Production.",  _x + _os, _y + (_os * 1));
-	    		_g2.drawString("When Green, your Woodshops will output Paper up to your maximum.",  _x + _os, _y + (_os * 2));
+	    		drawStatBox(_g2, 
+	    				"Toggle Paper Production.", 
+	    				"When Green, your Woodshops will output Paper up to your maximum.",
+	    				"",
+	    				"");
 			} else if(buildingStatBox == 9) {
-	    		_x = (int)CurMouse.getX() - con_start_x/2 - x_add*6;
-	    		_y = (int)CurMouse.getY() + x_add/2;
-				_g2.setColor(backing_brown);
-				_g2.fillRect(_x, _y, box_w, box_h/2);
-				_g2.setColor(Color.white);
-				_g2.drawRect(_x, _y, box_w, box_h/2);
-				_g2.setColor(front_blue);
-	    		_g2.drawString("Toggle Rock Production.",  _x + _os, _y + (_os * 1));
-	    		_g2.drawString("When Green, your Rockery will output Rocks up to your maximum.",  _x + _os, _y + (_os * 2));
+	    		drawStatBox(_g2, 
+	    				"Toggle Rock Production.", 
+	    				"When Green, your Rockery will output Rocks up to your maximum.",
+	    				"",
+	    				"");
 			} else if(buildingStatBox == 10) {
-	    		_x = (int)CurMouse.getX() - con_start_x/2 - x_add*6;
-	    		_y = (int)CurMouse.getY() + x_add/2;
-				_g2.setColor(backing_brown);
-				_g2.fillRect(_x, _y, box_w, box_h/2);
-				_g2.setColor(Color.white);
-				_g2.drawRect(_x, _y, box_w, box_h/2);
-				_g2.setColor(front_blue);
-	    		_g2.drawString("Toggle Scissor Production.",  _x + _os, _y + (_os * 1));
-	    		_g2.drawString("When Green, your Smelters will output Scissors up to your maximum.",  _x + _os, _y + (_os * 2));
+	    		drawStatBox(_g2, 
+	    				"Toggle Scissor Production.", 
+	    				"When Green, your Smelters will output Scissors up to your maximum.",
+	    				"",
+	    				"");
 			}
-	    	
 		}	
 	}
 	
+	private void drawStatBox(Graphics2D _g2, String _s1, String _s2, String _s3, String _s4) {
+		int _x = (int)CurMouse.getX() - con_start_x/2 - x_add*3;
+		int _y = (int)CurMouse.getY() + x_add/2;
+		final int _os = 15;
+		final int box_w = 500;
+		int box_h = 70;
+		if (_s3 == "") {
+			box_h /= 2;
+		}
+		_g2.setColor(backing_brown);
+		_g2.fillRect(_x, _y, box_w, box_h);
+		_g2.setColor(Color.white);
+		_g2.drawRect(_x, _y, box_w, box_h);
+		_g2.setColor(front_blue);
+		_g2.drawString(_s1,  _x + _os, _y + (_os * 1));
+		_g2.drawString(_s2,  _x + _os, _y + (_os * 2));
+		_g2.drawString(_s3,  _x + _os, _y + (_os * 3));
+		_g2.drawString(_s4,  _x + _os, _y + (_os * 4));
+	}
+	
 	private void drawSea(Graphics2D _g2, boolean doStars) {
-	    final float M = 0.71f;
-	    final float offset = utility.world_size;
+	    final float D = utility.waterfall_disk_size * utility.world_size;
 	    if (doStars == true) {
-		    float D = M*utility.world_size;
-		    //Bezier approximation to circle
-//		    float xValueInset = D * 0.1f;
-		    float yValueOffset = D * theTransforms.getShear() * 4.0f / 3.0f;
-		    float size = utility.window_Y*5f;// * theTransforms.getShearPercentage();
-//	    	GeneralPath waterfall = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-//	    	waterfall.moveTo( -D,0f);
-//	    	waterfall.curveTo(-D,D*1.34,        D,D*1.34,        D,0f);
-//	    	waterfall.curveTo(	-D + xValueInset, yValueOffset,
-//	    						 D - xValueInset, yValueOffset,
-//	    						 D, 0f);
-//	    	waterfall.lineTo(D, size);
-//	    	waterfall.curveTo( 	 D - xValueInset, yValueOffset + size,
-//	    						-D + xValueInset, yValueOffset + size,
-//	    						-D, size);
-//	    	waterfall.closePath();
 		    _g2.setTransform(theTransforms.af_translate_zoom);
-		    GradientPaint gradient = new GradientPaint(new Point(0,0), dsea_blue, new Point(0,(int) ((yValueOffset + size)*0.5)), Color.black);
-		    _g2.setPaint(gradient);
-		    _g2.fillRect((int)-D, (int)0f, (int)(2*D), (int)size); //Draw Col
+		    _g2.setPaint(dark_gradient);
+		    _g2.fillRect((int)-D, (int)0f, (int)(2*D), utility.waterfall_size); //Draw Column
+		    ///Do waterfall
+		    _g2.setClip((int)-D, (int)0f, (int)(2*D), utility.waterfall_size);
+		    _g2.setPaint(light_gradient);
+		    for (WaterfallSplash _w :  theSpriteManger.GetWaterfallSplashObjects()) {
+		    	((WaterfallSplash_Applet)_w).Render(_g2);
+		    }
 		    _g2.setTransform(theTransforms.af);
+		    _g2.setClip(null);
 	    }
 	    _g2.setColor(dsea_blue);
-	    _g2.fillOval ((int)(-offset*M),(int)(-offset*M),(int)(offset*2*M),(int)(offset*2*M));
+	    _g2.fillOval ((int)(-D),(int)(-D),(int)(D*2),(int)(D*2));
 	    if (background_stars.size() == 0) { //get some stars!
 	    	for (int s=0; s<100; ++s) {
-	    		int radius = Math.round((utility.world_size*M) + utility.rndI(utility.world_size*4));
+	    		int radius = Math.round((utility.world_size*utility.waterfall_disk_size*1.1f) + utility.rndI(utility.world_size*4));
 	    		float angle = (float) (utility.rnd() * Math.PI * 2);
 	    		background_stars.add(new Point( (int)Math.round(radius*Math.cos(angle)) , (int)Math.round(radius*Math.sin(angle)) ));
 	    	}
@@ -614,15 +574,8 @@ public class SceneRenderer_Applet {
 		    _g2.setTransform(theTransforms.af_translate_zoom);
 		    _g2.setColor(Color.white); //possibility to add stars
 		    for (Point _p : background_stars) {
-		    	//if (Math.abs((System.currentTimeMillis() / 1000) % _p.x ) < 2) {
-		    		//System.out.println("TWINKLE");
-		    	//	return;
-		    	//}
-				Point2D transform = null;
-				transform = theTransforms.af_shear_rotate.transform(new Point(_p.x,_p.y), transform);
-				final int _x = (int)Math.round(transform.getX());
-				final int _y = (int)Math.round(transform.getY());
-		    	_g2.fillOval(_x,_y,3,3);
+				Point2D transform = theTransforms.getTransformedPoint(_p.x, _p.y);
+		    	_g2.fillOval((int)transform.getX(),(int)transform.getY(),3,3);
 		    }
 		    _g2.setTransform(theTransforms.af);
 		}

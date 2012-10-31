@@ -1,8 +1,10 @@
 package com.timboeWeb.rpsrts;
 
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 
 import com.timboe.rpsrts.Utility;
 
@@ -47,6 +49,8 @@ public class TransformStore {
 
 	private boolean updateNeeded = true;
 	
+	Point2D transform = null; //for inverse transform
+	
 	public void updateTransforms() {
 		if (updateNeeded == false) return;
 		//System.out.println("TRANSLATE_Y : "+TRANSLATE_Y);
@@ -75,6 +79,7 @@ public class TransformStore {
 		af_backing.translate(-utility.world_size2,-utility.world_size2);
 
 		updateNeeded = false;
+		
 	}
 	
 	public float GetZoom() {
@@ -170,6 +175,11 @@ public class TransformStore {
 	
 	public float getShearPercentage() {
 		return (YSHEAR_MAX - YSHEAR) * (1f/(1f-YSHEAR_MIN));
+	}
+	
+	public Point2D getTransformedPoint(float _x, float _y) {
+		transform = af_shear_rotate.transform(new Point((int)_x,(int)_y), transform);
+		return transform;		
 	}
 	
 	public float getRotate() {

@@ -14,7 +14,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
-
 import com.timboeWeb.rpsrts.GameWorld_Applet;
 import com.timboeWeb.rpsrts.SceneRenderer_Applet;
 import com.timboeWeb.rpsrts.SpriteManager_Applet;
@@ -27,10 +26,11 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	 */
 	private static final long serialVersionUID = -4515697164989975837L;
 	private long _TIME_OF_LAST_TICK = 0; // Internal
-	private final int _DO_FPS_EVERY_X_TICKS = 1; // refresh FPS after X frames
+	private final int _DO_FPS_EVERY_X_TICKS = 6; // refresh FPS after X frames
 	private long _TIME_OF_NEXT_TICK; // Internal
-	private int _TICK; // Counter
-	private int _DESIRED_TPS = 30; // Ticks per second to aim for
+	private int _DESIRED_FPS = 30; // Frames per second to aim for
+	private int _TICKS_PER_RENDER = 2;
+	private int _DESIRED_TPS = _DESIRED_FPS * _TICKS_PER_RENDER;
 
 	int last_X = -1; //Mouse cursor historic
 	int last_Y = -1;
@@ -193,7 +193,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		theSpriteManger.Reset();
 		theWorld.Reset();
 		theSceneRenderer.background_buffered = null;
-		_TICK = 0;
+		utility.TICK = 0;
 	}
 
 	public void doWinLoose() {
@@ -226,11 +226,9 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	    } else if (utility.gameMode == GameMode.gameOn){
 	    	theSceneRenderer.sceneGame(g2);
 	    	if (utility.mouseClick == true) theSceneRenderer.mouseClick();
-		    theSpriteManger.Tick();
 		    doWinLoose();
 	    } else if (utility.gameMode == GameMode.gameOverLost || utility.gameMode == GameMode.gameOverWon) {
 	    	theSceneRenderer.sceneGameOver(g2);
-		    theSpriteManger.Tick();
 	    }
 
 		utility.mouseClick = false;
@@ -259,14 +257,19 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			}
 			_TIME_OF_NEXT_TICK = System.currentTimeMillis()
 					+ Math.round(1000f / _DESIRED_TPS);
+			
+			++utility.TICK;
+		    if (utility.gameMode != GameMode.titleScreen) theSpriteManger.Tick();
 
-			if (_TICK % _DO_FPS_EVERY_X_TICKS == 0) {
-				utility.FPS = Math.round(1. / (System.currentTimeMillis() - _TIME_OF_LAST_TICK)
-								  * 1000. * _DO_FPS_EVERY_X_TICKS);
+			if (utility.TICK % _DO_FPS_EVERY_X_TICKS == 0) {
+				utility.FPS = Math.round((1. / (System.currentTimeMillis() - _TIME_OF_LAST_TICK)* 1000. * _DO_FPS_EVERY_X_TICKS) / _TICKS_PER_RENDER);
 				_TIME_OF_LAST_TICK = System.currentTimeMillis();
 			}
-			++_TICK;
-			repaint();
+			
+			if (utility.TICK % _TICKS_PER_RENDER == 0) {
+				repaint();
+			}
+			
 			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		}
 	}

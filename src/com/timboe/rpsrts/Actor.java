@@ -61,11 +61,11 @@ public class Actor extends Sprite {
 			iCollect.add(ResourceType.Cactus);
 			iCollect.add(ResourceType.Tree);
 		}
-		speed = 1f * RPS;
-		strength = (int) (4f / RPS);
-		maxHealth = (int) (50f / RPS);
+		speed = utility.actor_speed * RPS;
+		strength = (int) (utility.actor_strength / RPS);
+		maxHealth = (int) (utility.actor_starting_health / RPS);
 		ticks_per_tock *= RPS;
-		attack_range = 30;
+		attack_range = utility.actor_attack_range;
 
 		
 		health = maxHealth;
@@ -154,7 +154,7 @@ public class Actor extends Sprite {
 	@Override
 	public void Kill() {
 		if (dead == true) return;
-		theSpriteManager.PlaceSpooge(x, y, GetOwner(), 20, 0.8f);
+		theSpriteManager.PlaceSpooge(x, y, GetOwner(), utility.spooges_actor_death, 0.8f);
 		QuitJob(true);
 		dead = true;
 		resource_manager.UnitDeath(type,owner);

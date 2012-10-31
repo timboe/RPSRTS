@@ -64,9 +64,9 @@ public class Building_Applet extends Building {
 		}
 	}
 	
-	public void Render(Graphics2D _g2, int _tick_count) {
+	public void Render(Graphics2D _g2, int _frame_count) {
 		if (dead == true) return;
-		if (_tick_count % 2 == 0) {
+		if (_frame_count % 2 == 0) {
 			++animStep;
 		}
 
@@ -87,10 +87,10 @@ public class Building_Applet extends Building {
 			_x_points[2] = x + b_r + 2;
 			_x_points[3] = x + b_r - 2;
 
-			_y_points[0] = y - b_r + 2 + y_offset/6;
-			_y_points[1] = y - b_r - 2 + y_offset/6;
-			_y_points[2] = y + b_r - 2 + y_offset/6;
-			_y_points[3] = y + b_r + 2 + y_offset/6;
+			_y_points[0] = y - b_r + 2 + y_offset/8;
+			_y_points[1] = y - b_r - 2 + y_offset/8;
+			_y_points[2] = y + b_r - 2 + y_offset/8;
+			_y_points[3] = y + b_r + 2 + y_offset/8;
 
 			_g2.fillPolygon(_x_points, _y_points, 4);
 
@@ -99,10 +99,10 @@ public class Building_Applet extends Building {
 			_x_points[2] = x + b_r + 2;
 			_x_points[3] = x + b_r - 2;
 
-			_y_points[0] = y + b_r - 2 + y_offset/6;
-			_y_points[1] = y + b_r + 2 + y_offset/6;
-			_y_points[2] = y - b_r + 2 + y_offset/6;
-			_y_points[3] = y - b_r - 2 + y_offset/6;
+			_y_points[0] = y + b_r - 2 + y_offset/8;
+			_y_points[1] = y + b_r + 2 + y_offset/8;
+			_y_points[2] = y - b_r + 2 + y_offset/8;
+			_y_points[3] = y - b_r - 2 + y_offset/8;
 			_g2.fillPolygon(_x_points, _y_points, 4);
 
 			delete_hover = false;

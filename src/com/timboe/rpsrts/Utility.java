@@ -50,6 +50,7 @@ public class Utility {
 	public GameMode gameMode = GameMode.titleScreen; //what state is game currently in
 	public long loose_time; //what time was game won/lost
 	public long FPS = 0;
+	public int TICK;
 	public boolean mouseClick = false;
 	public boolean mouseDrag = false;
 	public boolean sendMouseDragPing = false;
@@ -70,7 +71,7 @@ public class Utility {
 
 	
 	//time settings
-	public final int ticks_per_tock = 30;
+	public final int ticks_per_tock = 60; //one per second
 
 	//world manager settings
 	public final float wg_seconds_to_wait = 1f; //Time to wait between steps
@@ -110,7 +111,11 @@ public class Utility {
 	public final int tocks_before_retake_job_from_boss = 5; //How long before retake job from same boss once quit
 	public final int actor_look_for_spot_radius = 50;
 	public final int actor_aggro_radius = 60;
-
+	public final float actor_speed = 0.5f;
+	public final float actor_strength = 4f;
+	public final float actor_starting_health = 50f;
+	public final int actor_attack_range = 30;
+	
 	//biome settings
 	public final int biome_golbal_density_mod = 1;//tiles_size; //derived
 	public final float biome_colour_range = 10; //smear of colours in biome
@@ -131,6 +136,22 @@ public class Utility {
 	public final float resource_change_spawn = 0.001f; //careful with this one! can fill board up with trees n' junk
 	public final int resource_max_stuff = 50;
 
+	//spooge settings
+	public final float gravity = 0.2f;
+	public final int spooges_actor_death = 20;
+	public final int spooges_building_death = 200;
+	public final int spooges_totem_death = 30;
+	public final int spooges_base_death = 1000;
+
+	//waterfall settings
+	public final int waterfall_splash_radius = 30;
+	public final int waterfall_splashes = 400;
+	public final int waterfall_size = (int) (window_Y*4f);
+	public final float waterfall_disk_size = 0.71f;
+	public final float waterfall_fall_rate = 0.5f;
+	public final float waterfall_fall_speed = 10f;
+
+	
 	//building settings
 	public final int building_gather_radius = 100;
 	public final int building_gatherers_per_site = 2;
@@ -140,13 +161,13 @@ public class Utility {
 	public final int building_AI_GranularityToStudy = 10; //Higher value makes AI place quicker, but leaves sub-optimal placement
 	public final float building_refund_amount = 0.5f;
 	public final int building_no_resource_penalty = 50;//s
-	public final int building_Place_degrees = 32;
-	public final int building_Place_degrees_show = 16;
+	public final int building_Place_degrees = 32; //can-be-placed markers
+	public final int building_Place_degrees_show = 16; //can-be-placed markers
 
 	//AI
 	public final int AI_BadBuilding_Before_Sell = 3; //building_no_resource_penalty seconds per tick
 	public final int AI_NewUnitsWhenXClosetoCap = 2;
-	public final int AI_BuildCooldown = 40;//tocks
+	public final int AI_BuildCooldown = 40;//tocks (applies per building type)
 	public final int AI_TargetUnitMultipler = 3;
 	
 	//COSTS

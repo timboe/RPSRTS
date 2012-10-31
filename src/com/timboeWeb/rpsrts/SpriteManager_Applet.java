@@ -19,6 +19,7 @@ import com.timboe.rpsrts.ResourceType;
 import com.timboe.rpsrts.Spoogicles;
 import com.timboe.rpsrts.Sprite;
 import com.timboe.rpsrts.SpriteManager;
+import com.timboe.rpsrts.WaterfallSplash;
 import com.timboe.rpsrts.WorldPoint;
 
 public class SpriteManager_Applet extends SpriteManager {
@@ -107,18 +108,18 @@ public class SpriteManager_Applet extends SpriteManager {
 				_scale);		
 		GetSpoogiclesObjects().add(newSpoogicles);
 	}
+	
+	@Override
+	public void PlaceWaterfallSplash(int _x, int _y, int _r) {
+		final WaterfallSplash newWFS = new WaterfallSplash_Applet(++GlobalSpriteCounter, _x, _y, _r);
+		GetWaterfallSplashObjects().add(newWFS);
+	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void Render(Graphics2D _g2) {
-//		if (utility.dbg == true && thePathfinderGrid != null && ) {
-//			for (final WeightedPoint _w : thePathfinderGrid.point_collection) {
-//				_w.Render(_g2, _af);
-//			}
-//		}
-//		
+		++FrameCount;
 		
 		TreeSet<Sprite> ZOrder = new TreeSet<Sprite>();
-		
 		HashSet<Sprite> ActorObjects_Applet = (HashSet) ActorObjects;
 		for (final Sprite _s : ActorObjects_Applet) {
 			ZOrder.add(_s);
@@ -139,18 +140,19 @@ public class SpriteManager_Applet extends SpriteManager {
 		for (final Sprite _s : SpoogiclesObjects_Applet) {
 			ZOrder.add(_s);
 		}
+		//Waterfall splashs' are rendered by the Scene Drawer (we just look after them here with other sprites)
 		
 		for (final Sprite _Z : ZOrder) {
 			if (_Z.GetIsActor() == true) {
-				((Actor_Applet) _Z).Render(_g2, TickCount);
+				((Actor_Applet) _Z).Render(_g2, FrameCount);
 			} else if (_Z.GetIsResource() == true) {
-				((Resource_Applet) _Z).Render(_g2, TickCount);
+				((Resource_Applet) _Z).Render(_g2, FrameCount);
 			} else if (_Z.GetIsBuilding() == true) {
-				((Building_Applet) _Z).Render(_g2, TickCount);
+				((Building_Applet) _Z).Render(_g2, FrameCount);
 			} else if (_Z.GetIsProjectile() == true) {
-				((Projectile_Applet) _Z).Render(_g2, TickCount);
+				((Projectile_Applet) _Z).Render(_g2, FrameCount);
 			} else if (_Z.GetIsSpoogicle() == true) {
-				((Spoogicles_Applet) _Z).Render(_g2, TickCount);
+				((Spoogicles_Applet) _Z).Render(_g2, FrameCount);
 			}
 		}
 		
@@ -222,11 +224,11 @@ public class SpriteManager_Applet extends SpriteManager {
 		if (drawingTopBar == false) {
 			_g2.setTransform(theTransforms.af_translate_zoom);
 			if (_graphic != null) {
-				_g2.drawImage(_graphic[TickCount/2 % animSteps], __x - _r, __y - _r - _y_offset, null);
+				_g2.drawImage(_graphic[FrameCount/2 % animSteps], __x - _r, __y - _r - _y_offset, null);
 			}
 		} else { //Drawing top bar
 			if (_graphic != null) {
-				_g2.drawImage(_graphic[TickCount/2 % animSteps], _x - _r, _y - _r - _y_offset, null);
+				_g2.drawImage(_graphic[FrameCount/2 % animSteps], _x - _r, _y - _r - _y_offset, null);
 			}
 		}
 	}
@@ -252,7 +254,7 @@ public class SpriteManager_Applet extends SpriteManager {
 				if (_b.GetCollects().size() == 0) { //not gatherer
 					continue;
 				}
-				for (int angle = (TickCount%utility.building_Place_degrees); angle <= utility.wg_DegInCircle; angle += utility.building_Place_degrees) {
+				for (int angle = (FrameCount%utility.building_Place_degrees); angle <= utility.wg_DegInCircle; angle += utility.building_Place_degrees) {
 					_g2.drawArc(_b.GetX() - utility.building_gather_radius, _b.GetY() - utility.building_gather_radius,
 							utility.building_gather_radius * 2, utility.building_gather_radius * 2, angle, utility.building_Place_degrees_show);
 				}
@@ -309,7 +311,7 @@ public class SpriteManager_Applet extends SpriteManager {
 			if (doDistanceCheck == true) {
 				_g2.setColor(Color.white);
 				_g2.setTransform(theTransforms.af);
-				for (int angle = (TickCount%utility.building_Place_degrees); angle <= utility.wg_DegInCircle; angle += utility.building_Place_degrees) {
+				for (int angle = (FrameCount%utility.building_Place_degrees); angle <= utility.wg_DegInCircle; angle += utility.building_Place_degrees) {
 					_g2.drawArc(_mouse_x - utility.building_gather_radius, _mouse_y - utility.building_gather_radius,
 							utility.building_gather_radius * 2, utility.building_gather_radius * 2, angle, utility.building_Place_degrees_show);
 				}

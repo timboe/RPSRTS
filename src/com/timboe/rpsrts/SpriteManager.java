@@ -19,6 +19,7 @@ public class SpriteManager {
 	private float ws_time_of_last_operation = 0;
 	private boolean worldSeeded = false;
 	protected int TickCount = 0;
+	protected int FrameCount = 0;
 	
 	Thread pathfinding_thread;
 	Pathfinder pathfinder;
@@ -33,13 +34,14 @@ public class SpriteManager {
 
 	protected final HashSet<Sprite> CollisionObjects = new HashSet<Sprite>();
 	protected final HashSet<Actor> ActorObjects = new HashSet<Actor>();
-	public final HashSet<Building> BuildingOjects = new HashSet<Building>();
+	protected final HashSet<Building> BuildingOjects = new HashSet<Building>();
 	protected final HashSet<Resource> ResourceObjects = new HashSet<Resource>();
 	protected final HashSet<Projectile> ProjectileObjects = new HashSet<Projectile>();
 	protected final HashSet<Spoogicles> SpoogicleObjects = new HashSet<Spoogicles>();
-	
-	protected final HashSet<Resource> TempResourceHolder = new HashSet<Resource>();
+	protected final HashSet<WaterfallSplash> WaterfallSplahsObjects = new HashSet<WaterfallSplash>();
 
+	//
+	protected final HashSet<Resource> TempResourceHolder = new HashSet<Resource>();
 
 	protected SpriteManager() {
 	}
@@ -48,7 +50,6 @@ public class SpriteManager {
 		int _snap_x = _P.getX();
 		int _snap_y = _P.getY();
 
-		
 		_snap_x = _snap_x - (_snap_x % theWorld.tiles_size) + (theWorld.tiles_size/2);
 		_snap_y = _snap_y - (_snap_y % theWorld.tiles_size) + (theWorld.tiles_size/2);
 		
@@ -259,6 +260,11 @@ public class SpriteManager {
 				toKill.add(_s);
 			}
 		}
+		for (final WaterfallSplash _w : GetWaterfallSplashObjects()) {
+			if (_w.GetDead() == true) {
+				toKill.add(_w);
+			}
+		}
 		for (final Sprite die : toKill) {
 			GetActorObjects().remove(die);
 			GetResourceObjects().remove(die);
@@ -266,6 +272,7 @@ public class SpriteManager {
 			GetProjectileObjects().remove(die);
 			GetCollisionObjects().remove(die);
 			GetSpoogiclesObjects().remove(die);
+			GetWaterfallSplashObjects().remove(die);
 		}
 		toKill.clear();
 	}
@@ -282,6 +289,10 @@ public class SpriteManager {
 	
 	public HashSet<Spoogicles> GetSpoogiclesObjects() {
 		return SpoogicleObjects;
+	}
+	
+	public HashSet<WaterfallSplash> GetWaterfallSplashObjects() {
+		return WaterfallSplahsObjects;
 	}
 	
 	public HashSet<Building> GetBuildingOjects() {
@@ -527,6 +538,9 @@ public class SpriteManager {
 		//OVER RIDE
 	}
 
+	protected void PlaceWaterfallSplash(int _x, int _y, int _r) {
+		//OVER RIDE
+	}
 
 	protected Actor PlaceActor(WorldPoint starting_troops, ActorType scissors, ObjectOwner oo) {
 		//OVERRIDE
@@ -557,6 +571,12 @@ public class SpriteManager {
 		for (final Building _b : GetBuildingOjects()) {
 			_b.Tick(TickCount);
 		}
+		for (final Spoogicles _s : GetSpoogiclesObjects()) {
+			_s.Tick(TickCount);
+		}
+		for (final WaterfallSplash _w : GetWaterfallSplashObjects()) {
+			_w.Tick(TickCount);
+		}
 		
 		//any resources added?
 		//now we're clear of the tick loop we can add these to the list
@@ -564,6 +584,14 @@ public class SpriteManager {
 			GetResourceObjects().addAll(TempResourceHolder);
 			GetCollisionObjects().addAll(TempResourceHolder);
 			TempResourceHolder.clear();
+		}
+		
+		//check if we need more splashes
+		if (GetWaterfallSplashObjects().size() < utility.waterfall_splashes && utility.rnd() < utility.waterfall_fall_rate) {
+			float angle = (float) (utility.rnd() * Math.PI * 2);
+			int _x = (int) (utility.world_size * utility.waterfall_disk_size * Math.cos(angle));
+			int _y = (int) (utility.world_size * utility.waterfall_disk_size * Math.sin(angle));
+			PlaceWaterfallSplash(_x, _y, utility.waterfall_splash_radius);
 		}
 	}
 

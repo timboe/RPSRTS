@@ -2,7 +2,6 @@ package com.timboeWeb.rpsrts;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 import java.awt.geom.Point2D;
@@ -46,10 +45,9 @@ public class Actor_Applet extends Actor {
 		}
 	}
 		
-	public void Render(Graphics2D _g2, int _tick_count) {
+	public void Render(Graphics2D _g2, int _frame_count) {
 		if (dead == true) return;
-		Point2D transform = null;
-		transform = theTransforms.af_shear_rotate.transform(new Point(x, y), transform);
+		Point2D transform = theTransforms.getTransformedPoint(x, y);
 		final int _x = (int)Math.round(transform.getX());
 		final int _y = (int)Math.round(transform.getY());
 
