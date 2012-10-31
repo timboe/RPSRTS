@@ -42,11 +42,8 @@ public class WorldChunk_Applet extends WorldChunk {
 		_g2.fillRect (super.x-extra, super.y-extra, super.tile_s+(2*extra), super.tile_s+(2*extra));
 
 		_g2.setColor(Color.white);
-		_g2.fillOval((int)Math.round(super.GetXCentre()),(int)Math.round(super.GetYCentre()),3,3);
-		//g.setColor(Color.white);
-		_g2.drawString(Integer.toString(super.GetAngle())+"°", (int)Math.round(super.GetXCentre())-20,(int)Math.round(super.GetYCentre()) - 2 );
-		//g.drawString(Integer.toString(super.GetX())+","+Integer.toString(super.GetY()), (int)Math.round(super.GetXCentre())-20,(int)Math.round(super.GetYCentre())+13 );
-		//_g2.drawString(Integer.toString(super.ID), (int)Math.round(super.GetXCentre())-10,(int)Math.round(super.GetYCentre())-3 );
+		_g2.fillOval((int)Math.round(super.GetXCentre() - 3),(int)Math.round(super.GetYCentre() - 3),6,6);
+		_g2.drawString(Integer.toString(super.GetAngle())+"°", (int)Math.round(super.GetXCentre())-20,(int)Math.round(super.GetYCentre()) - 10 );
 	}
 
 }

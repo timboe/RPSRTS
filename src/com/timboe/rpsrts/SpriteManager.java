@@ -206,7 +206,7 @@ public class SpriteManager {
 //	}
 
 	WorldPoint FindSpotForResource(WorldPoint _loc) {
-		return FindGoodSpot(_loc, utility.resourceRadius, theWorld.GetTileSize(), true);
+		return FindGoodSpot(_loc, utility.resourceRadius, utility.tiles_size, true);
 	}
 	
 	//TODO CHECK THAT CHANGING THIS TO INCLUDE ACTORS IN THE CHECK WAS A GOOD IDEA (has overhead)
@@ -352,11 +352,15 @@ public class SpriteManager {
 		//System.out.println("ENTER SEED");
 		final WorldPoint player_starting = theWorld.GetIdeadStartingLocation(ObjectOwner.Player);
 		final WorldPoint enemy_starting = theWorld.GetIdeadStartingLocation(ObjectOwner.Enemy);
-		final float timeNow = (System.nanoTime() / 1000000) / 1000.0f;
+		final float timeNow = (System.nanoTime() / 1000000000f);
+		float time_to_wait = utility.wg_seconds_to_wait;
+		if (utility.dbg == true) {
+			time_to_wait = 0f;
+		}
 
-		if (ws_step == 0 && (timeNow-ws_time_of_last_operation) > utility.wg_seconds_to_wait) {
+		if (ws_step == 0 && (timeNow-ws_time_of_last_operation) > time_to_wait) {
 			++ws_step;
-			ws_time_of_last_operation = (System.nanoTime() / 1000000) / 1000.0f;
+			ws_time_of_last_operation = (System.nanoTime() / 1000000000f);
 			System.out.println("STATE: START SEED " + ws_step + " RND_C:" + utility.rnd_count);
 
 			//Setup the pathfinding grid 
@@ -402,13 +406,12 @@ public class SpriteManager {
 			}
 		}
 		
-		if (ws_step == 2 && (timeNow-ws_time_of_last_operation) > utility.wg_seconds_to_wait) {
+		if (ws_step == 2 && (timeNow-ws_time_of_last_operation) > time_to_wait) {
 			System.out.println("STATE: RESOURCE " + ws_step + " RND_C:" + utility.rnd_count);
 			++ws_step;
-			ws_time_of_last_operation = (System.nanoTime() / 1000000) / 1000.0f;
+			ws_time_of_last_operation = (System.nanoTime() / 1000000000f);
 			//initial plant!
 			final HashSet<WorldTile> render_tiles = theWorld.GetRenderTiles();
-			final int tile_size = theWorld.GetTileSize();
 			for (final WorldTile _t : render_tiles) {
 				ResourceType toPlant = null;
 				if (_t.GetBiomeType() == BiomeType.FORREST) {
@@ -433,7 +436,7 @@ public class SpriteManager {
 				float resDensity = _t.GetOwner().GetResourceDensity();
 				if (toPlant == ResourceType.Rockpile || toPlant == ResourceType.Mine) resDensity /= (float) utility.place_res_gaussian; //Trees only come in one
 				if (utility.rnd() < resDensity) { //TODO check reduction factor here
-					final WorldPoint look_around = new WorldPoint(_t.GetX() + utility.rndI(tile_size), _t.GetY() + utility.rndI(tile_size));
+					final WorldPoint look_around = new WorldPoint(_t.GetX() + utility.rndI(utility.tiles_size), _t.GetY() + utility.rndI(utility.tiles_size));
 					WorldPoint ideal_resource_loation = FindSpotForResource(look_around);// FindGoodSpot(look_around, utility.resourceRadius, tile_size, true);
 					if (ideal_resource_loation != null) {
 						//Try placing resources around a gaussian centred on 5
@@ -443,7 +446,7 @@ public class SpriteManager {
 						for (int place = 0; place < toPlace; ++place) {
 							if (ideal_resource_loation != null) PlaceResource(ideal_resource_loation, toPlant, false);
 							//get new location nearby
-							ideal_resource_loation = FindGoodSpot(look_around, utility.resourceRadius, tile_size*5, true);
+							ideal_resource_loation = FindGoodSpot(look_around, utility.resourceRadius, utility.tiles_size*5, true);
 						}
 					}
 				}
@@ -462,9 +465,9 @@ public class SpriteManager {
 //			System.out.println("AV Res:"+avRes+" avRes Target:"+utility.resource_desired_global);
 		}
 
-		if (ws_step == 3 && (timeNow-ws_time_of_last_operation) > utility.wg_seconds_to_wait) {
+		if (ws_step == 3 && (timeNow-ws_time_of_last_operation) > time_to_wait) {
 			++ws_step;
-			ws_time_of_last_operation = (System.nanoTime() / 1000000) / 1000.0f;
+			ws_time_of_last_operation = (System.nanoTime() / 1000000000f);
 			WorldPoint starting_troops;
 			for (int owner = 0; owner < 2; ++owner) {
 				WorldPoint starting;
@@ -502,9 +505,9 @@ public class SpriteManager {
 			}
 		}
 
-		if (ws_step == 4 && (timeNow-ws_time_of_last_operation) > utility.wg_seconds_to_wait) {
+		if (ws_step == 4 && (timeNow-ws_time_of_last_operation) > time_to_wait) {
 			++ws_step;
-			ws_time_of_last_operation = (System.nanoTime() / 1000000) / 1000.0f;
+			ws_time_of_last_operation = (System.nanoTime() / 10000000000f);
 			worldSeeded = true;
 			System.out.println("STATE: MAGIC FINAL NUMBER AT SPRITE STATE " + ws_step + " RND_C:" + utility.rnd_count);
 		}

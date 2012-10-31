@@ -2,6 +2,7 @@ package com.timboe.rpsrts;
 
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Vector;
 
 public class GameWorld {
 	protected final Utility utility = Utility.GetUtility();
@@ -67,72 +68,77 @@ public class GameWorld {
 	}
 
 	public int GenerateWorld() {
-		final float timeNow = (System.nanoTime() / 10000000000f);
-
+		final float timeNow = (System.nanoTime() / 1000000000f);
+		float time_to_wait = utility.wg_seconds_to_wait;
+		if (utility.dbg == true) {
+			time_to_wait = 0f;
+		}
 		if (utility.doWorldGen == false) return 1; //Stop until player clicks GO
-		
+		//System.out.println("STATE: TICK " + (System.nanoTime() / 1000000000f));
+
 		if (wg_state == 0) {
 			Reset();
-			wg_time_of_last_operation = (System.nanoTime() / 10000000000f);
+			wg_time_of_last_operation = (System.nanoTime() / 1000000000f);
 			wg_state = 1;
 			System.out.println("STATE: reset " + wg_state + " RND_C:" + utility.rnd_count);
 		}
 
-		if (wg_state == 1 && (timeNow-wg_time_of_last_operation) > utility.wg_seconds_to_wait ) {
+		if (wg_state == 1 && (timeNow-wg_time_of_last_operation) > time_to_wait ) {
 			GenerateWorld_CrinkleIslandEdge();
-			wg_time_of_last_operation = (System.nanoTime() / 10000000000f);
+			wg_time_of_last_operation = (System.nanoTime() / 1000000000f);
 			++wg_state;
 			System.out.println("STATE: crinkle " + wg_state + " RND_C:" + utility.rnd_count);
 		}
 
-		if (wg_state == 2 && (timeNow-wg_time_of_last_operation) > utility.wg_seconds_to_wait ) {
+		if (wg_state == 2 && (timeNow-wg_time_of_last_operation) > time_to_wait ) {
 			GenerateWorld_RandomSeed();
-			wg_time_of_last_operation = (System.nanoTime() / 10000000000f);
+			wg_time_of_last_operation = (System.nanoTime() / 1000000000f);
 			++wg_state;
 			System.out.println("STATE: RND SEED " + wg_state + " RND_C:" + utility.rnd_count);
 		}
 
-		if (wg_state == 3 && (timeNow-wg_time_of_last_operation) > utility.wg_seconds_to_wait ) {
+		if (wg_state == 3 && (timeNow-wg_time_of_last_operation) > time_to_wait ) {
 			++wg_state;
 			System.out.println("STATE: WAIT " + wg_state + " RND_C:" + utility.rnd_count);
 			return wg_state;
 		}
 
-		if (wg_state == 4 && (timeNow-wg_time_of_last_operation) > utility.wg_seconds_to_wait ) {
+		if (wg_state == 4 && (timeNow-wg_time_of_last_operation) > time_to_wait ) {
 			final int nBiomes = GenerateWorld_Apply_kT();
 			if (nBiomes == -1)
 				return wg_state;
 			else if (nBiomes < utility.wg_MinBiomes || nBiomes > utility.wg_MaxBiomes) {
 				wg_state = 1;
 			} else {
-				wg_time_of_last_operation = (System.nanoTime() / 10000000000f);
+				wg_time_of_last_operation = (System.nanoTime() / 1000000000f);
 				++wg_state;
 				System.out.println("STATE: KT (CHECK BIOME N)  " + wg_state + " RND_C:" + utility.rnd_count);
 			}
 		}
 
-		if (wg_state == 5 && (timeNow-wg_time_of_last_operation) > utility.wg_seconds_to_wait ) {
+		if (wg_state == 5 && (timeNow-wg_time_of_last_operation) > time_to_wait ) {
 			final boolean allGood = GenerateWorld_AssignBiomes();
 			if (allGood == false) {
 				System.out.println("--WORLD GEN FAILS ON ASSIGN BIOMES");
-				wg_state = 1;
+				utility._RPSRTS.genNewWorld();
+				return 5;
 			} else {
-				wg_time_of_last_operation = (System.nanoTime() / 10000000000f);
+				wg_time_of_last_operation = (System.nanoTime() / 1000000000f);
 				++wg_state;
 				System.out.println("STATE: ASSIGN BIOME " + wg_state + " RND_C:" + utility.rnd_count);
 			}
 		}
 
-		if (wg_state == 6 && (timeNow-wg_time_of_last_operation) > utility.wg_seconds_to_wait ) {
+		if (wg_state == 6 && (timeNow-wg_time_of_last_operation) > time_to_wait ) {
 			GenerateWorld_ErodeEdges();
-			wg_time_of_last_operation = (System.nanoTime() / 10000000000f);
+			wg_time_of_last_operation = (System.nanoTime() / 1000000000f);
 			++wg_state;
 			System.out.println("STATE: ERODE " + wg_state + " RND_C:" + utility.rnd_count);
 		}
 
-		if (wg_state == 7 && (timeNow-wg_time_of_last_operation) > utility.wg_seconds_to_wait ) {
+		if (wg_state == 7 && (timeNow-wg_time_of_last_operation) > time_to_wait ) {
 			++wg_times_erroded;
-			wg_time_of_last_operation = (System.nanoTime() / 10000000000f);
+			wg_time_of_last_operation = (System.nanoTime() / 1000000000f);
 			if (wg_times_erroded == utility.wg_ErrodeIterations)  {
 				++wg_state;
 				System.out.println("STATE:" + wg_state + " RND_C:" + utility.rnd_count);
@@ -356,7 +362,7 @@ public class GameWorld {
 		return true;
 	}
 
-	public void GenerateWorld_CrinkleIslandEdge() {
+	private void GenerateWorld_CrinkleIslandEdge() {
 		//Seed edges
 		System.out.println("STATE: before loop RND_C:" + utility.rnd_count);
 
@@ -400,12 +406,12 @@ public class GameWorld {
 		}
 	}
 
-	public void GenerateWorld_ErodeEdges() {
+	private void GenerateWorld_ErodeEdges() {
 	System.out.println("STATE: ERRODE START " + wg_state + " RND_C:" + utility.rnd_count);
 		for (final WorldTile t : render_tiles) {
 			final Biome myOwner = t.GetOwner();
 			final LinkedList<WorldTile> neighbours = GetNeighbour(t,false);
-			final LinkedList<WorldTile> possibleSwaps = new LinkedList<WorldTile>();
+			final Vector<WorldTile> possibleSwaps = new Vector<WorldTile>();
 			for (final WorldTile n : neighbours) {
 				if (n.GetOwner() != myOwner) {
 					possibleSwaps.add(n);
@@ -414,7 +420,7 @@ public class GameWorld {
 			if (possibleSwaps.size() > 0 && true) {//) { //XXX RND BUG
 				//Give this tile to the other biome
 				//int location = 0;//utility.rnd.nextInt(possibleSwaps.size())
-				final WorldTile tile_to_give = possibleSwaps.removeFirst();//utility.rnd.nextInt(possibleSwaps.size()) );  //XXX RND BUG
+				final WorldTile tile_to_give = possibleSwaps.elementAt( utility.rndI( possibleSwaps.size() ) );//possibleSwaps.removeFirst();//  //XXX RND BUG
 				Biome OwnerBiome = tile_to_give.GetOwner(); //TODO STILL NOT WORKINg (isn't  it?) 
 				OwnerBiome.RemoveTile(tile_to_give);
 				myOwner.AddTile(tile_to_give);
@@ -528,10 +534,6 @@ public class GameWorld {
 		final float x_diff = c1.GetXCentre() - c2.GetXCentre();
 		final float y_diff = c1.GetYCentre() - c2.GetYCentre();
 		return (float) Math.sqrt( Math.pow(x_diff, 2) + Math.pow(y_diff, 2));
-	}
-
-	public int GetTileSize() {
-		return tiles_size;
 	}
 
 	public boolean GetWorldGenerated(){

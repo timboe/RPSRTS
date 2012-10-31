@@ -66,9 +66,7 @@ public class SpriteManager_Applet extends SpriteManager {
 				, _bt
 				, _oo);
 		GetBuildingOjects().add(newBuilding);
-		//synchronized (CollisionObjectsThreadSafe) {
-			GetCollisionObjects().add(newBuilding);
-		//}
+		GetCollisionObjects().add(newBuilding);
 		return newBuilding;
 	}
 	
@@ -112,12 +110,12 @@ public class SpriteManager_Applet extends SpriteManager {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void Render(Graphics2D _g2) {
-//		if (thePathfinderGrid != null && utility.dbg == true) {
+//		if (utility.dbg == true && thePathfinderGrid != null && ) {
 //			for (final WeightedPoint _w : thePathfinderGrid.point_collection) {
 //				_w.Render(_g2, _af);
 //			}
 //		}
-		
+//		
 		
 		TreeSet<Sprite> ZOrder = new TreeSet<Sprite>();
 		
@@ -268,10 +266,10 @@ public class SpriteManager_Applet extends SpriteManager {
 			//REMOVE BUILDING
 			for (final Building _b : GetBuildingOjects()) {
 				if (utility.Seperation(_mouse_x, _b.GetX(), _mouse_y, _b.GetY()) < utility.buildingRadius) {
-					if (_b.GetType() == BuildingType.Base) {
+					if (utility.dbg == false && _b.GetType() == BuildingType.Base) {
 						continue;
 					}
-					if (_b.GetOwner() == ObjectOwner.Enemy) {
+					if (utility.dbg == false && _b.GetOwner() == ObjectOwner.Enemy) {
 						continue;
 					}
 					_b.DeleteHover();

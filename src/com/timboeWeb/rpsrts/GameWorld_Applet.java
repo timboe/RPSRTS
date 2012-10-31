@@ -13,11 +13,13 @@ public class GameWorld_Applet extends GameWorld {
 	public static GameWorld_Applet GetGameWorld_Applet() {
 		return singleton;
 	}
+	
+	private SceneRenderer_Applet theSceneRenderer;
 
 	public GameWorld_Applet() {
 		super();
 		this_object = (GameWorld)this; 
-		System.out.println("--- World Manager spawned (depends on Util) : "+this);
+		System.out.println("--- World Manager spawned (depends on Util,Scene[Linked on Init()]) : "+this);
 	}
 	
 	@Override
@@ -48,27 +50,30 @@ public class GameWorld_Applet extends GameWorld {
 		    	chunks[ID++] = new WorldChunk_Applet(x,y,chunks_size,ID);
 		    }
 	    }
+	    
+	    theSceneRenderer = SceneRenderer_Applet.GetSceneRenderer_Applet();
 	}
 	
-	public void DrawTiles(Graphics2D g2, boolean _renderAll, boolean _aa) {
+	public void DrawTiles(Graphics2D _g2, boolean _renderAll, boolean _aa) {
 		if (_renderAll == true) {
 			for (final WorldTile_Applet t : (WorldTile_Applet[]) tiles) {
-				t.DrawTile(g2,_aa,false);
+				t.DrawTile(_g2,_aa,false);
 			}
 		} else {
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			HashSet<WorldTile_Applet> render_tiles_app = (HashSet) render_tiles;
 			for (final WorldTile_Applet t : render_tiles_app) {
-				t.DrawTile(g2,_aa,false);
+				t.DrawTile(_g2,_aa,false);
 			}
 		}
 	}
 	
 	public void DrawChunks(Graphics2D _g2, boolean _useEnergy, boolean _aa) {
-		
+		_g2.setFont(theSceneRenderer.myGridFont);
 		for (final WorldChunk_Applet c : (WorldChunk_Applet[]) chunks) {
 			c.DrawTileState(_g2, _useEnergy, _aa);
 		}
+		_g2.setFont(theSceneRenderer.myFont);	
 	}
 
 	public void DrawIslandEdge(Graphics2D g2) {

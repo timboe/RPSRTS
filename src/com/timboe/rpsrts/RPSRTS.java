@@ -30,7 +30,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	private final int _DO_FPS_EVERY_X_TICKS = 1; // refresh FPS after X frames
 	private long _TIME_OF_NEXT_TICK; // Internal
 	private int _TICK; // Counter
-	private final int _DESIRED_TPS = 30; // Ticks per second to aim for
+	private int _DESIRED_TPS = 30; // Ticks per second to aim for
 
 	int last_X = -1; //Mouse cursor historic
 	int last_Y = -1;
@@ -177,6 +177,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
+		if (utility.gameMode == GameMode.titleScreen) return;
 		if (e.getWheelRotation() < 0) {
 			theTransforms.zoomIn(false);
 		} else {

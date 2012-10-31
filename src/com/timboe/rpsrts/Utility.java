@@ -73,7 +73,7 @@ public class Utility {
 	public final int ticks_per_tock = 30;
 
 	//world manager settings
-	public final float wg_seconds_to_wait = 0f; //Time to wait between steps
+	public final float wg_seconds_to_wait = 1f; //Time to wait between steps
 	public final int wg_DegInCircle = 360;
 	public final float island_scale = 0.75f; //Size of initial circular island w.r.t. world
 	public final float wg_CrinkleScale = 30; //Multiplier to Gaussian edge smear

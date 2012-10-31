@@ -62,7 +62,7 @@ public class Resource_Applet extends Resource {
 		if (utility.dbg == true) {
 			_g2.setColor(Color.white);
 			_g2.setTransform(theTransforms.af_translate_zoom);
-			_g2.drawString(Float.toString(GetZOrder()), _x - r, _y - r); //usually - stuff XXX
+			_g2.drawString(Integer.toString(stuff), _x - r, _y - r); //usually - stuff XXX
 		}
 	}
 

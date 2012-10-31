@@ -57,6 +57,7 @@ public class SceneRenderer_Applet {
 	public Point2D MouseTF;
 	
     Font myFont = new Font(Font.MONOSPACED, Font.BOLD, 12);
+    Font myGridFont = new Font(Font.MONOSPACED, Font.BOLD, 20);
     Font myBigFont = new Font(Font.MONOSPACED, Font.BOLD, 100);
     Font myMediumFont = new Font(Font.MONOSPACED, Font.BOLD, 50);
 	
