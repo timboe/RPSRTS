@@ -112,7 +112,7 @@ public class Utility {
 	public final int actor_aggro_radius = 60;
 
 	//biome settings
-	public final int biome_golbal_density_mod = tiles_size; //derived
+	public final int biome_golbal_density_mod = 1;//tiles_size; //derived
 	public final float biome_colour_range = 10; //smear of colours in biome
 	public final int biome_desert_min_density = 2 + biome_golbal_density_mod;
 	public final int biome_desert_rnd_density = 2 + biome_golbal_density_mod;

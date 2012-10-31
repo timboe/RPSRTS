@@ -27,17 +27,17 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	 */
 	private static final long serialVersionUID = -4515697164989975837L;
 	private long _TIME_OF_LAST_TICK = 0; // Internal
-	private final int _DO_FPS_EVERY_X_TICKS = 10; // refresh FPS after X frames
+	private final int _DO_FPS_EVERY_X_TICKS = 1; // refresh FPS after X frames
 	private long _TIME_OF_NEXT_TICK; // Internal
 	private int _TICK; // Counter
 	private final int _DESIRED_TPS = 30; // Ticks per second to aim for
 
-	int last_X = -1;
+	int last_X = -1; //Mouse cursor historic
 	int last_Y = -1;
 	
-	private Thread th;
+	private Thread th; //My running thread
 
-	private Image dbImage;
+	private Image dbImage; //Double buffer
 	private Graphics dbg;
 
 	private final Utility utility = Utility.GetUtility();
@@ -86,8 +86,6 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 				}
 			}
 		} else {
-		
-		
 			if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 				utility.mouseClick = false;
 				theSceneRenderer.buildingToPlace = null;
@@ -163,7 +161,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	@Override
 	public void mousePressed(MouseEvent e) {
 		if (e.getButton() == MouseEvent.BUTTON1) {
-
+			utility.mouseClick = true;
 		}
 	}
 
@@ -226,6 +224,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	    	theSceneRenderer.sceneTitle(g2);
 	    } else if (utility.gameMode == GameMode.gameOn){
 	    	theSceneRenderer.sceneGame(g2);
+	    	if (utility.mouseClick == true) theSceneRenderer.mouseClick();
 		    theSpriteManger.Tick();
 		    doWinLoose();
 	    } else if (utility.gameMode == GameMode.gameOverLost || utility.gameMode == GameMode.gameOverWon) {

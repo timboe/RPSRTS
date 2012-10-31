@@ -22,11 +22,10 @@ public class PathfinderGrid {
 	public void Init() {
 		point_collection.clear();
 		point_collection_map.clear();
-		int world_size = (utility.world_tiles*utility.tiles_size);
 
 		int ID = 0;
-		for (int x = -(world_size/2); x < (world_size/2); x = x + utility.tiles_size) {
-			for (int y = -(world_size/2); y < (world_size/2); y = y + utility.tiles_size) {
+		for (int x = -utility.world_size2; x < utility.world_size2; x = x + utility.tiles_size) {
+			for (int y = -utility.world_size2; y < utility.world_size2; y = y + utility.tiles_size) {
 				if (theWorld.tiles[ID++].GetWalkable() == false) continue; //unreachable
 				WeightedPoint WP = new WeightedPoint(x+(utility.tiles_size/2), y+(utility.tiles_size/2));
 				point_collection.add(WP);

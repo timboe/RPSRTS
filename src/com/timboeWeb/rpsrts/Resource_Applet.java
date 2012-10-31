@@ -33,6 +33,12 @@ public class Resource_Applet extends Resource {
 			anim = 5;
 		}
 
+		if (not_reachable_penalty > 0 || true) {
+			_g2.setColor(Color.red);
+			_g2.setTransform(theTransforms.af);
+			_g2.fillOval(x - r, y - r, 2*r, 2*r);
+		}
+		
 		if (type == ResourceType.Tree) {
 			_g2.setTransform(theTransforms.af_translate_zoom);
 			_g2.drawImage(theBitmaps.tree[anim], _x - r, _y - r - 9, null);
@@ -41,20 +47,22 @@ public class Resource_Applet extends Resource {
 			_g2.drawImage(theBitmaps.cactus[anim], _x - r, _y - r - 9, null);
 		} else if (type == ResourceType.Mine) {
 			_g2.setTransform(theTransforms.af);
-			_g2.drawImage(theBitmaps.mine[toDraw], x - r - (anim/2), y - r - (anim/2), 2 * r + (anim/1), 2 * r + (anim/1), null);
+			_g2.drawImage(theBitmaps.mine[toDraw], x - r - (anim/2), y - r - (anim/2), 2 * r + anim, 2 * r + anim, null);
 		} else if (type == ResourceType.Rockpile) {
 			_g2.setTransform(theTransforms.af_translate_zoom);
-			_g2.drawImage(theBitmaps.stone[toDraw], _x - r - (anim/2), _y - r - (anim/2), 2 * r + (anim/1), 2 * r + (anim/1), null);
+			_g2.drawImage(theBitmaps.stone[toDraw], _x - r, _y - r - 3, null);
 		}
+		
 		if (not_reachable_penalty > 0 || true) {
-			_g2.setColor(Color.red);
+			_g2.setColor(Color.blue);
 			_g2.setTransform(theTransforms.af);
-			_g2.fillRect(x - 1, y - 1 + r, 2, 2);
+			_g2.fillOval(x - 1, y - 1, 2, 2);
 		}
+
 		if (utility.dbg == true) {
 			_g2.setColor(Color.white);
 			_g2.setTransform(theTransforms.af_translate_zoom);
-			_g2.drawString(Integer.toString(stuff), _x - r, _y - r);
+			_g2.drawString(Float.toString(GetZOrder()), _x - r, _y - r); //usually - stuff XXX
 		}
 	}
 

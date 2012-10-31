@@ -24,7 +24,7 @@ public class TransformStore {
     RenderingHints aa_off = new RenderingHints(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);
     
     private boolean aa = true;
-    private boolean disable_aa = true;
+    private boolean disable_aa = false;
 	
     public AffineTransform af_none = new AffineTransform();
     public AffineTransform af_backing = new AffineTransform();
@@ -41,13 +41,15 @@ public class TransformStore {
 	public float TOP_ROTATE; //keep this here 
 	
 	private final float YSHEAR_MIN = 0.15f;
-	private final float YSHEAR_MAX = 0.85f;
-	
+	private final float YSHEAR_MAX = 1f;//0.85f;
+	private final float TRANSLATE_X_MAX = 0.0165f;
+	private final float TRANSLATE_Y_MAX = 0.01f;
+
 	private boolean updateNeeded = true;
 	
 	public void updateTransforms() {
 		if (updateNeeded == false) return;
-		System.out.println("shear% : "+getShearPercentage());
+		//System.out.println("TRANSLATE_Y : "+TRANSLATE_Y);
 				
 		final float trans_X = (utility.window_X+TRANSLATE_X)/2f;
 		final float trans_Y = (utility.window_Y+TRANSLATE_Y)/2f;
@@ -70,7 +72,7 @@ public class TransformStore {
 		af.rotate(ROTATE);
 	    
 		af_backing.setTransform(af);
-		af_backing.translate(-(utility.world_tiles * utility.tiles_size)/2,-(utility.world_tiles * utility.tiles_size)/2);
+		af_backing.translate(-utility.world_size2,-utility.world_size2);
 
 		updateNeeded = false;
 	}
@@ -87,6 +89,16 @@ public class TransformStore {
 		updateNeeded = true;
 		TRANSLATE_X += _mod_x/(100000f * ZOOM);
 		TRANSLATE_Y += _mod_y/(100000f * ZOOM);
+		if (TRANSLATE_X > TRANSLATE_X_MAX) {
+			TRANSLATE_X = TRANSLATE_X_MAX;
+		} else if (TRANSLATE_X < -TRANSLATE_X_MAX) {
+			TRANSLATE_X = -TRANSLATE_X_MAX;
+		}
+		if (TRANSLATE_Y > TRANSLATE_Y_MAX) {
+			TRANSLATE_Y = TRANSLATE_Y_MAX;
+		} else if (TRANSLATE_Y < -TRANSLATE_Y_MAX) {
+			TRANSLATE_Y = -TRANSLATE_Y_MAX;
+		}
 	}
 	
 	public void modifyShear(float _mod) {

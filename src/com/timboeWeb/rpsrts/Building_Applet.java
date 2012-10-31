@@ -87,11 +87,10 @@ public class Building_Applet extends Building {
 			_x_points[2] = x + b_r + 2;
 			_x_points[3] = x + b_r - 2;
 
-			_y_points[0] = y - b_r + 2 + y_offset/2;
-			_y_points[1] = y - b_r - 2 + y_offset/2;
-			_y_points[2] = y + b_r - 2 + y_offset/2;
-			_y_points[3] = y + b_r + 2 + y_offset/2;
-
+			_y_points[0] = y - b_r + 2 + y_offset/6;
+			_y_points[1] = y - b_r - 2 + y_offset/6;
+			_y_points[2] = y + b_r - 2 + y_offset/6;
+			_y_points[3] = y + b_r + 2 + y_offset/6;
 
 			_g2.fillPolygon(_x_points, _y_points, 4);
 
@@ -100,10 +99,10 @@ public class Building_Applet extends Building {
 			_x_points[2] = x + b_r + 2;
 			_x_points[3] = x + b_r - 2;
 
-			_y_points[0] = y + b_r - 2 + y_offset/2;
-			_y_points[1] = y + b_r + 2 + y_offset/2;
-			_y_points[2] = y - b_r + 2 + y_offset/2;
-			_y_points[3] = y - b_r - 2 + y_offset/2;
+			_y_points[0] = y + b_r - 2 + y_offset/6;
+			_y_points[1] = y + b_r + 2 + y_offset/6;
+			_y_points[2] = y - b_r + 2 + y_offset/6;
+			_y_points[3] = y - b_r - 2 + y_offset/6;
 			_g2.fillPolygon(_x_points, _y_points, 4);
 
 			delete_hover = false;
@@ -114,13 +113,13 @@ public class Building_Applet extends Building {
 		if (health < maxHealth) {
 			_g2.setTransform(theTransforms.af_translate_zoom);
 			_g2.setColor(Color.black);
-			_g2.fillRect(_x - r, _y - r - 4 - y_offset, r * 2, 1);
+			_g2.fillRect(_x - r, _y - r - 8 - y_offset, r * 2, 1);
 			if (owner == ObjectOwner.Player) {
 				_g2.setColor(Color.red);
 			} else {
 				_g2.setColor(Color.blue);
 			}
-			_g2.fillRect(_x - r, _y - r - 4 - y_offset, (int) Math.round(r * 2 * ((float)health/(float)maxHealth) ), 1);
+			_g2.fillRect(_x - r, _y - r - 8 - y_offset, (int) Math.round(r * 2 * ((float)health/(float)maxHealth) ), 1);
 		}
 
 		if (utility.dbg == true) {
@@ -128,7 +127,11 @@ public class Building_Applet extends Building {
 			_g2.setColor(Color.red);
 			_g2.drawString(Integer.toString(GetEmployees()), _x - r, _y - r - 10);
 		}
-		
+		if (true) { //DBG
+			_g2.setColor(Color.red);
+			_g2.setTransform(theTransforms.af);
+			_g2.fillOval(x - r, y - r, 2*r, 2*r);
+		}
 		if (underConstruction == true) {
 			int conStep = 0;
 			final float healthFrac = (float)health/(float)maxHealth;
@@ -143,19 +146,20 @@ public class Building_Applet extends Building {
 			}
 			_g2.setTransform(theTransforms.af_translate_zoom);
 			if (owner == ObjectOwner.Player) {
-				_g2.drawImage(theBitmaps.construction_player[conStep], _x - r, _y - r, null);
+				_g2.drawImage(theBitmaps.construction_player[conStep], _x - r, _y - r - 5, null);
 			} else {
-				_g2.drawImage(theBitmaps.construction_enemy[conStep], _x - r, _y - r, null);
+				_g2.drawImage(theBitmaps.construction_enemy[conStep], _x - r, _y - r - 5, null);
 			}
-			return;
+		} else {
+			_g2.setTransform(theTransforms.af_translate_zoom);
+			_g2.drawImage(spriteGraphic[animStep % animSteps], _x - r, _y - r - 5 - y_offset, null);
 		}
-
-		_g2.setTransform(theTransforms.af_translate_zoom);
-		_g2.drawImage(spriteGraphic[animStep % animSteps], _x, _y, null);
 		
-		_g2.setColor(Color.blue);
-		_g2.setTransform(theTransforms.af);
-		_g2.fillRect(x, y, 1, 1);
+		if (true) { //DBG
+			_g2.setColor(Color.blue);
+			_g2.setTransform(theTransforms.af);
+			_g2.fillOval(x - 1, y - 1, 2, 2);
+		}
 		
 
 	}

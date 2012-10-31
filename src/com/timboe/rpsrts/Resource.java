@@ -13,13 +13,12 @@ public class Resource extends Sprite {
 	public Resource(int _ID, int _x, int _y, int _r, ResourceType _type) {
 		super(_ID, _x, _y, _r);
 		type = _type;
-		int _start_stuff = utility.rndI(utility.resource_rnd)
-				+ utility.resource_min;
+		int _start_stuff = utility.rndI(utility.resource_rnd) + utility.resource_min;
 		
 		penalty_size = utility.not_reachable_penelty_tocks;
 		Add(_start_stuff);
 		
-		toDraw = utility.rndI(4); //for mines and rockpiles
+		toDraw = utility.rndI(4); //for mines and rockpiles (different art)
 		
 		//snap me to the world grid
 		WeightedPoint _my_snap = theSpriteManager.ClipToGrid(this.GetLoc());
@@ -75,7 +74,7 @@ public class Resource extends Sprite {
 
 	public int Plunder(int _requested) {
 		//System.out.println("Resource: "+_requested+" requested");
-		if (_requested < stuff) {
+		if (_requested <= stuff) {
 			stuff -= _requested;
 		} else {
 			_requested = stuff;

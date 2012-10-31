@@ -116,7 +116,7 @@ public class Sprite implements Comparable<Sprite> {
 	}
 
 	public float GetZOrder() {
-		return (float) (x_prec * Math.cos(utility.rotateAngle) - (y_prec * Math.sin(utility.rotateAngle)));
+		return (float) ( -1f * (x_prec * Math.sin(utility.rotateAngle) + (y_prec * Math.cos(utility.rotateAngle))) );
 
 	}
 	

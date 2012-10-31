@@ -653,7 +653,7 @@ public class SceneRenderer_Applet {
 		}
 	}
 	
-	public void mouseClick(Point CurMouse) {
+	public void mouseClick() {
 	    if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (0 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (0 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 			if (buildingToPlace == BuildingType.Woodshop) buildingToPlace = null;
 			else buildingToPlace = BuildingType.Woodshop;

@@ -85,7 +85,6 @@ public class SpriteManager_Applet extends SpriteManager {
 	public Resource PlaceResource(WorldPoint _p, ResourceType _rt, boolean AddToTempList) {
 		//NO rechecks that coordinates are safe - be warned!
 		final int _r = utility.resourceRadius;
-		//System.out.println("new actor b4");
 		final Resource newResource = new Resource_Applet(++GlobalSpriteCounter
 				, (int)_p.getX()
 				, (int)_p.getY()
