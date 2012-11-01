@@ -28,8 +28,8 @@ public class TransformStore {
     public AffineTransform af_translate_zoom = new AffineTransform();
     public AffineTransform af_shear_rotate = new AffineTransform();
     //Display parameters
-	private float ZOOM=0.9f;
-	private float YSHEAR=0.6f;
+	private float ZOOM = 0f;
+	private float YSHEAR = 0f;
 	private float ROTATE = 0f;
 	private float TRANSLATE_X = 0f;
 	private float TRANSLATE_Y = 0f;
@@ -46,6 +46,15 @@ public class TransformStore {
 	private TransformStore() {
 		System.out.println("--- Transform Manager spawned (depends on Util) : "+this);
 	    aa_on.put(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_SPEED);
+	    Reset();
+	}
+	
+	public void Reset() {
+		ZOOM=0.9f;
+		YSHEAR=0.6f;
+		ROTATE = 0f;
+		TRANSLATE_X = 0f;
+		TRANSLATE_Y = 0f;
 	}
 	
 	public boolean GetAA() {

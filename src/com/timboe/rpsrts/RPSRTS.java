@@ -13,9 +13,12 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 
 import com.timboe.rpsrts.applet.GameWorld_Applet;
 import com.timboe.rpsrts.applet.SceneRenderer_Applet;
+import com.timboe.rpsrts.applet.ShapeStore;
 import com.timboe.rpsrts.applet.SpriteManager_Applet;
 import com.timboe.rpsrts.applet.TransformStore;
 import com.timboe.rpsrts.enumerators.GameMode;
@@ -46,17 +49,20 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	private final TransformStore theTransforms = TransformStore.GetTransformStore();
 	private final ResourceManager resource_manager = ResourceManager.GetResourceManager();
 	private final SceneRenderer_Applet theSceneRenderer = SceneRenderer_Applet.GetSceneRenderer_Applet();
+	private final ShapeStore theShapeStore = ShapeStore.GetShapeStore();
 	
     @Override
 	public void destroy() { }
 
 	public void doWinLoose() {
-		if (theSpriteManger.enemy_base != null && theSpriteManger.enemy_base.GetDead() == true) {
+		if (theSpriteManger.GetBase(ObjectOwner.Enemy) != null && theSpriteManger.GetBase(ObjectOwner.Enemy).GetDead() == true) {
 			utility.gameMode = GameMode.gameOverWon;
 			utility.loose_time = System.currentTimeMillis() / 1000l;
-		} else if (theSpriteManger.player_base != null && theSpriteManger.player_base.GetDead() == true) {
+			utility.SetTicksPerRender(utility.slowmo_ticks_per_render); 
+		} else if (theSpriteManger.GetBase(ObjectOwner.Player) != null && theSpriteManger.GetBase(ObjectOwner.Player).GetDead() == true) {
 			utility.gameMode = GameMode.gameOverLost;
 			utility.loose_time = System.currentTimeMillis() / 1000l;
+			utility.SetTicksPerRender(utility.slowmo_ticks_per_render); 
 		}
 	}
 
@@ -113,6 +119,12 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 				theTransforms.toggleAA();
 			} else if (e.getKeyChar() == 'd') {
 				utility.dbg = !utility.dbg;
+			} else if (e.getKeyChar() == 's') {
+				if (utility.GetTicksPerRender() == utility.game_ticks_per_render) {
+					utility.SetTicksPerRender(utility.GetTicksPerRender() * 100);
+				} else {
+					utility.SetTicksPerRender(utility.game_ticks_per_render);
+				}
 			} else if (e.getKeyChar() == 'w') {
 				genNewWorld();
 			} else if (e.getKeyChar() == 'c') {
@@ -234,8 +246,11 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		utility.mouseClick = false;
 		utility.sendMouseDragPing = false;
 	    g2.setTransform(theTransforms.af_none);
-	    g2.setColor(Color.white);
-		g2.fillOval(utility.window_X/2 - 5, utility.window_Y/2  -5, 10, 10);
+	    g2.setColor(Color.gray);
+	    GeneralPath x = theShapeStore.GetCross();
+	    x.transform(AffineTransform.getTranslateInstance(utility.window_X/2, utility.window_Y/2));
+	    x.transform(AffineTransform.getScaleInstance(0.25,0.25));
+	    g2.draw(x);
 		utility.worldGenLock = false;
 	}
 
@@ -259,14 +274,14 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 					+ Math.round(1000f / utility.GetDesiredTPS());
 			
 			++utility._TICK;
-		    if (utility.gameMode != GameMode.titleScreen) theSpriteManger.Tick();
+		    theSpriteManger.Tick();
 
 			if (utility._TICK % utility.do_fps_every_x_ticks == 0) {
-				utility.FPS = Math.round((1. / (System.currentTimeMillis() - utility._TIME_OF_LAST_TICK)* 1000. * utility.do_fps_every_x_ticks) / utility.ticks_per_render);
+				utility.FPS = Math.round((1. / (System.currentTimeMillis() - utility._TIME_OF_LAST_TICK)* 1000. * utility.do_fps_every_x_ticks) / utility.GetTicksPerRender());
 				utility._TIME_OF_LAST_TICK = System.currentTimeMillis();
 			}
 			
-			if (utility._TICK % utility.ticks_per_render == 0) {
+			if (utility._TICK % utility.GetTicksPerRender() == 0) {
 				repaint();
 			}
 			

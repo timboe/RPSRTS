@@ -11,6 +11,7 @@ import com.timboe.rpsrts.enumerators.ActorJob;
 import com.timboe.rpsrts.enumerators.ActorType;
 import com.timboe.rpsrts.enumerators.BiomeType;
 import com.timboe.rpsrts.enumerators.BuildingType;
+import com.timboe.rpsrts.enumerators.GameMode;
 import com.timboe.rpsrts.enumerators.ObjectOwner;
 import com.timboe.rpsrts.enumerators.ResourceType;
 import com.timboe.rpsrts.sprites.Actor;
@@ -53,8 +54,8 @@ public class SpriteManager {
 
 	public int GlobalSpriteCounter;
 
-	public Building player_base;
-	public Building enemy_base;
+	private Building player_base;
+	private Building enemy_base;
 
 	private final HashSet<Sprite> CollisionObjects = new HashSet<Sprite>();
 	private final HashSet<Actor> ActorObjects = new HashSet<Actor>();
@@ -696,6 +697,9 @@ public class SpriteManager {
 
 
 	public void Tick() {
+		if (utility.gameMode == GameMode.titleScreen) return;
+		if (utility.gamePaused == true) return;
+		
 		++TickCount;
 		if (TickCount % utility.ticks_per_tock/2 == 0) Tock();
 		synchronized (GetActorObjects()) {

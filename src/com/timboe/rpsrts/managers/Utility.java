@@ -20,23 +20,24 @@ public class Utility {
 	public boolean worldGenLock = false;
 	//Global variables
 	public RPSRTS _RPSRTS;
-	public boolean dbg = true; //debug flag
+	public boolean dbg = false; //debug flag
 	public boolean noPlayers = true; //AI takes over both teams
 	public float rotateAngle = 0f; //copied here as ROTATE stored in Transform(awt) or Matrix(andorid) classes
 	public boolean doWorldGen = false; //proceed with building world
-	public int pathfind_counter = 0; //pathfinding counter
 	public GameMode gameMode = GameMode.titleScreen; //what state is game currently in
 	public long loose_time; //what time was game won/lost
 	public long FPS = 0;
 	public boolean mouseClick = false;
 	public boolean mouseDrag = false;
 	public boolean sendMouseDragPing = false;
+	public boolean gamePaused = false;
 	//
 	public int _TICK;
 	public long _TIME_OF_LAST_TICK = 0; // Internal
 	public long _TIME_OF_NEXT_TICK; // Internal
 	private int _DESIRED_FPS = 30; // Frames per second to aim for
 	private int _DESIRED_TPS;
+	private int _TICKS_PER_RENDER = 2; //nominal is 2 (game will go suuuper fast if this is bumped up)
 
 	//---------\\
 	// STATICS \\
@@ -46,15 +47,16 @@ public class Utility {
 	public final int window_X = 1000;
 	public final int window_Y = 600;
 	public final int tiles_per_chunk = 8; //Used for coarse kT algo
-	public final int world_tiles = 176/2; //Number of tile elements on X
+	public final int world_tiles = 176; //Number of tile elements on X
 	public final int tiles_size = 7; //Size of tile element in pixels
 	public final int world_size = world_tiles*tiles_size;
 	public final int world_size2 = world_size/2;
-	//time settings
+	//time, fps & update settings
 	public final int ticks_per_tock = 60; //at 30 FPS, 2 ticks per render, this is one tock per second
-	//fps & update settings
 	public final int do_fps_every_x_ticks = 6; // refresh FPS after X frames
-	public final int ticks_per_render = 2; //nominal is 2 (game will go suuuper fast if this is bumped up)
+	public final int game_ticks_per_render = 2;
+	public final int slowmo_ticks_per_render = 1;
+	
 	//world manager settings
 	public final float wg_seconds_to_wait = 1f; //Time to wait between steps
 	public final int wg_DegInCircle = 360;
@@ -121,15 +123,21 @@ public class Utility {
 	
 	//spooge settings
 	public final float gravity = 0.2f;
-	public final int spooges_actor_death = 20;
-	public final int spooges_building_death = 200;
-	public final int spooges_totem_death = 30;
+	public final int spooges_actor_death = 20;//20;
+	public final int spooges_hit = 2;//2;
+	public final int spooges_building_death = 200;// 200;
+	public final int spooges_totem_death = 0; //30
 	public final int spooges_base_death = 1000;
+	public final float spooges_scale_actor_death = 1f;
+	public final float spooges_scale_hit = 1f;
+	public final float spooges_scale_building_death = 1f;
+	public final float spooges_scale_totem_death = 1f;
+	public final float spooges_scale_base_death = 1f;
 
 	//waterfall settings
-	public final int waterfall_splash_radius = 30;
-	public final int waterfall_splashes = 400;
-	public final int waterfall_size = (int) (window_Y*4f);
+	public final int waterfall_splash_radius = world_size/100;
+	public final int waterfall_splashes = 400; //maximum splashes
+	public final int waterfall_size = (int) (window_Y*4f); //this is vertical size / height
 	public final float waterfall_disk_size = 0.71f;
 	public final float waterfall_fall_rate = 1f;
 
@@ -226,9 +234,18 @@ public class Utility {
 		//return (float) Math.sqrt( (a.getX()-b.getX())*(a.getX()-b.getX()) + (a.getY()-b.getY())*(a.getY()-b.getY()) );
 	}
 	
+	public void SetTicksPerRender(int _tps) {
+		_TICKS_PER_RENDER = _tps;
+		_DESIRED_TPS = _DESIRED_FPS * _TICKS_PER_RENDER;
+	}
+	
+	public int GetTicksPerRender() {
+		return _TICKS_PER_RENDER;
+	}
+	
 	public void SetDesiredFPS(int _fps) {
 		_DESIRED_FPS = _fps;
-		_DESIRED_TPS = _DESIRED_FPS * ticks_per_render;
+		_DESIRED_TPS = _DESIRED_FPS * _TICKS_PER_RENDER;
 	}
 	
 	public int GetDesiredTPS() {

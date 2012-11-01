@@ -166,9 +166,9 @@ public class Building extends Sprite {
 		resource_manager.RemoveBuildingFromTally(owner, type);
 		if (underConstruction == false) {
 			resource_manager.DecreaseMaxUnits(type, owner);
-			if (type == BuildingType.Base) theSpriteManager.PlaceSpooge(x, y, GetOwner(), utility.spooges_base_death, 3f);
-			else if (getiAttract().size() == 0) theSpriteManager.PlaceSpooge(x, y, GetOwner(), utility.spooges_building_death, 1.2f);
-			else theSpriteManager.PlaceSpooge(x, y, GetOwner(), utility.spooges_totem_death, 1f);
+			if (type == BuildingType.Base) theSpriteManager.PlaceSpooge(x, y, GetOwner(), utility.spooges_base_death, utility.spooges_scale_base_death);
+			else if (getiAttract().size() == 0) theSpriteManager.PlaceSpooge(x, y, GetOwner(), utility.spooges_building_death, utility.spooges_scale_building_death);
+			else theSpriteManager.PlaceSpooge(x, y, GetOwner(), utility.spooges_totem_death, utility.spooges_scale_totem_death);
 		}
 		dead = true;
 		GridDeRegister();

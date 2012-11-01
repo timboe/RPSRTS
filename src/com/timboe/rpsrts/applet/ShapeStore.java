@@ -19,7 +19,7 @@ public class ShapeStore {
 	private ShapeStore() {
 		
 		//waterfall
-		final int _r = utility.wander_radius;
+		final int _r = utility.waterfall_splash_radius;
 		final int _x = 0 - _r;
 		waterfall = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
     	waterfall.moveTo(_x, 0);

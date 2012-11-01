@@ -223,10 +223,12 @@ public class AI implements Runnable {
 				//find a place to attack
 				Building toAttack = getWhatToAttack(toAttackType);
 				//since 1st attack then if this comes back nill, go for base!
-				if (toAttack == null) toAttack = theSpriteManager.player_base;
+				if (toAttack == null) {
+					toAttack = theSpriteManager.GetBase(enemy);
+				}
 
 				WorldPoint destination_location = theSpriteManager.FindGoodSpot(toAttack.GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
-				WorldPoint starting_location = theSpriteManager.FindGoodSpot(theSpriteManager.enemy_base.GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
+				WorldPoint starting_location = theSpriteManager.FindGoodSpot(theSpriteManager.GetBase(me).GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
 				if (destination_location != null && starting_location != null) {
 					Building attackor = theSpriteManager.PlaceBuilding(starting_location, toBuild, me);
 					attack_attractors.add(attackor);
@@ -435,7 +437,7 @@ public class AI implements Runnable {
 			for (Building _b : theSpriteManager.GetBuildingOjects()) {
 				if (_b.GetOwner() == me) continue;
 				if (_b.GetType() != toAttackType) continue;
-				float sep = utility.Seperation(theSpriteManager.enemy_base.GetLoc(), _b.GetLoc());
+				float sep = utility.Seperation(theSpriteManager.GetBase(me).GetLoc(), _b.GetLoc());
 				if (sep < distanceToTarget) {
 					distanceToTarget = sep;
 					toAttack = _b;

@@ -154,12 +154,20 @@ public class SceneRenderer_Applet {
     }
 	
 	private void drawEndScreen(Graphics2D g2) {
+		boolean clicked = false;
 		if (utility.gameMode == GameMode.gameOverWon) {
 			g2.setTransform(theTransforms.af_none);
 			g2.drawImage(theBitmaps.WIN,0,0,null);
+			clicked = drawButton(g2, 195, 500, 605, "I CAN DO BETTER!", 60);
 		} else {
 			g2.setTransform(theTransforms.af_none);
 			g2.drawImage(theBitmaps.LOOSE,0,0,null);
+			clicked = drawButton(g2, 195, 500, 605, "LET ME TRY AGAIN!", 60);
+		}
+		if (clicked == true) {
+			theTransforms.Reset();
+			utility.gameMode = GameMode.titleScreen;
+			utility.SetTicksPerRender(utility.game_ticks_per_render);
 		}
 	}
 	
@@ -295,8 +303,9 @@ public class SceneRenderer_Applet {
 		int y = 100;
 		Rectangle clip1 = new Rectangle(x,     y, 210, 115);
 		Rectangle clip2 = new Rectangle(x+210, y, 210, 115);
-		g2.setFont(myBigFont);
 
+		//Title
+		g2.setFont(myBigFont);
 		g2.setTransform(theTransforms.af_none);
 		g2.setClip(clip1);
 		g2.setColor(front_blue);
@@ -309,7 +318,6 @@ public class SceneRenderer_Applet {
 		g2.drawRoundRect(x+10, y+10, 400, 100, 20, 20);
 		g2.setColor(front_blue);
 		g2.drawString("RPSRTS", x+30, y+90);
-		
 		g2.setClip(clip2);
 		g2.setColor(backing_brown);
 		g2.fillRoundRect(x, y, 400, 100, 20, 20);
@@ -323,50 +331,50 @@ public class SceneRenderer_Applet {
 		g2.drawString("RPSRTS", x+34, y+90);
 		g2.setClip(null);
 		
-		g2.setFont(myMediumFont);
-		x = 250;
-		y = 300;
-		Color c1 = front_blue;
-		Color c2 = backing_brown;
-		if (CurMouse != null 
-				&& CurMouse.getX() > x 
-				&& CurMouse.getX() < x+500 
-				&& CurMouse.getY() > y 
-				&& CurMouse.getY() < y+50) {
-			c1 = backing_brown;
-			c2 = front_blue;
-			if (utility.mouseClick == true) {
-				utility._RPSRTS.genNewWorld();
-			}
+		boolean clicked = drawButton(g2, 250, 300, 500, "GENERATE ISLAND", 43);
+		if (clicked == true) {
+			utility._RPSRTS.genNewWorld();
+
 		}
-		g2.setColor(c1);
-		g2.fillRoundRect(x, y, 500, 50, 10, 10);
-		g2.setColor(Color.white);
-		g2.drawRoundRect(x, y, 500, 50, 10, 10);
-		g2.setColor(c2);
-		g2.fillRoundRect(x+3, y+3, 500, 50, 10, 10);
-		g2.setColor(Color.white);
-		g2.drawRoundRect(x+3, y+3, 500, 50, 10, 10);
-		g2.setColor(c1);
-		g2.drawString("GENERATE ISLAND", x+30, y+43);
 		
-		x = 175;
-		y = 400;
-		g2.setColor(front_blue);
-		g2.fillRoundRect(x, y, 650, 50, 10, 10);
-		g2.setColor(Color.white);
-		g2.drawRoundRect(x, y, 650, 50, 10, 10);
-		g2.setColor(backing_brown);
-		g2.fillRoundRect(x+3, y+3, 650, 50, 10, 10);
-		g2.setColor(Color.white);
-		g2.drawRoundRect(x+3, y+3, 650, 50, 10, 10);
-		g2.setColor(front_blue);
 		String cursor = "";
 		if ((System.currentTimeMillis() / 1000L) % 2 == 0) { // if even second
 			cursor = "|";
 		}
-		g2.drawString("ISLAND SEED:"+utility.rndSeedTxt+cursor, x+20, y+43);
-		g2.setFont(myFont);		
+		clicked = drawButton(g2, 175, 400, 650, "ISLAND SEED:"+utility.rndSeedTxt+cursor, 20);
+	}
+	
+	private boolean drawButton(Graphics2D g2, int _x, int _y, int _w, String _s, int _txt_x_offset) {
+		g2.setFont(myMediumFont);
+		final int _h = 50; //height
+		final int _b = 10; //bevel
+		final int _o = 3; //offset
+		final int _txt_y_offset = 43;
+		Color c1 = front_blue;
+		Color c2 = backing_brown;
+		boolean click = false;
+		if (CurMouse != null 
+				&& CurMouse.getX() > _x 
+				&& CurMouse.getX() < _x+_w 
+				&& CurMouse.getY() > _y 
+				&& CurMouse.getY() < _y+_h) {
+			c1 = backing_brown;
+			c2 = front_blue;
+			if (utility.mouseClick == true) {
+				click = true;
+			}
+		}
+		g2.setColor(c1);
+		g2.fillRoundRect(_x, _y, _w, _h, _b, _b);
+		g2.setColor(Color.white);
+		g2.drawRoundRect(_x, _y, _w, _h, _b, _b);
+		g2.setColor(c2);
+		g2.fillRoundRect(_x+_o, _y+_o, _w, _h, _b, _b);
+		g2.setColor(Color.white);
+		g2.drawRoundRect(_x+_o, _y+_o, _w, _h, _b, _b);
+		g2.setColor(c1);
+		g2.drawString(_s, _x + _txt_x_offset, _y + _txt_y_offset);
+		return click;
 	}
 	
 	private void drawTopBar(Graphics2D _g2) {
@@ -392,8 +400,10 @@ public class SceneRenderer_Applet {
 			} else if(buildingToPlace == BuildingType.X) {
 				_g2.translate(con_start_x + (6 * x_add), y_height/2);
 			}
-    		_g2.rotate(theTransforms.TOP_ROTATE);
 			_g2.fillOval(-20, -20, 40, 40);
+    		_g2.rotate(theTransforms.TOP_ROTATE);
+			_g2.fillRect(-17, -17, 34, 34);
+    		_g2.rotate(theTransforms.TOP_ROTATE);
 			_g2.fillRect(-17, -17, 34, 34);
 	    	_g2.setTransform(theTransforms.af_none);
 	    }
@@ -602,7 +612,6 @@ public class SceneRenderer_Applet {
 	public void sceneGame(Graphics2D g2) {
 		g2.setTransform(theTransforms.af);
     	drawBufferedBackground(g2);
-		if (utility.dbg == true) theSpriteManger.PlaceSpooge(100, 200, ObjectOwner.Player, 5, 1f); //test
 	    theSpriteManger.Render(g2);
 	    if (buildingToPlace != null) {
 	    	final boolean placed = theSpriteManger.TryPlaceItem(buildingToPlace, g2, (int)MouseTF.getX(), (int)MouseTF.getY(), utility.mouseClick);
@@ -615,9 +624,7 @@ public class SceneRenderer_Applet {
 	    	//am i over a building?
 	    	buildingToMove = theSpriteManger.GetBuildingAtMouse((int)MouseTF.getX(), (int)MouseTF.getY());
 	    	if (buildingToMove != null) {
-	    		if (buildingToMove.GetCollects().size() > 0) buildingToMove = null;
-	    		else if (buildingToMove.GetOwner() == ObjectOwner.Enemy) buildingToMove = null;
-	    		else if (buildingToMove.GetType() == BuildingType.Base) buildingToMove = null;
+	    		if (buildingToMove.getiAttract().size() == 0) buildingToMove = null; //Only totems attract
 	    	}
         }
 	    drawTopBar(g2);
@@ -626,7 +633,7 @@ public class SceneRenderer_Applet {
 	public void sceneGameOver(Graphics2D g2) {
     	drawBufferedBackground(g2);
 	    theSpriteManger.Render(g2);
-	    drawTopBar(g2);
+	    //drawTopBar(g2);
 	    if ( (System.currentTimeMillis() / 1000l) - utility.loose_time > 3) {
 	    	drawEndScreen(g2);
 	    }

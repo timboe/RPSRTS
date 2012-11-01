@@ -31,9 +31,7 @@ public class Projectile extends Sprite {
 		float _hypotenuse = utility.Seperation(GetLoc(), target.GetLoc());
 		if (_hypotenuse < r) {
 			target.Attack(strength*multiplier);
-			int n = 2;
-			//if (target instanceof Building) n = 2;
-			theSpriteManager.PlaceSpooge(x, y, target.GetOwner(), n, 0.5f);
+			theSpriteManager.PlaceSpooge(x, y, target.GetOwner(), utility.spooges_hit, utility.spooges_scale_hit);
 			Kill();
 			return;
 		}

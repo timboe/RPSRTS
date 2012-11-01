@@ -349,7 +349,7 @@ public class Actor extends Sprite {
 	@Override
 	public void Kill() {
 		if (dead == true) return;
-		theSpriteManager.PlaceSpooge(x, y, GetOwner(), utility.spooges_actor_death, 0.8f);
+		theSpriteManager.PlaceSpooge(x, y, GetOwner(), utility.spooges_actor_death, utility.spooges_scale_actor_death);
 		QuitJob(true);
 		dead = true;
 		resource_manager.UnitDeath(type,owner);
