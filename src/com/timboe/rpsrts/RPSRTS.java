@@ -28,7 +28,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	private long _TIME_OF_LAST_TICK = 0; // Internal
 	private final int _DO_FPS_EVERY_X_TICKS = 6; // refresh FPS after X frames
 	private long _TIME_OF_NEXT_TICK; // Internal
-	private int _DESIRED_FPS = 30; // Frames per second to aim for
+	private int _DESIRED_FPS = 300; // Frames per second to aim for
 	private int _TICKS_PER_RENDER = 2;
 	private int _DESIRED_TPS = _DESIRED_FPS * _TICKS_PER_RENDER;
 

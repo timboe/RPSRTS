@@ -1,6 +1,9 @@
 package com.timboe.rpsrts;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.TreeSet;
 import java.util.Vector;
 
 public class SpriteManager {
@@ -32,13 +35,21 @@ public class SpriteManager {
 	public Building player_base;
 	public Building enemy_base;
 
-	protected final HashSet<Sprite> CollisionObjects = new HashSet<Sprite>();
-	protected final HashSet<Actor> ActorObjects = new HashSet<Actor>();
-	protected final HashSet<Building> BuildingOjects = new HashSet<Building>();
-	protected final HashSet<Resource> ResourceObjects = new HashSet<Resource>();
-	protected final HashSet<Projectile> ProjectileObjects = new HashSet<Projectile>();
-	protected final HashSet<Spoogicles> SpoogicleObjects = new HashSet<Spoogicles>();
-	protected final HashSet<WaterfallSplash> WaterfallSplahsObjects = new HashSet<WaterfallSplash>();
+	private final HashSet<Sprite> CollisionObjects = new HashSet<Sprite>();
+	private final HashSet<Actor> ActorObjects = new HashSet<Actor>();
+	private final HashSet<Building> BuildingOjects = new HashSet<Building>();
+	private final HashSet<Resource> ResourceObjects = new HashSet<Resource>();
+	private final HashSet<Projectile> ProjectileObjects = new HashSet<Projectile>();
+	private final HashSet<Spoogicles> SpoogicleObjects = new HashSet<Spoogicles>();
+	private final HashSet<WaterfallSplash> WaterfallSplahsObjects = new HashSet<WaterfallSplash>();
+	// Synchronised
+	private final Collection<Sprite> CollisionObjectsSync = Collections.synchronizedCollection(CollisionObjects);
+	private final Collection<Actor> ActorObjectsSync = Collections.synchronizedCollection(ActorObjects);
+	private final Collection<Building> BuildingOjectsSync = Collections.synchronizedCollection(BuildingOjects);
+	private final Collection<Resource> ResourceObjectsSync = Collections.synchronizedCollection(ResourceObjects);
+	private final Collection<Projectile> ProjectileObjectsSync = Collections.synchronizedCollection(ProjectileObjects);
+	private final Collection<Spoogicles> SpoogicleObjectsSync = Collections.synchronizedCollection(SpoogicleObjects);
+	private final Collection<WaterfallSplash> WaterfallSplahsObjectsSync = Collections.synchronizedCollection(WaterfallSplahsObjects);
 
 	//
 	protected final HashSet<Resource> TempResourceHolder = new HashSet<Resource>();
@@ -65,9 +76,12 @@ public class SpriteManager {
 	
 	public Building GetBuildingAtMouse(int _x, int _y) {
 		WorldPoint _mouse = new WorldPoint(_x, _y);
-		for (Building _b : BuildingOjects) {
-			if (utility.Seperation(_b.GetLoc(), _mouse) < utility.buildingRadius) return _b;
+		synchronized (GetBuildingOjects()) {
+			for (Building _b : GetBuildingOjects()) {
+				if (utility.Seperation(_b.GetLoc(), _mouse) < utility.buildingRadius) return _b;
+			}
 		}
+
 		return null;
 	}
 
@@ -91,35 +105,23 @@ public class SpriteManager {
 					if (utility.Seperation(_me, _s.GetLoc()) < _r + _s.GetR() ) return false;
 				}
 			}			
-//			synchronized (CollisionObjectsThreadSafe) {
-//				for (final Sprite _s : CollisionObjectsThreadSafe) {
-//					if (_ID1_to_ignore_collision_of == _s.GetID()) {
-//						continue;
-//					}
-//					if (_ID2_to_ignore_collision_of == _s.GetID()) {
-//						continue;
-//					}
-//					final int _x_d = _s.GetX() - _x;
-//					final int _y_d = _s.GetY() - _y;
-//					final float sep = Math.sqrt( (_x_d * _x_d) + (_y_d * _y_d) );
-//					final float combRad = _r + _s.GetR();
-//					if (sep < combRad) return false;
-//				}
-//			}
+
 		}
 		if (ACTOR == true) {
-			for (final Actor _a : ActorObjects) {
-				if (_ID1_to_ignore_collision_of == _a.GetID()) {
-					continue;
+			synchronized (GetActorObjects()) {
+				for (final Actor _a : GetActorObjects()) {
+					if (_ID1_to_ignore_collision_of == _a.GetID()) {
+						continue;
+					}
+					if (_ID2_to_ignore_collision_of == _a.GetID()) {
+						continue;
+					}
+					final int _x_d = _a.GetX() - _x;
+					final int _y_d = _a.GetY() - _y;
+					final float sep = (float) Math.sqrt( (_x_d * _x_d) + (_y_d * _y_d) );
+					final float combRad = _r + _a.GetR();
+					if (sep < combRad) return false;
 				}
-				if (_ID2_to_ignore_collision_of == _a.GetID()) {
-					continue;
-				}
-				final int _x_d = _a.GetX() - _x;
-				final int _y_d = _a.GetY() - _y;
-				final float sep = (float) Math.sqrt( (_x_d * _x_d) + (_y_d * _y_d) );
-				final float combRad = _r + _a.GetR();
-				if (sep < combRad) return false;
 			}
 		}
 		//System.out.println("Place/Move ALLOWED");
@@ -127,66 +129,68 @@ public class SpriteManager {
 	}
 
 	private void CheckActorCombat(){
-		for (final Actor _a : ActorObjects) {
-			Sprite chosen_target = null;
-			float min_distance = utility.minimiser_start;
-			for (final Sprite _target : ActorObjects) {
-				if (_target.GetDead() == true) {
-					continue;
-				}
-				if (_a.GetID() == _target.GetID()) {
-					continue;
-				}
-				if (_a.GetOwner() == _target.GetOwner()) {
-					continue;
-				}
-				if (utility.Seperation(_a.GetLoc(), _target.GetLoc()) > utility.actor_aggro_radius) {
-					continue;
-				}
-				final boolean getPrefered =  _a.GetIfPreferedTarget(_target);
-				final boolean getCloser = (utility.Seperation(_a.GetLoc(), _target.GetLoc()) < min_distance);
-				if (chosen_target == null) {
-					chosen_target = _target;
-					min_distance = utility.Seperation(_a.GetLoc(), _target.GetLoc());
-				} else if (getPrefered == true && getCloser == true) {
-					chosen_target = _target;
-					min_distance = utility.Seperation(_a.GetLoc(), _target.GetLoc());
-				} else if (getPrefered == true && getCloser == false) {
-					if (_a.GetIfPreferedTarget(chosen_target) == false) {
+		synchronized (GetActorObjects()) {
+			for (final Actor _a : GetActorObjects()) {
+				Sprite chosen_target = null;
+				float min_distance = utility.minimiser_start;
+				for (final Sprite _target : ActorObjects) {
+					if (_target.GetDead() == true) {
+						continue;
+					}
+					if (_a.GetID() == _target.GetID()) {
+						continue;
+					}
+					if (_a.GetOwner() == _target.GetOwner()) {
+						continue;
+					}
+					if (utility.Seperation(_a.GetLoc(), _target.GetLoc()) > utility.actor_aggro_radius) {
+						continue;
+					}
+					final boolean getPrefered =  _a.GetIfPreferedTarget(_target);
+					final boolean getCloser = (utility.Seperation(_a.GetLoc(), _target.GetLoc()) < min_distance);
+					if (chosen_target == null) {
 						chosen_target = _target;
 						min_distance = utility.Seperation(_a.GetLoc(), _target.GetLoc());
-					}
-				} else if (getPrefered == false && getCloser == true) {
-					if (_a.GetIfPreferedTarget(chosen_target) == false) {
+					} else if (getPrefered == true && getCloser == true) {
 						chosen_target = _target;
 						min_distance = utility.Seperation(_a.GetLoc(), _target.GetLoc());
+					} else if (getPrefered == true && getCloser == false) {
+						if (_a.GetIfPreferedTarget(chosen_target) == false) {
+							chosen_target = _target;
+							min_distance = utility.Seperation(_a.GetLoc(), _target.GetLoc());
+						}
+					} else if (getPrefered == false && getCloser == true) {
+						if (_a.GetIfPreferedTarget(chosen_target) == false) {
+							chosen_target = _target;
+							min_distance = utility.Seperation(_a.GetLoc(), _target.GetLoc());
+						}
 					}
 				}
-			}
-			if (chosen_target != null) {
-				_a.SetNemesis(chosen_target);
-				continue;
-			}
-			for (final Sprite _target : BuildingOjects) {
-				if (_target.GetDead() == true) {
+				if (chosen_target != null) {
+					_a.SetNemesis(chosen_target);
 					continue;
 				}
-				if (_a.GetOwner() == _target.GetOwner()) {
-					continue;
-				}
-				if (utility.Seperation(_a.GetLoc(), _target.GetLoc()) > utility.actor_aggro_radius) {
-					continue;
-				}
-				if (chosen_target == null || _a.GetIfPreferedTarget(_target) == true) {
-					if (utility.Seperation(_a.GetLoc(), _target.GetLoc()) < min_distance) {
-						chosen_target = _target;
-						min_distance = utility.Seperation(_a.GetLoc(), _target.GetLoc());
+				for (final Sprite _target : BuildingOjects) {
+					if (_target.GetDead() == true) {
+						continue;
+					}
+					if (_a.GetOwner() == _target.GetOwner()) {
+						continue;
+					}
+					if (utility.Seperation(_a.GetLoc(), _target.GetLoc()) > utility.actor_aggro_radius) {
+						continue;
+					}
+					if (chosen_target == null || _a.GetIfPreferedTarget(_target) == true) {
+						if (utility.Seperation(_a.GetLoc(), _target.GetLoc()) < min_distance) {
+							chosen_target = _target;
+							min_distance = utility.Seperation(_a.GetLoc(), _target.GetLoc());
+						}
 					}
 				}
-			}
-			if (chosen_target != null) {
-				_a.SetNemesis(chosen_target);
-			}
+				if (chosen_target != null) {
+					_a.SetNemesis(chosen_target);
+				}
+			}	
 		}
 	}
 	
@@ -235,44 +239,64 @@ public class SpriteManager {
 
 	public void Garbage() {
 		final Vector<Sprite> toKill = new Vector<Sprite>();
-		for (final Resource _r : GetResourceObjects()) {
-			if (_r.GetDead() == true) {
-				toKill.add(_r);
+		synchronized (GetResourceObjects()) {
+			for (final Resource _r : GetResourceObjects()) {
+				if (_r.GetDead() == true) {
+					toKill.add(_r);
+				}
+			}
+			GetResourceObjects().removeAll(toKill);
+			synchronized (GetCollisionObjects()) {
+				GetCollisionObjects().removeAll(toKill);
 			}
 		}
-		for (final Actor _a : ActorObjects) {
-			if (_a.GetDead() == true) {
-				toKill.add(_a);
+		toKill.clear();
+		synchronized (GetActorObjects()) {
+			for (final Actor _a : GetActorObjects()) {
+				if (_a.GetDead() == true) {
+					toKill.add(_a);
+				}
+			}
+			GetActorObjects().removeAll(toKill);
+		}
+		toKill.clear();
+		synchronized (GetBuildingOjects()) {
+			for (final Building _b : GetBuildingOjects()) {
+				if (_b.GetDead() == true) {
+					toKill.add(_b);
+				}
+			}
+			GetBuildingOjects().removeAll(toKill);
+			synchronized (GetCollisionObjects()) {
+				GetCollisionObjects().removeAll(toKill);
 			}
 		}
-		for (final Building _b : GetBuildingOjects()) {
-			if (_b.GetDead() == true) {
-				toKill.add(_b);
+		toKill.clear();
+		synchronized (GetProjectileObjects()) {
+			for (final Projectile _p : GetProjectileObjects()) {
+				if (_p.GetDead() == true) {
+					toKill.add(_p);
+				}
 			}
+			GetProjectileObjects().removeAll(toKill);
 		}
-		for (final Projectile _p : GetProjectileObjects()) {
-			if (_p.GetDead() == true) {
-				toKill.add(_p);
+		toKill.clear();
+		synchronized (GetSpoogiclesObjects()) {
+			for (final Spoogicles _s : GetSpoogiclesObjects()){
+				if (_s.GetDead() == true) {
+					toKill.add(_s);
+				}
 			}
+			GetSpoogiclesObjects().removeAll(toKill);
 		}
-		for (final Spoogicles _s : GetSpoogiclesObjects()){
-			if (_s.GetDead() == true) {
-				toKill.add(_s);
+		toKill.clear();
+		synchronized (GetWaterfallSplashObjects()) {
+			for (final WaterfallSplash _w : GetWaterfallSplashObjects()) {
+				if (_w.GetDead() == true) {
+					toKill.add(_w);
+				}
 			}
-		}
-		for (final WaterfallSplash _w : GetWaterfallSplashObjects()) {
-			if (_w.GetDead() == true) {
-				toKill.add(_w);
-			}
-		}
-		for (final Sprite die : toKill) {
-			GetActorObjects().remove(die);
-			GetResourceObjects().remove(die);
-			GetBuildingOjects().remove(die);
-			GetProjectileObjects().remove(die);
-			GetCollisionObjects().remove(die);
-			GetSpoogiclesObjects().remove(die);
-			GetWaterfallSplashObjects().remove(die);
+			GetWaterfallSplashObjects().removeAll(toKill);
 		}
 		toKill.clear();
 	}
@@ -283,51 +307,52 @@ public class SpriteManager {
 	}
 
 	
-	public HashSet<Actor> GetActorObjects() {
-		return ActorObjects;
+	public Collection<Actor> GetActorObjects() {
+		return ActorObjectsSync;
 	}
 	
-	public HashSet<Spoogicles> GetSpoogiclesObjects() {
-		return SpoogicleObjects;
+	public Collection<Spoogicles> GetSpoogiclesObjects() {
+		return SpoogicleObjectsSync;
 	}
 	
-	public HashSet<WaterfallSplash> GetWaterfallSplashObjects() {
-		return WaterfallSplahsObjects;
+	public Collection<WaterfallSplash> GetWaterfallSplashObjects() {
+		return WaterfallSplahsObjectsSync;
 	}
 	
-	public HashSet<Building> GetBuildingOjects() {
-		return BuildingOjects;
+	public Collection<Building> GetBuildingOjects() {
+		return BuildingOjectsSync;
 	}
 
-	public HashSet<Sprite> GetCollisionObjects() {
-		//return CollisionObjectsThreadSafe;
-		return CollisionObjects;
+	public Collection<Sprite> GetCollisionObjects() {
+		return CollisionObjectsSync;
 	}
 	
-	public HashSet<Projectile> GetProjectileObjects() {
-		return ProjectileObjects;
+	public Collection<Projectile> GetProjectileObjects() {
+		return ProjectileObjectsSync;
 	}
 
 	public Resource GetNearestResource(Building _b, Actor _a, int maxDistance) {
 		float _dist = utility.minimiser_start;
 		Resource r = null;
-		for (final Resource _r : GetResourceObjects()) {
-			if (_b.GetCollects().contains(_r.GetType())  //Boss accepts
-					&& _r.GetReachable() == true //Not currently `unreachable'
-					&& _a.GetCollects().contains(_r.GetType()) //Client can gather
-					&& utility.Seperation(_r.GetLoc(), _b.GetLoc()) < _dist //Is nearer
-					&& _r.GetRemaining() > 0 //Is not depleted
-					&& (r == null || utility.rnd() < 1f)) { //50% random chance to change (if not first node found) //TODO change back to 50%
-				_dist = utility.Seperation(_r.GetLoc(), _b.GetLoc());
-				r = _r;
+		synchronized (GetResourceObjects()) {
+			for (final Resource _r : GetResourceObjects()) {
+				if (_b.GetCollects().contains(_r.GetType())  //Boss accepts
+						&& _r.GetReachable() == true //Not currently `unreachable'
+						&& _a.GetCollects().contains(_r.GetType()) //Client can gather
+						&& utility.Seperation(_r.GetLoc(), _b.GetLoc()) < _dist //Is nearer
+						&& _r.GetRemaining() > 0 //Is not depleted
+						&& (r == null || utility.rnd() < 1f)) { //50% random chance to change (if not first node found) //TODO change back to 50%
+					_dist = utility.Seperation(_r.GetLoc(), _b.GetLoc());
+					r = _r;
+				}
 			}
 		}
 		if (_dist < maxDistance) return r;
 		else return null;
 	}
 
-	public HashSet<Resource> GetResourceObjects() {
-		return ResourceObjects;
+	public Collection<Resource> GetResourceObjects() {
+		return ResourceObjectsSync;
 	}
 	
 	public HashSet<Resource> GetTempResourceObjects() {
@@ -338,6 +363,36 @@ public class SpriteManager {
 		return worldSeeded;
 	}
 
+	public TreeSet<Sprite> GetSpritesZOrdered() {
+		TreeSet<Sprite> ZOrder = new TreeSet<Sprite>();
+		synchronized (GetActorObjects()) {
+			for (final Sprite _s : GetActorObjects()) {
+				ZOrder.add(_s);
+			}
+		}
+		synchronized (GetBuildingOjects()) {
+			for (final Sprite _s : GetBuildingOjects()) {
+				ZOrder.add(_s);
+			}
+		}
+		synchronized (GetResourceObjects()) {
+			for (final Sprite _s : GetResourceObjects()) {
+				ZOrder.add(_s);
+			}
+		}
+		synchronized (GetProjectileObjects()) {
+			for (final Sprite _s : GetProjectileObjects()) {
+				ZOrder.add(_s);
+			}
+		}
+		synchronized (GetSpoogiclesObjects()) {
+			for (final Sprite _s : GetSpoogiclesObjects()) {
+				ZOrder.add(_s);
+			}
+		}
+		return ZOrder;
+	}
+	
 	public void Reset() {
 		ws_step = 0;
 		player_base = null;
@@ -559,30 +614,46 @@ public class SpriteManager {
 	public void Tick() {
 		++TickCount;
 		if (TickCount % utility.ticks_per_tock/2 == 0) Tock();
-		for (final Actor _a : ActorObjects) {
-			_a.Tick(TickCount);
+		synchronized (GetActorObjects()) {
+			for (final Actor _a : GetActorObjects()) {
+				_a.Tick(TickCount);
+			}
 		}
-		for (final Projectile _p : GetProjectileObjects()) {
-			_p.Tick(TickCount);
+		synchronized (GetProjectileObjects()) {
+			for (final Projectile _p : GetProjectileObjects()) {
+				_p.Tick(TickCount);
+			}
 		}
-		for (final Resource _r : GetResourceObjects()) {
-			_r.Tick(TickCount);
+		synchronized (GetResourceObjects()) {
+			for (final Resource _r : GetResourceObjects()) {
+				_r.Tick(TickCount);
+			}
 		}
-		for (final Building _b : GetBuildingOjects()) {
-			_b.Tick(TickCount);
+		synchronized (GetBuildingOjects()) {
+			for (final Building _b : GetBuildingOjects()) {
+				_b.Tick(TickCount);
+			}
 		}
-		for (final Spoogicles _s : GetSpoogiclesObjects()) {
-			_s.Tick(TickCount);
+		synchronized (GetSpoogiclesObjects()) {
+			for (final Spoogicles _s : GetSpoogiclesObjects()) {
+				_s.Tick(TickCount);
+			}
 		}
-		for (final WaterfallSplash _w : GetWaterfallSplashObjects()) {
-			_w.Tick(TickCount);
+		synchronized (GetWaterfallSplashObjects()) {
+			for (final WaterfallSplash _w : GetWaterfallSplashObjects()) {
+				_w.Tick(TickCount);
+			}
 		}
 		
 		//any resources added?
 		//now we're clear of the tick loop we can add these to the list
 		if (GetTempResourceObjects().size() > 0) {
-			GetResourceObjects().addAll(TempResourceHolder);
-			GetCollisionObjects().addAll(TempResourceHolder);
+			synchronized (GetResourceObjects()) {
+				GetResourceObjects().addAll(TempResourceHolder);
+			}
+			synchronized (GetCollisionObjects()) {
+				GetCollisionObjects().addAll(TempResourceHolder);
+			}
 			TempResourceHolder.clear();
 		}
 		
@@ -623,85 +694,89 @@ public class SpriteManager {
 		CheckActorCombat();
 
 		//
-		for (final Building _b : GetBuildingOjects()) {
-			if (_b.GetDead() == true) {
-				continue;
-			}
-			if (_b.GetType() == BuildingType.Base) {
-				continue;
-			}
-			if (_b.Recruiting() == false) {
-				continue;
+		synchronized (GetBuildingOjects()) {
+			for (final Building _b : GetBuildingOjects()) {
+				if (_b.GetDead() == true) {
+					continue;
+				}
+				if (_b.GetType() == BuildingType.Base) {
+					continue;
+				}
+				if (_b.Recruiting() == false) {
+					continue;
+				}
+
+				//TODO collectors should build if not enough builders
+				
+				//building could do with new employee
+				float min_sep = utility.minimiser_start;
+				Actor toHire = null;
+				//If is a collector building type
+				if (_b.GetCollects().size() > 0) { //GATHER TYPE
+					if (_b.GetEmployees() >= utility.building_gatherers_per_site) {
+						continue;
+					}
+					synchronized (GetActorObjects()) {
+						for (final Actor _a : GetActorObjects()) {
+							if (_a.GetOwner() != _b.GetOwner()) {
+								continue;
+							}
+							if (_a.GetLastEmployer().contains(_b) == true) {
+								continue; //Check was not recent employee
+							}
+							if (_a.GetJob() != ActorJob.Idle) {
+								continue; //Check has no job
+							}
+							if (_a.GetCollects().containsAll( _b.GetCollects() ) == false){
+								continue; //Actor collects correct res
+							}
+							if (utility.Seperation(_a.GetLoc(), _b.GetLoc()) < min_sep ) { //Is closest?
+								min_sep = utility.Seperation(_a.GetLoc(), _b.GetLoc());
+								toHire = _a;
+							}
+						}
+					}
+					if (toHire != null) {
+						if (_b.GetBeingBuilt() == true) {
+							toHire.SetJob(ActorJob.Builder, _b);
+							//System.out.println("NEW JOB "+toHire.GetOwner()+" "+toHire.GetType()+" is going to BUILD for "+_b.GetType());
+						} else {
+							//System.out.println("NEW JOB "+toHire.GetOwner()+" "+toHire.GetType()+" is going to GATHER for "+_b.GetType());
+							toHire.SetJob(ActorJob.Gather, _b);
+						}
+					}
+				} else { //ATTRACTOR TYPE
+					if (_b.GetEmployees() >= resource_manager.GetActorsPerAttractor(_b.GetOwner(), _b.GetType())) {
+						continue;
+					}
+					synchronized (GetActorObjects()) {
+						for (final Actor _a : GetActorObjects()) {
+							if (_a.GetOwner() != _b.GetOwner()) {
+								continue;
+							}
+							if (_a.GetLastEmployer().contains(_b) == true) {
+								continue; //Check was not recent employee
+							}
+							if (_a.GetJob() != ActorJob.Idle) {
+								continue; //Check has no job
+							}
+							if (_b.GetAttracts().contains( _a.GetType() ) == false) {
+								continue; //Actor not attracted
+							}
+							if (utility.Seperation(_a.GetLoc(), _b.GetLoc()) < min_sep ) { //Is closest?
+								min_sep = utility.Seperation(_a.GetLoc(), _b.GetLoc());
+								toHire = _a;
+							}
+						}
+					}
+					if (toHire != null) {
+						toHire.SetJob(ActorJob.Guard, _b);
+						System.out.println("NEW JOB "+toHire.GetOwner()+" "+toHire.GetType()+" is going to GUARD "+_b.GetType());
+					}
+				}
 			}
 
-			//TODO collectors should build if not enough builders
-			
-			//building could do with new employee
-			float min_sep = utility.minimiser_start;
-			Actor toHire = null;
-			//If is a collector building type
-			if (_b.GetCollects().size() > 0) { //GATHER TYPE
-				if (_b.GetEmployees() >= utility.building_gatherers_per_site) {
-					continue;
-				}
-				for (final Actor _a : ActorObjects) {
-					if (_a.GetOwner() != _b.GetOwner()) {
-						continue;
-					}
-					if (_a.GetLastEmployer().contains(_b) == true) {
-						continue; //Check was not recent employee
-					}
-					if (_a.GetJob() != ActorJob.Idle) {
-						continue; //Check has no job
-					}
-					if (_a.GetCollects().containsAll( _b.GetCollects() ) == false){
-						continue; //Actor collects correct res
-					}
-					if (utility.Seperation(_a.GetLoc(), _b.GetLoc()) < min_sep ) { //Is closest?
-						min_sep = utility.Seperation(_a.GetLoc(), _b.GetLoc());
-						toHire = _a;
-					}
-				}
-				if (toHire != null) {
-					if (_b.GetBeingBuilt() == true) {
-						toHire.SetJob(ActorJob.Builder, _b);
-						//System.out.println("NEW JOB "+toHire.GetOwner()+" "+toHire.GetType()+" is going to BUILD for "+_b.GetType());
-					} else {
-						//System.out.println("NEW JOB "+toHire.GetOwner()+" "+toHire.GetType()+" is going to GATHER for "+_b.GetType());
-						toHire.SetJob(ActorJob.Gather, _b);
-					}
-				}
-			} else { //ATTRACTOR TYPE
-				if (_b.GetEmployees() >= resource_manager.GetActorsPerAttractor(_b.GetOwner(), _b.GetType())) {
-					continue;
-				}
-				for (final Actor _a : ActorObjects) {
-					if (_a.GetOwner() != _b.GetOwner()) {
-						continue;
-					}
-					if (_a.GetLastEmployer().contains(_b) == true) {
-						continue; //Check was not recent employee
-					}
-					if (_a.GetJob() != ActorJob.Idle) {
-						continue; //Check has no job
-					}
-					if (_b.GetAttracts().contains( _a.GetType() ) == false) {
-						continue; //Actor not attracted
-					}
-					if (utility.Seperation(_a.GetLoc(), _b.GetLoc()) < min_sep ) { //Is closest?
-						min_sep = utility.Seperation(_a.GetLoc(), _b.GetLoc());
-						toHire = _a;
-					}
-				}
-				if (toHire != null) {
-					toHire.SetJob(ActorJob.Guard, _b);
-					System.out.println("NEW JOB "+toHire.GetOwner()+" "+toHire.GetType()+" is going to GUARD "+_b.GetType());
-				}
-			}
+			if (AI_thread.isAlive() == false) AI_thread.run();
 		}
-
-		if (AI_thread.isAlive() == false) AI_thread.run();
-
 	}
-
 }

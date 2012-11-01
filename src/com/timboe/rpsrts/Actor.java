@@ -1,5 +1,6 @@
 package com.timboe.rpsrts;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Vector;
 
@@ -24,7 +25,8 @@ public class Actor extends Sprite {
 	boolean tick;
 	boolean tock;
 	
-	protected Vector<WorldPoint> waypoint_list = null; //pahfinding list
+	private Vector<WorldPoint> waypoint_list = null; //pahfinding list
+	protected Collection<WorldPoint> waypoint_list_sync = null; 
 	protected Sprite destination; //final pathfind destination
 	protected WorldPoint waypoint;  //current pathfind destination
 	Thread pathfinding_thread = null;
@@ -100,6 +102,7 @@ public class Actor extends Sprite {
 		destination = null;
 		waypoint = null;
 		waypoint_list = null;
+		waypoint_list_sync = null;
 		if (pathfinder != null) {
 			pathfinder.Kill();
 		}
@@ -350,26 +353,29 @@ public class Actor extends Sprite {
 			//System.out.println("moveLoop FIRST WAYPOINT WP("+waypoint.getX()+","+waypoint.getY()+") POS ("+x_prec+","+y_prec+")");
 			final float _hypotenuse = utility.Seperation(x_prec, waypoint.getX(), y_prec, waypoint.getY()); //  // Math.sqrt( Math.pow(x_prec - destination_list.lastElement().getX(),2) +  Math.pow(y_prec - destination_list.lastElement().getY(),2) );
 			float radiusToAchieve = 1f; //If pathfinding to pathfind node
-			if (waypoint_list == null || waypoint_list.size() == 0)
-			 {
-				radiusToAchieve = utility.tiles_size + r + destination.GetR(); //If final target (pathfinding accuracy now tiles_size)
+			synchronized (waypoint_list_sync) {
+				if (waypoint_list_sync == null || waypoint_list_sync.size() == 0)	 {
+					radiusToAchieve = utility.tiles_size + r + destination.GetR(); //If final target (pathfinding accuracy now tiles_size)
+				}
 			}
 			if (_hypotenuse <= radiusToAchieve) { //At waypoint?
 				//Is there another waypoint?
-				if (waypoint_list != null && waypoint_list.size() > 0) {
-					//Set to go here - next waypoint
-					waypoint = waypoint_list.lastElement();
-					waypoint_list.remove( waypoint_list.size() - 1 );
-				} else {
-					//OK, so no more waypoints - are we there?
-					if (utility.Seperation(waypoint, destination.GetLoc()) < r + destination.GetR()) {
-						//Reached final destination
-						//System.out.println("INFO REACHED FINAL DESTINATION");
-						ClearDestination();
-						return true;
+				synchronized (waypoint_list_sync) {
+					if (waypoint_list != null && waypoint_list_sync.size() > 0) {
+						//Set to go here - next waypoint
+						waypoint = ((Vector<WorldPoint>) waypoint_list_sync).lastElement();
+						waypoint_list_sync.remove( waypoint_list_sync.size() - 1 );
 					} else {
-						//NOPE, GO STRAIGHT LINE - IF WE HIT SOMETHING THEN ROUTE GETS RECALCULATED
-						waypoint = destination.GetLoc();
+						//OK, so no more waypoints - are we there?
+						if (utility.Seperation(waypoint, destination.GetLoc()) < r + destination.GetR()) {
+							//Reached final destination
+							//System.out.println("INFO REACHED FINAL DESTINATION");
+							ClearDestination();
+							return true;
+						} else {
+							//NOPE, GO STRAIGHT LINE - IF WE HIT SOMETHING THEN ROUTE GETS RECALCULATED
+							waypoint = destination.GetLoc();
+						}
 					}
 				}
 				return false;
@@ -460,14 +466,18 @@ public class Actor extends Sprite {
 			else {
 				//Done, get result.
 				//System.out.println("PATHFINDING DONE! Result is:" + pathfinder.GetResult());
-				waypoint_list = pathfinder.GetResult();
-				if (waypoint_list == null) {
+				//synchronized (waypoint_list_sync) {
+					waypoint_list_sync = pathfinder.GetResult();
+				//}
+				if (waypoint_list_sync == null) {
 					navagate_status = PathfindStatus.Failed;
 					destination = null;
 					waypoint = null;
 				} else {
+					synchronized (waypoint_list_sync) {
+						waypoint = ((Vector<WorldPoint>) waypoint_list_sync).lastElement();
+					}
 					navagate_status = PathfindStatus.Passed;
-					waypoint = waypoint_list.lastElement();
 				}
 				pathfinder = null;
 				pathfinding_thread = null;

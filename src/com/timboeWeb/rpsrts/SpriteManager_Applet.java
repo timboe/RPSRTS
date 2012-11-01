@@ -5,8 +5,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.util.HashSet;
-import java.util.TreeSet;
 
 import com.timboe.rpsrts.Actor;
 import com.timboe.rpsrts.ActorType;
@@ -47,7 +45,9 @@ public class SpriteManager_Applet extends SpriteManager {
 				, utility.actorRadius
 				, _at
 				, _o);
-		ActorObjects.add(newActor);
+		synchronized (GetActorObjects()) {
+			GetActorObjects().add(newActor);
+		}
 		return newActor;
 	}
 	
@@ -66,8 +66,13 @@ public class SpriteManager_Applet extends SpriteManager {
 				, _r
 				, _bt
 				, _oo);
-		GetBuildingOjects().add(newBuilding);
-		GetCollisionObjects().add(newBuilding);
+		synchronized (GetBuildingOjects()) {
+			GetBuildingOjects().add(newBuilding);
+
+		}
+		synchronized (GetCollisionObjects()) {
+			GetCollisionObjects().add(newBuilding);
+		}
 		return newBuilding;
 	}
 	
@@ -77,7 +82,9 @@ public class SpriteManager_Applet extends SpriteManager {
 				, _source
 				, utility.projectileRadius
 				, _target);
-		GetProjectileObjects().add(newProjectile);
+		synchronized (GetProjectileObjects()) {
+			GetProjectileObjects().add(newProjectile);
+		}
 	}
 
 	@Override
@@ -90,8 +97,12 @@ public class SpriteManager_Applet extends SpriteManager {
 				, _r
 				, _rt);
 		if (AddToTempList == false) {
-			GetResourceObjects().add(newResource);
-			GetCollisionObjects().add(newResource);
+			synchronized (GetResourceObjects()) {
+				GetResourceObjects().add(newResource);
+			}
+			synchronized (GetCollisionObjects()) {
+				GetCollisionObjects().add(newResource);
+			}
 		} else { //resource can't corrupt it's own list while it's ticking
 			GetTempResourceObjects().add(newResource);
 		}
@@ -105,44 +116,26 @@ public class SpriteManager_Applet extends SpriteManager {
 				_y,
 				_oo,
 				_n,
-				_scale);		
-		GetSpoogiclesObjects().add(newSpoogicles);
+				_scale);	
+		synchronized (GetSpoogiclesObjects()) {
+			GetSpoogiclesObjects().add(newSpoogicles);
+		}
 	}
 	
 	@Override
 	public void PlaceWaterfallSplash(int _x, int _y, int _r) {
 		final WaterfallSplash newWFS = new WaterfallSplash_Applet(++GlobalSpriteCounter, _x, _y, _r);
-		GetWaterfallSplashObjects().add(newWFS);
+		synchronized (GetWaterfallSplashObjects()) {
+			GetWaterfallSplashObjects().add(newWFS);
+		}
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void Render(Graphics2D _g2) {
 		++FrameCount;
-		
-		TreeSet<Sprite> ZOrder = new TreeSet<Sprite>();
-		HashSet<Sprite> ActorObjects_Applet = (HashSet) ActorObjects;
-		for (final Sprite _s : ActorObjects_Applet) {
-			ZOrder.add(_s);
-		}
-		HashSet<Sprite> BuildingObjects_Applet = (HashSet) BuildingOjects;
-		for (final Sprite _s : BuildingObjects_Applet) {
-			ZOrder.add(_s);
-		}
-		HashSet<Sprite> ResourceObjects_Applet = (HashSet) ResourceObjects;
-		for (final Sprite _s : ResourceObjects_Applet) {
-			ZOrder.add(_s);
-		}
-		HashSet<Sprite> ProjectileObjects_Applet = (HashSet) ProjectileObjects;
-		for (final Sprite _s : ProjectileObjects_Applet) {
-			ZOrder.add(_s);
-		}
-		HashSet<Sprite> SpoogiclesObjects_Applet = (HashSet) SpoogicleObjects;
-		for (final Sprite _s : SpoogiclesObjects_Applet) {
-			ZOrder.add(_s);
-		}
+
 		//Waterfall splashs' are rendered by the Scene Drawer (we just look after them here with other sprites)
 		
-		for (final Sprite _Z : ZOrder) {
+		for (final Sprite _Z : GetSpritesZOrdered()) {
 			if (_Z.GetIsActor() == true) {
 				((Actor_Applet) _Z).Render(_g2, FrameCount);
 			} else if (_Z.GetIsResource() == true) {
@@ -247,40 +240,44 @@ public class SpriteManager_Applet extends SpriteManager {
 			doDistanceCheck = false;
 		} else { //do distance check
 			doDistanceCheck = true;
-			for (final Building _b : GetBuildingOjects()) {
-				if (_b.GetOwner() != ObjectOwner.Player) {
-					continue;
-				}
-				if (_b.GetCollects().size() == 0) { //not gatherer
-					continue;
-				}
-				for (int angle = (FrameCount%utility.building_Place_degrees); angle <= utility.wg_DegInCircle; angle += utility.building_Place_degrees) {
-					_g2.drawArc(_b.GetX() - utility.building_gather_radius, _b.GetY() - utility.building_gather_radius,
-							utility.building_gather_radius * 2, utility.building_gather_radius * 2, angle, utility.building_Place_degrees_show);
-				}
-				if (utility.Seperation(_mouse_x, _b.GetX(), _mouse_y, _b.GetY()) < utility.building_gather_radius) {
-					closeToExisting = true;
+			synchronized (GetBuildingOjects()) {
+				for (final Building _b : GetBuildingOjects()) {
+					if (_b.GetOwner() != ObjectOwner.Player) {
+						continue;
+					}
+					if (_b.GetCollects().size() == 0) { //not gatherer
+						continue;
+					}
+					for (int angle = (FrameCount%utility.building_Place_degrees); angle <= utility.wg_DegInCircle; angle += utility.building_Place_degrees) {
+						_g2.drawArc(_b.GetX() - utility.building_gather_radius, _b.GetY() - utility.building_gather_radius,
+								utility.building_gather_radius * 2, utility.building_gather_radius * 2, angle, utility.building_Place_degrees_show);
+					}
+					if (utility.Seperation(_mouse_x, _b.GetX(), _mouse_y, _b.GetY()) < utility.building_gather_radius) {
+						closeToExisting = true;
+					}
 				}
 			}
 		}
 
 		if (_bt == BuildingType.X) {
 			//REMOVE BUILDING
-			for (final Building _b : GetBuildingOjects()) {
-				if (utility.Seperation(_mouse_x, _b.GetX(), _mouse_y, _b.GetY()) < utility.buildingRadius) {
-					if (utility.dbg == false && _b.GetType() == BuildingType.Base) {
-						continue;
+			synchronized (GetBuildingOjects()) {
+				for (final Building _b : GetBuildingOjects()) {
+					if (utility.Seperation(_mouse_x, _b.GetX(), _mouse_y, _b.GetY()) < utility.buildingRadius) {
+						if (utility.dbg == false && _b.GetType() == BuildingType.Base) {
+							continue;
+						}
+						if (utility.dbg == false && _b.GetOwner() == ObjectOwner.Enemy) {
+							continue;
+						}
+						_b.DeleteHover();
+						if (_place_remove == true) {
+							resource_manager.CanAffordBuy(_b.GetType(), ObjectOwner.Player, false, true);
+							_b.Kill();
+							return true;
+						}
 					}
-					if (utility.dbg == false && _b.GetOwner() == ObjectOwner.Enemy) {
-						continue;
-					}
-					_b.DeleteHover();
-					if (_place_remove == true) {
-						resource_manager.CanAffordBuy(_b.GetType(), ObjectOwner.Player, false, true);
-						_b.Kill();
-						return true;
-					}
-				}
+				}	
 			}
 		} else if ( CheckSafe(true,true,_mouse_x, _mouse_y, radius_to_check, 0, 0) == true
 				&& resource_manager.CanAffordBuy(_bt, ObjectOwner.Player, false, false)

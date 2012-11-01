@@ -555,8 +555,10 @@ public class SceneRenderer_Applet {
 		    ///Do waterfall
 		    _g2.setClip((int)-D, (int)0f, (int)(2*D), utility.waterfall_size);
 		    _g2.setPaint(light_gradient);
-		    for (WaterfallSplash _w :  theSpriteManger.GetWaterfallSplashObjects()) {
-		    	((WaterfallSplash_Applet)_w).Render(_g2);
+		    synchronized (theSpriteManger.GetWaterfallSplashObjects()) {
+			    for (WaterfallSplash _w :  theSpriteManger.GetWaterfallSplashObjects()) {
+			    	((WaterfallSplash_Applet)_w).Render(_g2);
+			    }
 		    }
 		    _g2.setTransform(theTransforms.af);
 		    _g2.setClip(null);

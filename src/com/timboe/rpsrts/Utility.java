@@ -83,7 +83,7 @@ public class Utility {
 	public final float wg_kTEndPt = 10.f; //Max random chunk energy
 	public final float wg_kT_R =  14 * tiles_size; //kT algorithm R parameter  (derived)
 	public final int wg_MinBiomes = 15; //Min number of generated biomes
-	public final long wg_MaxBiomes = 65; //Max number of generated biomes
+	public final long wg_MaxBiomes = 65*100; //Max number of generated biomes
 	public final float wg_MainBaseRadius = 0.8f; //How far out the main bases are placed
 	public final int wg_ErrodeIterations = 4; //times to errode world
 	public final int wg_EnemyBaseAngle = 135; //starting angle for enemy
@@ -148,8 +148,7 @@ public class Utility {
 	public final int waterfall_splashes = 400;
 	public final int waterfall_size = (int) (window_Y*4f);
 	public final float waterfall_disk_size = 0.71f;
-	public final float waterfall_fall_rate = 0.5f;
-	public final float waterfall_fall_speed = 10f;
+	public final float waterfall_fall_rate = 1f;
 
 	
 	//building settings

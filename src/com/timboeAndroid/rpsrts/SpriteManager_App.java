@@ -1,6 +1,5 @@
 package com.timboeAndroid.rpsrts;
 
-import java.util.HashSet;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -44,7 +43,9 @@ public class SpriteManager_App extends SpriteManager {
 				, utility.actorRadius
 				, _at
 				, _o);
-		ActorObjects.add(newActor);
+		synchronized (GetActorObjects()) {
+			GetActorObjects().add(newActor);
+		}
 		return newActor;
 	}
 	
@@ -63,10 +64,12 @@ public class SpriteManager_App extends SpriteManager {
 				, _r
 				, _bt
 				, _oo);
-		GetBuildingOjects().add(newBuilding);
-		//synchronized (CollisionObjectsThreadSafe) {
+		synchronized (GetBuildingOjects()) {
+			GetBuildingOjects().add(newBuilding);
+		}
+		synchronized (GetCollisionObjects()) {
 			GetCollisionObjects().add(newBuilding);
-		//}
+		}
 		return newBuilding;
 	}
 	
@@ -76,7 +79,9 @@ public class SpriteManager_App extends SpriteManager {
 				, _source
 				, utility.projectileRadius
 				, _target);
-		GetProjectileObjects().add(newProjectile);
+		synchronized (GetProjectileObjects()) {
+			GetProjectileObjects().add(newProjectile);
+		}
 	}
 
 	@Override
@@ -90,31 +95,31 @@ public class SpriteManager_App extends SpriteManager {
 				, _r
 				, _rt);
 		if (AddToTempList == false) {
-			GetResourceObjects().add(newResource);
-			GetCollisionObjects().add(newResource);
+			synchronized (GetResourceObjects()) {
+				GetResourceObjects().add(newResource);
+			}
+			synchronized (GetCollisionObjects()) {
+				GetCollisionObjects().add(newResource);
+			}
 		} else { //resource can't corrupt it's own list while it's ticking
 			GetTempResourceObjects().add(newResource);
 		}
 		return newResource;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void Render(Canvas canvas, Matrix _af, Matrix _af_translate_zoom, Matrix _af_shear_rotate, Matrix _af_none) {
-		HashSet<Actor_App> ActorObjects_App = (HashSet) ActorObjects;
-		for (final Actor_App _s : ActorObjects_App) {
-			_s.Render(canvas, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
-		}
-		HashSet<Building_App> BuildingObjects_App = (HashSet) BuildingOjects;
-		for (final Building_App _s : BuildingObjects_App) {
-			_s.Render(canvas, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
-		}
-		HashSet<Resource_App> ResourceObjects_App = (HashSet) ResourceObjects;
-		for (final Resource_App _s : ResourceObjects_App) {
-			_s.Render(canvas, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
-		}
-		HashSet<Projectile_App> ProjectileObjects_App = (HashSet) ProjectileObjects;
-		for (final Projectile_App _s : ProjectileObjects_App) {
-			_s.Render(canvas, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
+		for (final Sprite _Z : GetSpritesZOrdered()) {
+			if (_Z.GetIsActor() == true) {
+				((Actor_App) _Z).Render(canvas, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
+			} else if (_Z.GetIsResource() == true) {
+				((Resource_App) _Z).Render(canvas, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
+			} else if (_Z.GetIsBuilding() == true) {
+				((Building_App) _Z).Render(canvas, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
+			} else if (_Z.GetIsProjectile() == true) {
+				((Projectile_App) _Z).Render(canvas, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
+			} else if (_Z.GetIsSpoogicle() == true) {
+				((Spoogicles_App) _Z).Render(canvas, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
+			}
 		}
 	}
 	

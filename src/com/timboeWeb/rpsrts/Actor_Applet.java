@@ -107,12 +107,14 @@ public class Actor_Applet extends Actor {
 			} else {
 				_g2.setColor(Color.blue);
 			}
-			if (waypoint_list != null) {
-				for (final WorldPoint p : waypoint_list) {
-					if (p == null) {
-						continue;
+			if (waypoint_list_sync != null) {
+				synchronized (waypoint_list_sync) {
+					for (final WorldPoint p : waypoint_list_sync) {
+						if (p == null) {
+							continue;
+						}
+						_g2.fillRect((int) p.getX()-1, (int) p.getY()-1, 2, 2);
 					}
-					_g2.fillRect((int) p.getX()-1, (int) p.getY()-1, 2, 2);
 				}
 			}
 			if (waypoint != null) {

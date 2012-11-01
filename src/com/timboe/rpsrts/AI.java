@@ -39,54 +39,60 @@ public class AI implements Runnable {
 		WorldPoint chosenLocation = null;
 
 		//for buildings
-		for (final Building _b : theSpriteManager.GetBuildingOjects()) {
-			if (_b.GetOwner() == ObjectOwner.Player) {
-				continue;
-			}
-			if (_b.iAttract.size() > 0) { //Don't plant building near attractor
-				continue;
-			}
-			for (int x = _b.GetX() - utility.building_gather_radius; x < _b.GetX() + utility.building_gather_radius; x += utility.building_AI_GranularityToStudy*utility.rndI(theWorld.tiles_size)) {
-				for (int y = _b.GetY() - utility.building_gather_radius; y < _b.GetY() + utility.building_gather_radius; y += utility.building_AI_GranularityToStudy*utility.rndI(theWorld.tiles_size)) {
-					//Check we're near enough the building
-					if (utility.Seperation(new WorldPoint(x,y), _b.GetLoc()) > utility.building_gather_radius) {
-						continue;
-					}
-					//check we can place here (RESOURCE/BUILDING and ACTOR)
-					if (theSpriteManager.CheckSafe(true,true,x, y, utility.buildingRadius, 0, 0) == false) {
-						continue;
-					}
-					//check is open
-					boolean isOpen = true;
-					for (final Sprite _s : theSpriteManager.GetCollisionObjects()) {
-						if (utility.Seperation(new WorldPoint(x,y), _s.GetLoc()) < utility.building_AI_openSpace * utility.buildingRadius) {
-							isOpen = false;
-							break;
-						}
-					}
-					if (isOpen == false) {
-						continue;
-					}
-					//Count resources.
-					int resourcesHere = 0;
-					for (final Resource _r : theSpriteManager.GetResourceObjects()) {
-						if (_bt == BuildingType.Smelter && _r.GetType() != ResourceType.Mine) {
-							continue;
-						} else if (_bt == BuildingType.Rockery && _r.GetType() != ResourceType.Rockpile) {
-							continue;
-						} else if (_bt == BuildingType.Woodshop
-								&& !(_r.GetType() != ResourceType.Cactus || _r.GetType() != ResourceType.Tree)) {
+		synchronized (theSpriteManager.GetBuildingOjects()) {
+			for (final Building _b : theSpriteManager.GetBuildingOjects()) {
+				if (_b.GetOwner() == ObjectOwner.Player) {
+					continue;
+				}
+				if (_b.iAttract.size() > 0) { //Don't plant building near attractor
+					continue;
+				}
+				for (int x = _b.GetX() - utility.building_gather_radius; x < _b.GetX() + utility.building_gather_radius; x += utility.building_AI_GranularityToStudy*utility.rndI(theWorld.tiles_size)) {
+					for (int y = _b.GetY() - utility.building_gather_radius; y < _b.GetY() + utility.building_gather_radius; y += utility.building_AI_GranularityToStudy*utility.rndI(theWorld.tiles_size)) {
+						//Check we're near enough the building
+						if (utility.Seperation(new WorldPoint(x,y), _b.GetLoc()) > utility.building_gather_radius) {
 							continue;
 						}
-						if (utility.Seperation(new WorldPoint(x,y), _r.GetLoc()) > utility.building_gather_radius) {
+						//check we can place here (RESOURCE/BUILDING and ACTOR)
+						if (theSpriteManager.CheckSafe(true,true,x, y, utility.buildingRadius, 0, 0) == false) {
 							continue;
 						}
-						resourcesHere += _r.GetRemaining();
-					}
-					if (resourcesHere > maxResource) {
-						maxResource = resourcesHere;
-						//System.out.println("UPDATED MAX RESOURCE TO " +maxResource);
-						chosenLocation = new WorldPoint(x,y);
+						//check is open
+						boolean isOpen = true;
+						synchronized (theSpriteManager.GetCollisionObjects()) {
+							for (final Sprite _s : theSpriteManager.GetCollisionObjects()) {
+								if (utility.Seperation(new WorldPoint(x,y), _s.GetLoc()) < utility.building_AI_openSpace * utility.buildingRadius) {
+									isOpen = false;
+									break;
+								}
+							}
+						}
+						if (isOpen == false) {
+							continue;
+						}
+						//Count resources.
+						int resourcesHere = 0;
+						synchronized (theSpriteManager.GetResourceObjects()) {
+							for (final Resource _r : theSpriteManager.GetResourceObjects()) {
+								if (_bt == BuildingType.Smelter && _r.GetType() != ResourceType.Mine) {
+									continue;
+								} else if (_bt == BuildingType.Rockery && _r.GetType() != ResourceType.Rockpile) {
+									continue;
+								} else if (_bt == BuildingType.Woodshop
+										&& !(_r.GetType() != ResourceType.Cactus || _r.GetType() != ResourceType.Tree)) {
+									continue;
+								}
+								if (utility.Seperation(new WorldPoint(x,y), _r.GetLoc()) > utility.building_gather_radius) {
+									continue;
+								}
+								resourcesHere += _r.GetRemaining();
+							}	
+						}
+						if (resourcesHere > maxResource) {
+							maxResource = resourcesHere;
+							//System.out.println("UPDATED MAX RESOURCE TO " +maxResource);
+							chosenLocation = new WorldPoint(x,y);
+						}
 					}
 				}
 			}
@@ -169,12 +175,14 @@ public class AI implements Runnable {
 	}
 	
 	void RemoveOldBuildings() {
-		for (final Building _b : theSpriteManager.GetBuildingOjects()) {
-			if (_b.GetOwner() == ObjectOwner.Player) {
-				continue;
-			}
-			if (_b.no_local_resource_counter >= utility.AI_BadBuilding_Before_Sell) {
-				Refund(_b);
+		synchronized (theSpriteManager.GetBuildingOjects()) {
+			for (final Building _b : theSpriteManager.GetBuildingOjects()) {
+				if (_b.GetOwner() == ObjectOwner.Player) {
+					continue;
+				}
+				if (_b.no_local_resource_counter >= utility.AI_BadBuilding_Before_Sell) {
+					Refund(_b);
+				}
 			}
 		}
 	}
@@ -357,13 +365,15 @@ public class AI implements Runnable {
 	Building getWhatToAttack(BuildingType toAttackType) {
 		Building toAttack = null;
 		float distanceToTarget = utility.minimiser_start;
-		for (Building _b : theSpriteManager.BuildingOjects) {
-			if (_b.GetOwner() == ObjectOwner.Enemy) continue;
-			if (_b.type != toAttackType) continue;
-			float sep = utility.Seperation(theSpriteManager.enemy_base.GetLoc(), _b.GetLoc());
-			if (sep < distanceToTarget) {
-				distanceToTarget = sep;
-				toAttack = _b;
+		synchronized (theSpriteManager.GetBuildingOjects()) {
+			for (Building _b : theSpriteManager.GetBuildingOjects()) {
+				if (_b.GetOwner() == ObjectOwner.Enemy) continue;
+				if (_b.type != toAttackType) continue;
+				float sep = utility.Seperation(theSpriteManager.enemy_base.GetLoc(), _b.GetLoc());
+				if (sep < distanceToTarget) {
+					distanceToTarget = sep;
+					toAttack = _b;
+				}
 			}
 		}
 		return toAttack;
@@ -384,51 +394,54 @@ public class AI implements Runnable {
 		for (Sprite _s : toKill) defence_attractors.remove(_s);
 		
 		//look at my actors, are any of them under attack?
-		for (Actor _a : theSpriteManager.ActorObjects) {
-			if (_a.GetOwner() == ObjectOwner.Enemy) continue;
-			if (_a.attack_target == null) continue;
-			//Get if close to a target.
-			//EXTRA ALLOWANCE FOR DEFENCE, * 4 RATHER THAN * 2 TO KEEP CLEAR OF CURRENT WARZONES
-			boolean aOK = false;
-			for (Building _b : attack_attractors) {
-				if (_b.iCollect.contains( _a.type ) == false) continue;
-				if (utility.Seperation(_b.GetLoc(), _a.GetLoc()) < 4 * utility.wander_radius) {
-					aOK = true;
-					break;
-				}
-			}
-			for (Building _b : defence_attractors) {
-				if (_b.iCollect.contains( _a.type ) == false) continue;
-				if (utility.Seperation(_b.GetLoc(), _a.GetLoc()) < 4 * utility.wander_radius) {
-					aOK = true;
-					break;
-				}
-			}
-			if (aOK == false) { //gawd damn player, attacking our propahteh! (well, actors for now)
-				//choose correct type
-				BuildingType _bt = null;
-				if (_a.GetType() == ActorType.Paper) _bt = BuildingType.AttractorScissors;
-				else if (_a.GetType() == ActorType.Rock) _bt = BuildingType.AttractorPaper;
-				else if (_a.GetType() == ActorType.Scissors) _bt = BuildingType.AttractorRock;
-				
-				boolean haveOne = false;
-				for (Building _b : defence_attractors) {
-					if (_b.GetType() == _bt) {
-						haveOne = true;
+		synchronized (theSpriteManager.GetActorObjects()) {
+			for (Actor _a : theSpriteManager.GetActorObjects()) {
+				if (_a.GetOwner() == ObjectOwner.Enemy) continue;
+				if (_a.attack_target == null) continue;
+				//Get if close to a target.
+				//EXTRA ALLOWANCE FOR DEFENCE, * 4 RATHER THAN * 2 TO KEEP CLEAR OF CURRENT WARZONES
+				boolean aOK = false;
+				for (Building _b : attack_attractors) {
+					if (_b.iCollect.contains( _a.type ) == false) continue;
+					if (utility.Seperation(_b.GetLoc(), _a.GetLoc()) < 4 * utility.wander_radius) {
+						aOK = true;
 						break;
 					}
 				}
-				
-				if (haveOne == false && resource_manager.CanAffordBuy(_bt, ObjectOwner.Enemy, false, false)) {
-					//place new attractor
-					WorldPoint loc = theSpriteManager.FindGoodSpot(_a.GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
-					if (loc == null) break;					
-					Building defendor = theSpriteManager.PlaceBuilding(loc, _bt, ObjectOwner.Enemy);
-					defence_attractors.add(defendor);
-					resource_manager.CanAffordBuy(_bt, ObjectOwner.Enemy, true, false);
+				for (Building _b : defence_attractors) {
+					if (_b.iCollect.contains( _a.type ) == false) continue;
+					if (utility.Seperation(_b.GetLoc(), _a.GetLoc()) < 4 * utility.wander_radius) {
+						aOK = true;
+						break;
+					}
+				}
+				if (aOK == false) { //gawd damn player, attacking our propahteh! (well, actors for now)
+					//choose correct type
+					BuildingType _bt = null;
+					if (_a.GetType() == ActorType.Paper) _bt = BuildingType.AttractorScissors;
+					else if (_a.GetType() == ActorType.Rock) _bt = BuildingType.AttractorPaper;
+					else if (_a.GetType() == ActorType.Scissors) _bt = BuildingType.AttractorRock;
+					
+					boolean haveOne = false;
+					for (Building _b : defence_attractors) {
+						if (_b.GetType() == _bt) {
+							haveOne = true;
+							break;
+						}
+					}
+					
+					if (haveOne == false && resource_manager.CanAffordBuy(_bt, ObjectOwner.Enemy, false, false)) {
+						//place new attractor
+						WorldPoint loc = theSpriteManager.FindGoodSpot(_a.GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
+						if (loc == null) break;					
+						Building defendor = theSpriteManager.PlaceBuilding(loc, _bt, ObjectOwner.Enemy);
+						defence_attractors.add(defendor);
+						resource_manager.CanAffordBuy(_bt, ObjectOwner.Enemy, true, false);
+					}
 				}
 			}
 		}
+		
 	}
 	
 	void CheckAttractors() {
@@ -443,12 +456,14 @@ public class AI implements Runnable {
 			}
 			
 			boolean aOK = false;
-			for (Building _bb : theSpriteManager.BuildingOjects) {
-				if (_bb.GetOwner() == ObjectOwner.Enemy) continue;
-				if (utility.Seperation(_b.GetLoc(), _bb.GetLoc()) < 2 * utility.wander_radius) {
-					aOK = true;
-					break;
-				}
+			synchronized (theSpriteManager.GetBuildingOjects()) {
+				for (Building _bb : theSpriteManager.GetBuildingOjects()) {
+					if (_bb.GetOwner() == ObjectOwner.Enemy) continue;
+					if (utility.Seperation(_b.GetLoc(), _bb.GetLoc()) < 2 * utility.wander_radius) {
+						aOK = true;
+						break;
+					}
+				}	
 			}
 			if (aOK == true) continue;
 			
@@ -484,11 +499,13 @@ public class AI implements Runnable {
 		for (Building _b : defence_attractors) {
 			boolean player_nearby = false;
 			boolean enemy_nearby = false;
-			for (Actor _a : theSpriteManager.ActorObjects) {
-				if (utility.Seperation(_b.GetLoc(), _a.GetLoc()) < 2 *  utility.wander_radius) {
-					if (_a.GetOwner() == ObjectOwner.Player) player_nearby = true;
-					else if (_a.GetOwner() == ObjectOwner.Enemy) enemy_nearby = true;
-					if (player_nearby == true && enemy_nearby == true) break;
+			synchronized (theSpriteManager.GetActorObjects()) {
+				for (Actor _a : theSpriteManager.GetActorObjects()) {
+					if (utility.Seperation(_b.GetLoc(), _a.GetLoc()) < 2 *  utility.wander_radius) {
+						if (_a.GetOwner() == ObjectOwner.Player) player_nearby = true;
+						else if (_a.GetOwner() == ObjectOwner.Enemy) enemy_nearby = true;
+						if (player_nearby == true && enemy_nearby == true) break;
+					}
 				}
 			}
 			if (!(player_nearby == true && enemy_nearby == true)) { //note: negated
