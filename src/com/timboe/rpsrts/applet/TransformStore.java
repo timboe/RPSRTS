@@ -16,9 +16,7 @@ public class TransformStore {
 	
 	Utility utility = Utility.GetUtility();
 
-	
-	RenderingHints aa_on = new RenderingHints(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-	
+	RenderingHints aa_on = new RenderingHints(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);	
     RenderingHints aa_off = new RenderingHints(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);
     private boolean aa = true;
     
@@ -31,7 +29,6 @@ public class TransformStore {
     public AffineTransform af_shear_rotate = new AffineTransform();
     //Display parameters
 	private float ZOOM=0.9f;
-    
 	private float YSHEAR=0.6f;
 	private float ROTATE = 0f;
 	private float TRANSLATE_X = 0f;

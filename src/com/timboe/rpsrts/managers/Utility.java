@@ -45,12 +45,12 @@ public class Utility {
 	public final int window_X = 1000;
 	public final int window_Y = 600;
 	public final int tiles_per_chunk = 8; //Used for coarse kT algo
-	public final int world_tiles = 176; //Number of tile elements on X
+	public final int world_tiles = 176/2; //Number of tile elements on X
 	public final int tiles_size = 7; //Size of tile element in pixels
 	public final int world_size = world_tiles*tiles_size;
 	public final int world_size2 = world_size/2;
 	//time settings
-	public final int ticks_per_tock = 60; //one per second
+	public final int ticks_per_tock = 60; //at 30 FPS, 2 ticks per render, this is one tock per second
 	//fps & update settings
 	public final int do_fps_every_x_ticks = 6; // refresh FPS after X frames
 	public final int ticks_per_render = 2; //nominal is 2 (game will go suuuper fast if this is bumped up)

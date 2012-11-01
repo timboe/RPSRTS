@@ -3,6 +3,8 @@ package com.timboe.rpsrts.applet;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
@@ -13,8 +15,11 @@ import com.timboe.rpsrts.sprites.Building;
 public class Building_Applet extends Building {
 
 	BufferedImage[] spriteGraphic;	
-	protected Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();
-	protected TransformStore theTransforms = TransformStore.GetTransformStore();
+	private Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();
+	private TransformStore theTransforms = TransformStore.GetTransformStore();
+	private ShapeStore theShapeStore = ShapeStore.GetShapeStore();
+	private SceneRenderer_Applet theSceneRenderer = SceneRenderer_Applet.GetSceneRenderer_Applet();
+
 
 	public Building_Applet(int _ID, int _x, int _y, int _r, BuildingType _bt, ObjectOwner _oo) {
 		super(_ID, _x, _y, _r, _bt, _oo);
@@ -75,38 +80,29 @@ public class Building_Applet extends Building {
 		final int _x = (int)Math.round(transform.getX());
 		final int _y = (int)Math.round(transform.getY());
 
+		//Do delete hover
 		if (delete_hover) {
-			//Can't place here
 			_g2.setTransform(theTransforms.af);
 			_g2.setColor(Color.red);
-			final int[] _x_points = new int[4];
-			final int[] _y_points = new int[4];
-			final int b_r = utility.buildingRadius;
-			_x_points[0] = x - b_r - 2;
-			_x_points[1] = x - b_r + 2;
-			_x_points[2] = x + b_r + 2;
-			_x_points[3] = x + b_r - 2;
-
-			_y_points[0] = y - b_r + 2 + y_offset/8;
-			_y_points[1] = y - b_r - 2 + y_offset/8;
-			_y_points[2] = y + b_r - 2 + y_offset/8;
-			_y_points[3] = y + b_r + 2 + y_offset/8;
-
-			_g2.fillPolygon(_x_points, _y_points, 4);
-
-			_x_points[0] = x - b_r - 2;
-			_x_points[1] = x - b_r + 2;
-			_x_points[2] = x + b_r + 2;
-			_x_points[3] = x + b_r - 2;
-
-			_y_points[0] = y + b_r - 2 + y_offset/8;
-			_y_points[1] = y + b_r + 2 + y_offset/8;
-			_y_points[2] = y - b_r + 2 + y_offset/8;
-			_y_points[3] = y - b_r - 2 + y_offset/8;
-			_g2.fillPolygon(_x_points, _y_points, 4);
-
+			GeneralPath X = (GeneralPath) theShapeStore.GetCross();
+			X.transform(AffineTransform.getTranslateInstance(x, y));
+			_g2.fill(X);
 			delete_hover = false;
 			return;
+		}
+		
+		//Do move symbol
+		if (move_hover == true || 
+				(getiAttract().size() > 0
+				&& owner == ObjectOwner.Player
+				&&	theSceneRenderer.MouseTF != null 
+				&& theSceneRenderer.MouseTF.distance(x, y) < r) ) {
+			_g2.setTransform(theTransforms.af);
+			_g2.setColor(Color.green);
+			GeneralPath move = (GeneralPath) theShapeStore.GetMove();
+			move.transform(AffineTransform.getTranslateInstance(x, y));
+			_g2.fill(move);
+			if (utility.mouseDrag == false) move_hover = false;
 		}
 
 		//Do health

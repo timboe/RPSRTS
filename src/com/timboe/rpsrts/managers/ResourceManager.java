@@ -126,7 +126,19 @@ public class ResourceManager {
 		}
 	}
 
-	public boolean CanAffordBuy(BuildingType _bt, ObjectOwner _oo, boolean doPurchase, boolean doRefund) {
+	public boolean CanAfford(BuildingType _bt, ObjectOwner _oo) {
+		return AffordBuyRefund(_bt, _oo, false, false);
+	}
+	
+	public void Buy(BuildingType _bt, ObjectOwner _oo) {
+		AffordBuyRefund(_bt, _oo, true, false);
+	}
+	
+	public void Refund(BuildingType _bt, ObjectOwner _oo) {
+		AffordBuyRefund(_bt, _oo, false, true);
+	}
+	
+	private boolean AffordBuyRefund(BuildingType _bt, ObjectOwner _oo, boolean doPurchase, boolean doRefund) {
 		int cost_wood = 0;
 		int cost_iron = 0;
 		int cost_stone = 0;

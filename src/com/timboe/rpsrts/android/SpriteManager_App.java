@@ -18,7 +18,9 @@ import com.timboe.rpsrts.sprites.Actor;
 import com.timboe.rpsrts.sprites.Building;
 import com.timboe.rpsrts.sprites.Projectile;
 import com.timboe.rpsrts.sprites.Resource;
+import com.timboe.rpsrts.sprites.Spoogicles;
 import com.timboe.rpsrts.sprites.Sprite;
+import com.timboe.rpsrts.sprites.WaterfallSplash;
 import com.timboe.rpsrts.world.WorldPoint;
 
 public class SpriteManager_App extends SpriteManager {
@@ -35,76 +37,28 @@ public class SpriteManager_App extends SpriteManager {
 	}
 	
 	@Override
-	public Actor PlaceActor(WorldPoint _p, ActorType _at, ObjectOwner _o) {
-		//NO rechecks that coordinates are safe - be warned!
-		final Actor newActor = new Actor_App(++GlobalSpriteCounter
-				, (int)_p.getX()
-				, (int)_p.getY()
-				, utility.actorRadius
-				, _at
-				, _o);
-		synchronized (GetActorObjects()) {
-			GetActorObjects().add(newActor);
-		}
-		return newActor;
+	protected Actor PlatFormSpecific_PlaceActor(WorldPoint _p, ActorType _at, ObjectOwner _o) {
+		return (Actor) new Actor_App(++GlobalSpriteCounter, (int)_p.getX(), (int)_p.getY(), utility.actorRadius, _at, _o);
 	}
-	
 	@Override
-	public Building PlaceBuilding(WorldPoint _p, BuildingType _bt, ObjectOwner _oo) {
-		//Does NOT recheck that coordinates are safe - be warned!
-		int _r = utility.buildingRadius;
-		if (_bt == BuildingType.AttractorPaper
-				|| _bt == BuildingType.AttractorRock
-				|| _bt == BuildingType.AttractorScissors) {
-			_r = utility.attractorRadius;
-		}
-		final Building newBuilding = new Building_App(++GlobalSpriteCounter
-				, (int)_p.getX()
-				, (int)_p.getY()
-				, _r
-				, _bt
-				, _oo);
-		synchronized (GetBuildingOjects()) {
-			GetBuildingOjects().add(newBuilding);
-		}
-		synchronized (GetCollisionObjects()) {
-			GetCollisionObjects().add(newBuilding);
-		}
-		return newBuilding;
+	protected Building PlatformSpecific_PlaceBuilding(WorldPoint _p, int _r, BuildingType _bt, ObjectOwner _oo) {
+		return (Building) new Building_App(++GlobalSpriteCounter, (int)_p.getX(), (int)_p.getY(), _r, _bt, _oo);
 	}
-	
 	@Override
-	public void PlaceProjectile(Actor _source, Sprite _target) {
-		final Projectile newProjectile = new Projectile_App(++GlobalSpriteCounter
-				, _source
-				, utility.projectileRadius
-				, _target);
-		synchronized (GetProjectileObjects()) {
-			GetProjectileObjects().add(newProjectile);
-		}
+	protected Projectile PlatformSpecific_PlaceProjectile(Actor _source, Sprite _target) {
+		return (Projectile) new Projectile_App(++GlobalSpriteCounter, _source, utility.projectileRadius, _target);
 	}
-
 	@Override
-	public Resource PlaceResource(WorldPoint _p, ResourceType _rt, boolean AddToTempList) {
-		//NO rechecks that coordinates are safe - be warned!
-		final int _r = utility.resourceRadius;
-		//System.out.println("new actor b4");
-		final Resource newResource = new Resource_App(++GlobalSpriteCounter
-				, (int)_p.getX()
-				, (int)_p.getY()
-				, _r
-				, _rt);
-		if (AddToTempList == false) {
-			synchronized (GetResourceObjects()) {
-				GetResourceObjects().add(newResource);
-			}
-			synchronized (GetCollisionObjects()) {
-				GetCollisionObjects().add(newResource);
-			}
-		} else { //resource can't corrupt it's own list while it's ticking
-			GetTempResourceObjects().add(newResource);
-		}
-		return newResource;
+	protected Resource PlatformSpecific_PlaceResource(WorldPoint _p, ResourceType _rt) {
+		return (Resource) new Resource_App(++GlobalSpriteCounter, (int)_p.getX(), (int)_p.getY(), utility.resourceRadius, _rt);
+	}
+	@Override
+	protected Spoogicles PlatformSpecific_PlaceSpooge(int _x, int _y, ObjectOwner _oo, int _n, float _scale) {
+		return (Spoogicles) new Spoogicles_App(++GlobalSpriteCounter, _x, _y, _oo, _n, _scale);
+	}
+	@Override
+	protected WaterfallSplash PlatformSpecific_PlaceWaterfallSplash(int _x, int _y, int _r) {
+		return (WaterfallSplash) new WaterfallSplash_App(++GlobalSpriteCounter, _x, _y, _r);
 	}
 
 	public void Render(Canvas canvas, Matrix _af, Matrix _af_translate_zoom, Matrix _af_shear_rotate, Matrix _af_none) {
@@ -284,19 +238,19 @@ public class SpriteManager_App extends SpriteManager {
 					}
 					_b.DeleteHover();
 					if (_place_remove == true) {
-						resource_manager.CanAffordBuy(_b.GetType(), ObjectOwner.Player, false, true);
+						resource_manager.Refund(_b.GetType(), ObjectOwner.Player);
 						_b.Kill();
 						return true;
 					}
 				}
 			}
 		} else if ( CheckSafe(true,true,_mouse_x, _mouse_y, radius_to_check, 0, 0) == true
-				&& resource_manager.CanAffordBuy(_bt, ObjectOwner.Player, false, false)
+				&& resource_manager.CanAfford(_bt, ObjectOwner.Player)
 				&& ( (doDistanceCheck == true && closeToExisting == true) || doDistanceCheck == false) ) {
 			//PLACE BUILDING and location is A'OK
 			if (_place_remove == true) {
 				PlaceBuilding(new WorldPoint(_mouse_x,_mouse_y), _bt, ObjectOwner.Player);
-				resource_manager.CanAffordBuy(_bt, ObjectOwner.Player, true, false);
+				resource_manager.CanAfford(_bt, ObjectOwner.Player);
 				return true;
 			}
 

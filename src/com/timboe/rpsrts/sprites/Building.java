@@ -16,6 +16,7 @@ public class Building extends Sprite {
 	private HashSet<ActorType> iAttract = new HashSet<ActorType>(); 
 	protected ObjectOwner owner;
 	protected boolean delete_hover = false;
+	protected boolean move_hover = false;
 	Vector<Actor> employees = new Vector<Actor>();
 	protected boolean underConstruction;
 	protected int y_offset;
@@ -184,13 +185,11 @@ public class Building extends Sprite {
     			, 0) == false) { 
     		return;
     	}
-		//de-register
 		GridDeRegister();
-		//move
 		x = new_x;
 		y = new_y;
-		//register
 		GridRegister();
+		move_hover = true;
 	}
 	
 	public boolean Recruiting() {

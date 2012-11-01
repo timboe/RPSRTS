@@ -44,8 +44,18 @@ public class AI implements Runnable {
 	
 	Vector<Building> attack_attractors = new Vector<Building>();
 	Vector<Building> defence_attractors = new Vector<Building>();
+	
+	private ObjectOwner me;
+	private ObjectOwner enemy;
 
-	public AI () {
+	public AI (ObjectOwner _playing_for) {
+		if (_playing_for == enemy) {
+			me = ObjectOwner.Enemy;
+			enemy = ObjectOwner.Player;
+		} else {
+			me = ObjectOwner.Player;
+			enemy = ObjectOwner.Enemy;
+		}
 	}
 
 	void CheckAttractors() {
@@ -62,7 +72,7 @@ public class AI implements Runnable {
 			boolean aOK = false;
 			synchronized (theSpriteManager.GetBuildingOjects()) {
 				for (Building _bb : theSpriteManager.GetBuildingOjects()) {
-					if (_bb.GetOwner() == ObjectOwner.Enemy) continue;
+					if (_bb.GetOwner() == me) continue;
 					if (utility.Seperation(_b.GetLoc(), _bb.GetLoc()) < 2 * utility.wander_radius) {
 						aOK = true;
 						break;
@@ -101,18 +111,18 @@ public class AI implements Runnable {
 
 		//DEFENCE
 		for (Building _b : defence_attractors) {
-			boolean player_nearby = false;
-			boolean enemy_nearby = false;
+			boolean enemy_troop_nearby = false;
+			boolean my_troop_nearby = false;
 			synchronized (theSpriteManager.GetActorObjects()) {
 				for (Actor _a : theSpriteManager.GetActorObjects()) {
 					if (utility.Seperation(_b.GetLoc(), _a.GetLoc()) < 2 *  utility.wander_radius) {
-						if (_a.GetOwner() == ObjectOwner.Player) player_nearby = true;
-						else if (_a.GetOwner() == ObjectOwner.Enemy) enemy_nearby = true;
-						if (player_nearby == true && enemy_nearby == true) break;
+						if (_a.GetOwner() == enemy) enemy_troop_nearby = true;
+						else if (_a.GetOwner() == me) my_troop_nearby = true;
+						if (enemy_troop_nearby == true && my_troop_nearby == true) break;
 					}
 				}
 			}
-			if (!(player_nearby == true && enemy_nearby == true)) { //note: negated
+			if (!(enemy_troop_nearby == true && my_troop_nearby == true)) { //note: negated
 				//refund then remove
 				Refund(_b);
 			}
@@ -144,7 +154,7 @@ public class AI implements Runnable {
 		if (paper_chance > 0.5) paper_chance = 0.5f;
 		if (utility.rnd() < paper_chance 
 				&& attack_paper == false 
-				&& resource_manager.CanAffordBuy(BuildingType.AttractorPaper,ObjectOwner.Enemy,false,false) == true) {
+				&& resource_manager.CanAfford(BuildingType.AttractorPaper, me) == true) {
 			attack_paper = true;
 			toAttackWith.add(ActorType.Paper);
 			System.out.println("ATTACK WITH: PAPER");
@@ -154,7 +164,7 @@ public class AI implements Runnable {
 		if (rock_chance > 0.5) rock_chance = 0.5f;
 		if (utility.rnd() < rock_chance 
 				&& attack_rock == false
-				&& resource_manager.CanAffordBuy(BuildingType.AttractorRock,ObjectOwner.Enemy,false,false) == true) {
+				&& resource_manager.CanAfford(BuildingType.AttractorRock, me) == true) {
 			attack_rock = true;
 			toAttackWith.add(ActorType.Rock);
 			System.out.println("ATTACK WITH: ROCK");
@@ -164,7 +174,7 @@ public class AI implements Runnable {
 		if (scissors_chance > 0.5) scissors_chance = 0.5f;
 		if (utility.rnd() < scissors_chance 
 				&& attack_scissors == false 
-				&& resource_manager.CanAffordBuy(BuildingType.AttractorScissors,ObjectOwner.Enemy,false,false) == true) {
+				&& resource_manager.CanAfford(BuildingType.AttractorScissors, me) == true) {
 			attack_scissors = true;
 			toAttackWith.add(ActorType.Scissors);
 			System.out.println("ATTACK WITH: SCISSORS");
@@ -218,8 +228,7 @@ public class AI implements Runnable {
 				WorldPoint destination_location = theSpriteManager.FindGoodSpot(toAttack.GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
 				WorldPoint starting_location = theSpriteManager.FindGoodSpot(theSpriteManager.enemy_base.GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
 				if (destination_location != null && starting_location != null) {
-					Building attackor = theSpriteManager.PlaceBuilding(starting_location, toBuild, ObjectOwner.Enemy);
-					resource_manager.CanAffordBuy(toBuild, ObjectOwner.Enemy, true, false);
+					Building attackor = theSpriteManager.PlaceBuilding(starting_location, toBuild, me);
 					attack_attractors.add(attackor);
 					if (_t == ActorType.Paper) {
 						attack_paper_dest = destination_location;
@@ -248,7 +257,7 @@ public class AI implements Runnable {
 		//look at my actors, are any of them under attack?
 		synchronized (theSpriteManager.GetActorObjects()) {
 			for (Actor _a : theSpriteManager.GetActorObjects()) {
-				if (_a.GetOwner() == ObjectOwner.Enemy) continue;
+				if (_a.GetOwner() == me) continue; ///THIS WAS ObjectOwner.ENEMY(me) TODO CHECK AS I THINK IT SHOULD BE PLAYER (enemy)
 				if (_a.attack_target == null) continue;
 				//Get if close to a target.
 				//EXTRA ALLOWANCE FOR DEFENCE, * 4 RATHER THAN * 2 TO KEEP CLEAR OF CURRENT WARZONES
@@ -282,13 +291,12 @@ public class AI implements Runnable {
 						}
 					}
 					
-					if (haveOne == false && resource_manager.CanAffordBuy(_bt, ObjectOwner.Enemy, false, false)) {
+					if (haveOne == false && resource_manager.CanAfford(_bt, me)) {
 						//place new attractor
 						WorldPoint loc = theSpriteManager.FindGoodSpot(_a.GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
 						if (loc == null) break;					
-						Building defendor = theSpriteManager.PlaceBuilding(loc, _bt, ObjectOwner.Enemy);
+						Building defendor = theSpriteManager.PlaceBuilding(loc, _bt, me);
 						defence_attractors.add(defendor);
-						resource_manager.CanAffordBuy(_bt, ObjectOwner.Enemy, true, false);
 					}
 				}
 			}
@@ -361,7 +369,7 @@ public class AI implements Runnable {
 		//for buildings
 		synchronized (theSpriteManager.GetBuildingOjects()) {
 			for (final Building _b : theSpriteManager.GetBuildingOjects()) {
-				if (_b.GetOwner() == ObjectOwner.Player) {
+				if (_b.GetOwner() == enemy) {
 					continue;
 				}
 				if (_b.getiAttract().size() > 0) { //Don't plant building near attractor
@@ -425,7 +433,7 @@ public class AI implements Runnable {
 		float distanceToTarget = utility.minimiser_start;
 		synchronized (theSpriteManager.GetBuildingOjects()) {
 			for (Building _b : theSpriteManager.GetBuildingOjects()) {
-				if (_b.GetOwner() == ObjectOwner.Enemy) continue;
+				if (_b.GetOwner() == me) continue;
 				if (_b.GetType() != toAttackType) continue;
 				float sep = utility.Seperation(theSpriteManager.enemy_base.GetLoc(), _b.GetLoc());
 				if (sep < distanceToTarget) {
@@ -438,14 +446,14 @@ public class AI implements Runnable {
 	}
 	
 	void Refund(Building _b) {
-		resource_manager.CanAffordBuy(_b.GetType(), ObjectOwner.Enemy, false, true);
+		resource_manager.Refund(_b.GetType(), me);
 		_b.Kill();
 	}
 	
 	void RemoveOldBuildings() {
 		synchronized (theSpriteManager.GetBuildingOjects()) {
 			for (final Building _b : theSpriteManager.GetBuildingOjects()) {
-				if (_b.GetOwner() == ObjectOwner.Player) {
+				if (_b.GetOwner() == enemy) {
 					continue;
 				}
 				if (_b.no_local_resource_counter >= utility.AI_BadBuilding_Before_Sell) {
@@ -494,20 +502,20 @@ public class AI implements Runnable {
 	
 	void TryBuildResourceGathere() {
 		final Vector<BuildingType> toPlace = new Vector<BuildingType>();
-		if (resource_manager.CanAffordBuy(BuildingType.Woodshop, ObjectOwner.Enemy, false, false) == true
+		if (resource_manager.CanAfford(BuildingType.Woodshop, me) == true
 				&& utility.rnd() < 0.1f
 				&& woodshop_countdown == 0
 				&& resource_manager.ENEMY_PAPER >= resource_manager.ENEMY_MAX_PAPER - utility.AI_NewUnitsWhenXClosetoCap) {
 				toPlace.add(BuildingType.Woodshop);
 
 		}
-		if (resource_manager.CanAffordBuy(BuildingType.Smelter, ObjectOwner.Enemy, false, false) == true
+		if (resource_manager.CanAfford(BuildingType.Smelter, me) == true
 				&& utility.rnd() < 0.1f
 				&& smelter_countdown == 0
 				&& resource_manager.ENEMY_SCISSORS >= resource_manager.ENEMY_MAX_SCISSORS - utility.AI_NewUnitsWhenXClosetoCap) {
 				toPlace.add(BuildingType.Smelter);
 		}
-		if (resource_manager.CanAffordBuy(BuildingType.Rockery, ObjectOwner.Enemy, false, false) == true
+		if (resource_manager.CanAfford(BuildingType.Rockery, me) == true
 				&& utility.rnd() < 0.1f
 				&& rockery_countdown == 0
 				&& resource_manager.ENEMY_ROCK >= resource_manager.ENEMY_MAX_ROCK - utility.AI_NewUnitsWhenXClosetoCap) {
@@ -520,8 +528,7 @@ public class AI implements Runnable {
 			//System.out.println("ToPlace:"+location);
 
 			if (location != null) {
-				theSpriteManager.PlaceBuilding(location,toPlace.elementAt(random),ObjectOwner.Enemy);
-				resource_manager.CanAffordBuy(toPlace.elementAt(random), ObjectOwner.Enemy, true, false);
+				theSpriteManager.PlaceBuilding(location,toPlace.elementAt(random), me);
 				if (toPlace.elementAt(random) == BuildingType.Rockery) rockery_countdown += utility.AI_BuildCooldown;
 				if (toPlace.elementAt(random) == BuildingType.Smelter) smelter_countdown += utility.AI_BuildCooldown;
 				if (toPlace.elementAt(random) == BuildingType.Woodshop) woodshop_countdown += utility.AI_BuildCooldown;

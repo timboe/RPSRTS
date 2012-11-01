@@ -3,6 +3,8 @@ package com.timboe.rpsrts.applet;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
@@ -26,115 +28,44 @@ public class SpriteManager_Applet extends SpriteManager {
 		return singleton;
 	}
 
-	Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();
+	private Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();
+	private ShapeStore theShapeStore = ShapeStore.GetShapeStore();
+	private TransformStore theTransforms = TransformStore.GetTransformStore();
 	
-	TransformStore theTransforms = TransformStore.GetTransformStore();
 	private SpriteManager_Applet() {
 		super();
 		this_object = (SpriteManager)this;
 		System.out.println("--- Sprite Manager spawned (depends on Util,World,Path,Resource[linked on Reset()]) : "+this);
 	}
 
-	
 	@Override
-	public Actor PlaceActor(WorldPoint _p, ActorType _at, ObjectOwner _o) {
-		//NO rechecks that coordinates are safe - be warned!
-		final Actor newActor = new Actor_Applet(++GlobalSpriteCounter
-				, (int)_p.getX()
-				, (int)_p.getY()
-				, utility.actorRadius
-				, _at
-				, _o);
-		synchronized (GetActorObjects()) {
-			GetActorObjects().add(newActor);
-		}
-		return newActor;
+	protected Actor PlatFormSpecific_PlaceActor(WorldPoint _p, ActorType _at, ObjectOwner _o) {
+		return (Actor) new Actor_Applet(++GlobalSpriteCounter, (int)_p.getX(), (int)_p.getY(), utility.actorRadius, _at, _o);
+	}
+	@Override
+	protected Building PlatformSpecific_PlaceBuilding(WorldPoint _p, int _r, BuildingType _bt, ObjectOwner _oo) {
+		return (Building) new Building_Applet(++GlobalSpriteCounter, (int)_p.getX(), (int)_p.getY(), _r, _bt, _oo);
+	}
+	@Override
+	protected Projectile PlatformSpecific_PlaceProjectile(Actor _source, Sprite _target) {
+		return (Projectile) new Projectile_Applet(++GlobalSpriteCounter, _source, utility.projectileRadius, _target);
+	}
+	@Override
+	protected Resource PlatformSpecific_PlaceResource(WorldPoint _p, ResourceType _rt) {
+		return (Resource) new Resource_Applet(++GlobalSpriteCounter, (int)_p.getX(), (int)_p.getY(), utility.resourceRadius, _rt);
+	}
+	@Override
+	protected Spoogicles PlatformSpecific_PlaceSpooge(int _x, int _y, ObjectOwner _oo, int _n, float _scale) {
+		return (Spoogicles) new Spoogicles_Applet(++GlobalSpriteCounter, _x, _y, _oo, _n, _scale);
+	}
+	@Override
+	protected WaterfallSplash PlatformSpecific_PlaceWaterfallSplash(int _x, int _y, int _r) {
+		return (WaterfallSplash) new WaterfallSplash_Applet(++GlobalSpriteCounter, _x, _y, _r);
 	}
 	
-	@Override
-	public Building PlaceBuilding(WorldPoint _p, BuildingType _bt, ObjectOwner _oo) {
-		//Does NOT recheck that coordinates are safe - be warned!
-		int _r = utility.buildingRadius;
-		if (_bt == BuildingType.AttractorPaper
-				|| _bt == BuildingType.AttractorRock
-				|| _bt == BuildingType.AttractorScissors) {
-			_r = utility.attractorRadius;
-		}
-		final Building newBuilding = new Building_Applet(++GlobalSpriteCounter
-				, (int)_p.getX()
-				, (int)_p.getY()
-				, _r
-				, _bt
-				, _oo);
-		synchronized (GetBuildingOjects()) {
-			GetBuildingOjects().add(newBuilding);
-
-		}
-		synchronized (GetCollisionObjects()) {
-			GetCollisionObjects().add(newBuilding);
-		}
-		return newBuilding;
-	}
-	
-	@Override
-	public void PlaceProjectile(Actor _source, Sprite _target) {
-		final Projectile newProjectile = new Projectile_Applet(++GlobalSpriteCounter
-				, _source
-				, utility.projectileRadius
-				, _target);
-		synchronized (GetProjectileObjects()) {
-			GetProjectileObjects().add(newProjectile);
-		}
-	}
-
-	@Override
-	public Resource PlaceResource(WorldPoint _p, ResourceType _rt, boolean AddToTempList) {
-		//NO rechecks that coordinates are safe - be warned!
-		final int _r = utility.resourceRadius;
-		final Resource newResource = new Resource_Applet(++GlobalSpriteCounter
-				, (int)_p.getX()
-				, (int)_p.getY()
-				, _r
-				, _rt);
-		if (AddToTempList == false) {
-			synchronized (GetResourceObjects()) {
-				GetResourceObjects().add(newResource);
-			}
-			synchronized (GetCollisionObjects()) {
-				GetCollisionObjects().add(newResource);
-			}
-		} else { //resource can't corrupt it's own list while it's ticking
-			GetTempResourceObjects().add(newResource);
-		}
-		return newResource;
-	}
-	
-	@Override
-	public void PlaceSpooge(int _x, int _y, ObjectOwner _oo, int _n, float _scale) {
-		final Spoogicles newSpoogicles = new Spoogicles_Applet(++GlobalSpriteCounter,
-				_x,
-				_y,
-				_oo,
-				_n,
-				_scale);	
-		synchronized (GetSpoogiclesObjects()) {
-			GetSpoogiclesObjects().add(newSpoogicles);
-		}
-	}
-	
-	@Override
-	public void PlaceWaterfallSplash(int _x, int _y, int _r) {
-		final WaterfallSplash newWFS = new WaterfallSplash_Applet(++GlobalSpriteCounter, _x, _y, _r);
-		synchronized (GetWaterfallSplashObjects()) {
-			GetWaterfallSplashObjects().add(newWFS);
-		}
-	}
-
 	public void Render(Graphics2D _g2) {
 		++FrameCount;
-
 		//Waterfall splashs' are rendered by the Scene Drawer (we just look after them here with other sprites)
-		
 		for (final Sprite _Z : GetSpritesZOrdered()) {
 			if (_Z.GetIsActor() == true) {
 				((Actor_Applet) _Z).Render(_g2, FrameCount);
@@ -150,7 +81,6 @@ public class SpriteManager_Applet extends SpriteManager {
 		}
 		
 	}
-	
 	
 	public void SpecialRender(Graphics2D _g2, int _x, int _y, BufferedImage[] _graphic, boolean drawingTopBar) {
 		Point2D transform = null;
@@ -181,36 +111,12 @@ public class SpriteManager_Applet extends SpriteManager {
 		if (_graphic == theBitmaps.X) {
 			if (drawingTopBar == false) {
 				_g2.setTransform(theTransforms.af);
-			} else {
-				//_g2.setTransform(_af_none);
 			}
 			//Can't place here
 			_g2.setColor(Color.red);
-			final int[] _x_points = new int[4];
-			final int[] _y_points = new int[4];
-			_x_points[0] = _x - _r - 2;
-			_x_points[1] = _x - _r + 2;
-			_x_points[2] = _x + _r + 2;
-			_x_points[3] = _x + _r - 2;
-
-			_y_points[0] = _y - _r + 2;
-			_y_points[1] = _y - _r - 2;
-			_y_points[2] = _y + _r - 2;
-			_y_points[3] = _y + _r + 2;
-
-			_g2.fillPolygon(_x_points, _y_points, 4);
-
-			_x_points[0] = _x - _r - 2;
-			_x_points[1] = _x - _r + 2;
-			_x_points[2] = _x + _r + 2;
-			_x_points[3] = _x + _r - 2;
-
-			_y_points[0] = _y + _r - 2;
-			_y_points[1] = _y + _r + 2;
-			_y_points[2] = _y - _r + 2;
-			_y_points[3] = _y - _r - 2;
-			_g2.fillPolygon(_x_points, _y_points, 4);
-
+			GeneralPath X = (GeneralPath) theShapeStore.GetCross();
+			X.transform(AffineTransform.getTranslateInstance(_x, _y));
+			_g2.fill(X);
 			return;
 		}
 
@@ -272,7 +178,7 @@ public class SpriteManager_Applet extends SpriteManager {
 						}
 						_b.DeleteHover();
 						if (_place_remove == true) {
-							resource_manager.CanAffordBuy(_b.GetType(), ObjectOwner.Player, false, true);
+							resource_manager.Refund(_b.GetType(), ObjectOwner.Player);
 							_b.Kill();
 							return true;
 						}
@@ -280,12 +186,11 @@ public class SpriteManager_Applet extends SpriteManager {
 				}	
 			}
 		} else if ( CheckSafe(true,true,_mouse_x, _mouse_y, radius_to_check, 0, 0) == true
-				&& resource_manager.CanAffordBuy(_bt, ObjectOwner.Player, false, false)
+				&& resource_manager.CanAfford(_bt, ObjectOwner.Player)
 				&& ( (doDistanceCheck == true && closeToExisting == true) || doDistanceCheck == false) ) {
 			//PLACE BUILDING and location is A'OK
 			if (_place_remove == true) {
 				PlaceBuilding(new WorldPoint(_mouse_x,_mouse_y), _bt, ObjectOwner.Player);
-				resource_manager.CanAffordBuy(_bt, ObjectOwner.Player, true, false);
 				return true;
 			}
 

@@ -412,32 +412,79 @@ public class SpriteManager {
 		return worldSeeded;
 	}
 	
-	protected Actor PlaceActor(WorldPoint starting_troops, ActorType scissors, ObjectOwner oo) {
-		//OVERRIDE
-		return null;
+	public Actor PlaceActor(WorldPoint _p, ActorType _at, ObjectOwner _o) {
+		//NO rechecks that coordinates are safe - be warned!
+		final Actor newActor = PlatFormSpecific_PlaceActor(_p, _at, _o);
+		synchronized (GetActorObjects()) {
+			GetActorObjects().add(newActor);
+		}
+		return newActor;
 	}
+	
+	public Building PlaceBuilding(WorldPoint _p, BuildingType _bt, ObjectOwner _oo) {
+		//Does NOT recheck that coordinates are safe - be warned!
+		int _r = utility.buildingRadius;
+		if (_bt == BuildingType.AttractorPaper
+				|| _bt == BuildingType.AttractorRock
+				|| _bt == BuildingType.AttractorScissors) {
+			_r = utility.attractorRadius;
+		}
+		resource_manager.Buy(_bt, ObjectOwner.Enemy);
+		final Building newBuilding = PlatformSpecific_PlaceBuilding(_p, _r, _bt, _oo);
+		synchronized (GetBuildingOjects()) {
+			GetBuildingOjects().add(newBuilding);
 
-	public Building PlaceBuilding(WorldPoint enemy_location, BuildingType base, ObjectOwner enemy) {
-		//OVERRIDE
-		return null;
+		}
+		synchronized (GetCollisionObjects()) {
+			GetCollisionObjects().add(newBuilding);
+		}
+		return newBuilding;
 	}
-
+	
 	public void PlaceProjectile(Actor _source, Sprite _target) {
-		//OVER RIDE
+		final Projectile newProjectile = PlatformSpecific_PlaceProjectile(_source, _target);
+		synchronized (GetProjectileObjects()) {
+			GetProjectileObjects().add(newProjectile);
+		}
 	}
 
-	public Resource PlaceResource(WorldPoint ideal_resource_loation,	ResourceType toPlant, boolean AddToTempList) {
-		return null;
-		//OVER RIDE
+	public Resource PlaceResource(WorldPoint _p, ResourceType _rt, boolean AddToTempList) {
+		//NO rechecks that coordinates are safe - be warned!
+		final Resource newResource = PlatformSpecific_PlaceResource(_p, _rt);
+		if (AddToTempList == false) {
+			synchronized (GetResourceObjects()) {
+				GetResourceObjects().add(newResource);
+			}
+			synchronized (GetCollisionObjects()) {
+				GetCollisionObjects().add(newResource);
+			}
+		} else { //resource can't corrupt it's own list while it's ticking
+			GetTempResourceObjects().add(newResource);
+		}
+		return newResource;
 	}
 	
 	public void PlaceSpooge(int _x, int _y, ObjectOwner _oo, int _n, float _scale) {
-		//OVER RIDE
+		final Spoogicles newSpoogicles = PlatformSpecific_PlaceSpooge(_x, _y, _oo, _n, _scale);	
+		synchronized (GetSpoogiclesObjects()) {
+			GetSpoogiclesObjects().add(newSpoogicles);
+		}
 	}
-
-	protected void PlaceWaterfallSplash(int _x, int _y, int _r) {
-		//OVER RIDE
+	
+	public void PlaceWaterfallSplash(int _x, int _y, int _r) {
+		final WaterfallSplash newWFS = PlatformSpecific_PlaceWaterfallSplash(_x, _y, _r);
+		synchronized (GetWaterfallSplashObjects()) {
+			GetWaterfallSplashObjects().add(newWFS);
+		}
 	}
+	
+	//These methods are overridden by Applet or Android sub-instances of SpriteManager
+	protected Actor PlatFormSpecific_PlaceActor(WorldPoint _p, ActorType _at, ObjectOwner _o) { return null; }
+	protected Building PlatformSpecific_PlaceBuilding(WorldPoint _p, int _r, BuildingType _bt, ObjectOwner _oo) { return null; }
+	protected Projectile PlatformSpecific_PlaceProjectile(Actor _source, Sprite _target) { return null; }
+	protected Resource PlatformSpecific_PlaceResource(WorldPoint _p, ResourceType _rt) { return null; }
+	protected Spoogicles PlatformSpecific_PlaceSpooge(int _x, int _y, ObjectOwner _oo, int _n, float _scale) { return null; }
+	protected WaterfallSplash PlatformSpecific_PlaceWaterfallSplash(int _x, int _y, int _r) { return null; }
 
 	public void Reset() {
 		ws_step = 0;
@@ -468,7 +515,7 @@ public class SpriteManager {
 		 }
 		resource_manager.Reset();
 		//Start the AI
-		theAI = new AI();
+		theAI = new AI(ObjectOwner.Enemy); //AI playing as the bad guys (blue)
 		AI_thread = new Thread(theAI);
 
 	}
