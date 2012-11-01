@@ -164,6 +164,14 @@ public class SceneRenderer_Applet {
 			clicked = drawButton(g2, 195, 500, 605, "LET ME TRY AGAIN!", 60);
 		}
 		if (clicked == true) {
+			if (utility.playerName != null) {
+				//Do high score!
+				try {
+					utility._RPSRTS.SubmitHighScore();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 			utility._RPSRTS.genNewWorld();
 			utility.doWorldGen = false;
 		}

@@ -86,7 +86,7 @@ public class GameWorld {
 			System.out.println("STATE: reset " + wg_state + " RND_C:" + utility.rnd_count);
 		}
 
-		if (wg_state == 1 && (timeNow-wg_time_of_last_operation) > time_to_wait ) {
+		if (wg_state == 1) {
 			GenerateWorld_CrinkleIslandEdge();
 			wg_time_of_last_operation = (System.nanoTime() / 1000000000f);
 			++wg_state;
