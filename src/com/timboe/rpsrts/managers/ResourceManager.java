@@ -2,6 +2,7 @@ package com.timboe.rpsrts.managers;
 
 import com.timboe.rpsrts.enumerators.ActorType;
 import com.timboe.rpsrts.enumerators.BuildingType;
+import com.timboe.rpsrts.enumerators.GameMode;
 import com.timboe.rpsrts.enumerators.ObjectOwner;
 import com.timboe.rpsrts.enumerators.ResourceType;
 import com.timboe.rpsrts.sprites.Building;
@@ -16,6 +17,9 @@ public class ResourceManager {
 	private final Utility utility = Utility.GetUtility();
 	private final SpriteManager theSpriteManager = SpriteManager.GetSpriteManager();
 
+	private int PLAYER_SCORE = 0;
+	private int ENEMY_SCORE = 0;
+	
 	//
 	private boolean GEN_PAPER_PLAYER = true;
 	private boolean GEN_ROCK_PLAYER = true;
@@ -265,29 +269,37 @@ public class ResourceManager {
 		} else if (_bt ==BuildingType.AttractorScissors) {
 			cost_iron = utility.COST_AttractorScissors_Iron;
 		}
-		if (_oo == ObjectOwner.Player) {
-			if (doPurchase == true) {
+		if (doPurchase == true) {
+			ScorePoints(_oo, cost_wood);
+			ScorePoints(_oo, cost_iron);
+			ScorePoints(_oo, cost_stone);
+			if (_oo == ObjectOwner.Player) {
 				PLAYER_WOOD -= cost_wood;
 				PLAYER_IRON -= cost_iron;
 				PLAYER_STONE -= cost_stone;
-			} else if (doRefund == true) {
-				PLAYER_WOOD += cost_wood * utility.building_refund_amount;
-				PLAYER_IRON += cost_iron * utility.building_refund_amount;
-				PLAYER_STONE += cost_stone * utility.building_refund_amount;
-		    } else {
-				if (PLAYER_WOOD < cost_wood ) return false;
-				if (PLAYER_IRON < cost_iron) return false;
-				if (PLAYER_STONE < cost_stone) return false;
-			} 
-		} else if (_oo == ObjectOwner.Enemy) {
-			if (doPurchase == true) {
+			} else {
 				ENEMY_WOOD -= cost_wood;
 				ENEMY_IRON -= cost_iron;
 				ENEMY_STONE -= cost_stone;
-			} else if (doRefund == true) {
+			}
+		} else if (doRefund == true) {
+			ScorePoints(_oo, (int) (-cost_wood * utility.building_refund_amount));
+			ScorePoints(_oo, (int) (-cost_iron * utility.building_refund_amount));
+			ScorePoints(_oo, (int) (-cost_stone * utility.building_refund_amount));
+			if (_oo == ObjectOwner.Player) {
+				PLAYER_WOOD += cost_wood * utility.building_refund_amount;
+				PLAYER_IRON += cost_iron * utility.building_refund_amount;
+				PLAYER_STONE += cost_stone * utility.building_refund_amount;
+			} else {
 				ENEMY_WOOD += cost_wood * utility.building_refund_amount;
 				ENEMY_IRON += cost_iron * utility.building_refund_amount;
 				ENEMY_STONE += cost_stone * utility.building_refund_amount;
+			}
+		} else { //can afford?
+			if (_oo == ObjectOwner.Player) {
+				if (PLAYER_WOOD < cost_wood ) return false;
+				if (PLAYER_IRON < cost_iron) return false;
+				if (PLAYER_STONE < cost_stone) return false;
 			} else {
 				if (ENEMY_WOOD < cost_wood) return false;
 				if (ENEMY_IRON < cost_iron) return false;
@@ -372,6 +384,14 @@ public class ResourceManager {
 //				+" | EROCK:"+Integer.toString(ENEMY_ROCK)+"/"+Integer.toString(ENEMY_MAX_ROCK)
 //				+" | ESCISSORS:"+Integer.toString(ENEMY_SCISSORS)+"/"+Integer.toString(ENEMY_MAX_SCISSORS);
 //	}
+	
+	public int GetScore(ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Player) {
+			return PLAYER_SCORE;
+		} else {
+			return ENEMY_SCORE;
+		}
+	}
 
 	public void IncreaseMaxUnits(BuildingType _bt, ObjectOwner _oo) {
 		if (_oo == ObjectOwner.Player) {
@@ -417,6 +437,9 @@ public class ResourceManager {
 		ENEMY_SCISSORS = utility.starting_actors;
 		ENEMY_ROCK = utility.starting_actors;
 		ENEMY_PAPER = utility.starting_actors;
+		
+		PLAYER_SCORE = 0;
+		ENEMY_SCORE = 0;
 	}
 
 	public void TryToSpawnUnit(Building _b) {
@@ -467,26 +490,43 @@ public class ResourceManager {
 					if (toPlace == ActorType.Paper) {
 						++PLAYER_PAPER;
 						PLAYER_WOOD -= utility.COST_Paper_Wood;
+						ScorePoints(ObjectOwner.Player, utility.COST_Paper_Wood);
 					} else if (toPlace == ActorType.Scissors) {
 						++PLAYER_SCISSORS;
 						PLAYER_IRON -= utility.COST_Scissors_Iron;
+						ScorePoints(ObjectOwner.Player, utility.COST_Scissors_Iron);
 					} else if (toPlace == ActorType.Rock) {
 						++PLAYER_ROCK;
 						PLAYER_STONE -= utility.COST_Rock_Stone;
+						ScorePoints(ObjectOwner.Player, utility.COST_Rock_Stone);
 					}
 				} else if (owner == ObjectOwner.Enemy) {
 					if (toPlace == ActorType.Paper) {
 						++ENEMY_PAPER;
 						ENEMY_WOOD -= utility.COST_Paper_Wood;
+						ScorePoints(ObjectOwner.Enemy, utility.COST_Paper_Wood);
 					} else if (toPlace == ActorType.Scissors) {
 						++ENEMY_SCISSORS;
 						ENEMY_IRON -= utility.COST_Scissors_Iron;
+						ScorePoints(ObjectOwner.Enemy, utility.COST_Scissors_Iron);
 					} else if (toPlace == ActorType.Rock) {
 						++ENEMY_ROCK;
 						ENEMY_STONE -= utility.COST_Rock_Stone;
+						ScorePoints(ObjectOwner.Enemy, utility.COST_Rock_Stone);
 					}
 				}
 			}
+		}
+	}
+	
+	public void ScorePoints(ObjectOwner _oo, int _points) {
+		if (utility.gameMode != GameMode.gameOn) {
+			return; //No scoring points when the game has ended!
+		}
+		if (_oo == ObjectOwner.Player) {
+			PLAYER_SCORE += _points;
+		} else {
+			ENEMY_SCORE += _points;
 		}
 	}
 

@@ -15,6 +15,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.util.Locale;
 
 import com.timboe.rpsrts.applet.GameWorld_Applet;
 import com.timboe.rpsrts.applet.SceneRenderer_Applet;
@@ -57,22 +58,33 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	public void doWinLoose() {
 		if (theSpriteManger.GetBase(ObjectOwner.Enemy) != null && theSpriteManger.GetBase(ObjectOwner.Enemy).GetDead() == true) {
 			utility.gameMode = GameMode.gameOverWon;
-			utility.loose_time = System.currentTimeMillis() / 1000l;
-			utility.SetTicksPerRender(utility.slowmo_ticks_per_render); 
 		} else if (theSpriteManger.GetBase(ObjectOwner.Player) != null && theSpriteManger.GetBase(ObjectOwner.Player).GetDead() == true) {
 			utility.gameMode = GameMode.gameOverLost;
-			utility.loose_time = System.currentTimeMillis() / 1000l;
+		}
+		if (utility.gameMode != GameMode.gameOn) {
+			int seconds_to_win = (int) (utility.game_time_count / 1000);
+			int bonus = (int) (((utility.extra_score_mins * 60) - seconds_to_win) * utility.quick_win_bonus);
+			if (bonus < 0) bonus = 0;
+			if(utility.gameMode == GameMode.gameOverWon) {
+				resource_manager.ScorePoints(ObjectOwner.Player, bonus);
+			} else {
+				resource_manager.ScorePoints(ObjectOwner.Enemy, bonus);
+			}
 			utility.SetTicksPerRender(utility.slowmo_ticks_per_render); 
+			utility.loose_time = System.currentTimeMillis() / 1000l;
 		}
 	}
 
 	public void genNewWorld() {
 		utility.gameMode = GameMode.titleScreen;
+		theTransforms.Reset();
 		utility.doWorldGen = true;
+		utility.game_time_count = 0;
 		utility.setSeed();
 		theSpriteManger.Reset();
 		theWorld.Reset();
 		theSceneRenderer.background_buffered = null;
+		utility.SetTicksPerRender(utility.game_ticks_per_render);
 		utility._TICK = 0;
 	}
 
@@ -110,29 +122,41 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 					utility.rndSeedTxt += e.getKeyChar();
 				}
 			}
-		} else {
-			if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-				utility.mouseClick = false;
-				theSceneRenderer.buildingToPlace = null;
-				theSceneRenderer.buildingToMove = null;
-			} else if (e.getKeyChar() == 'a') {
-				theTransforms.toggleAA();
-			} else if (e.getKeyChar() == 'd') {
-				utility.dbg = !utility.dbg;
-			} else if (e.getKeyChar() == 's') {
-				if (utility.GetTicksPerRender() == utility.game_ticks_per_render) {
-					utility.SetTicksPerRender(utility.GetTicksPerRender() * 100);
-				} else {
-					utility.SetTicksPerRender(utility.game_ticks_per_render);
+		} else if (utility.gameMode == GameMode.gameOverWon) {
+			if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+				if (utility.playerName.length() > 0) {
+					utility.playerName = utility.playerName.substring(0, utility.playerName.length()-1 );
 				}
-			} else if (e.getKeyChar() == 'w') {
-				genNewWorld();
-			} else if (e.getKeyChar() == 'c') {
-				resource_manager.AddResources(ResourceType.Cactus, 100, ObjectOwner.Player);
-				resource_manager.AddResources(ResourceType.Rockpile, 100, ObjectOwner.Player);
-				resource_manager.AddResources(ResourceType.Mine, 100, ObjectOwner.Player);
+			} else if (utility.playerName.length() < 3) {
+				if (e.getKeyChar() >= '!' && e.getKeyChar() <= '~') { //assuming ASCII
+					utility.playerName += e.getKeyChar();
+					utility.playerName.toUpperCase(Locale.ENGLISH);
+				}
 			}
 		}
+
+		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+			utility.mouseClick = false;
+			theSceneRenderer.buildingToPlace = null;
+			theSceneRenderer.buildingToMove = null;
+		} else if (e.getKeyChar() == 'a') {
+			theTransforms.toggleAA();
+		} else if (e.getKeyChar() == 'd') {
+			utility.dbg = !utility.dbg;
+		} else if (e.getKeyChar() == 's') {
+			if (utility.GetTicksPerRender() == utility.game_ticks_per_render) {
+				utility.SetTicksPerRender(utility.GetTicksPerRender() * 100);
+			} else {
+				utility.SetTicksPerRender(utility.game_ticks_per_render);
+			}
+		} else if (e.getKeyChar() == 'w') {
+			genNewWorld();
+		} else if (e.getKeyChar() == 'c') {
+			resource_manager.AddResources(ResourceType.Cactus, 100, ObjectOwner.Player);
+			resource_manager.AddResources(ResourceType.Rockpile, 100, ObjectOwner.Player);
+			resource_manager.AddResources(ResourceType.Mine, 100, ObjectOwner.Player);
+		}
+		
 	}
 	@Override
 	public void keyReleased(KeyEvent e) {}
@@ -274,7 +298,10 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 					+ Math.round(1000f / utility.GetDesiredTPS());
 			
 			++utility._TICK;
-		    theSpriteManger.Tick();
+			if (utility.gamePaused == false && utility.gameMode != GameMode.titleScreen) {
+				theSpriteManger.Tick();
+				utility.game_time_count += (System.currentTimeMillis() - utility._TIME_OF_LAST_TICK);
+			}
 
 			if (utility._TICK % utility.do_fps_every_x_ticks == 0) {
 				utility.FPS = Math.round((1. / (System.currentTimeMillis() - utility._TIME_OF_LAST_TICK)* 1000. * utility.do_fps_every_x_ticks) / utility.GetTicksPerRender());

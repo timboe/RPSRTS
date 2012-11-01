@@ -25,12 +25,15 @@ public class Utility {
 	public float rotateAngle = 0f; //copied here as ROTATE stored in Transform(awt) or Matrix(andorid) classes
 	public boolean doWorldGen = false; //proceed with building world
 	public GameMode gameMode = GameMode.titleScreen; //what state is game currently in
+	public long game_time_count; //gameplay time in ms;
 	public long loose_time; //what time was game won/lost
 	public long FPS = 0;
 	public boolean mouseClick = false;
 	public boolean mouseDrag = false;
 	public boolean sendMouseDragPing = false;
 	public boolean gamePaused = false;
+	public boolean showRedScore = true;
+	public String playerName = ""; 
 	//
 	public int _TICK;
 	public long _TIME_OF_LAST_TICK = 0; // Internal
@@ -133,6 +136,10 @@ public class Utility {
 	public final float spooges_scale_building_death = 1f;
 	public final float spooges_scale_totem_death = 1f;
 	public final float spooges_scale_base_death = 1f;
+	
+	//score settings
+	public final int extra_score_mins = 10; //how many mins until no quick win bonus
+	public final float quick_win_bonus = 2f;
 
 	//waterfall settings
 	public final int waterfall_splash_radius = world_size/100;

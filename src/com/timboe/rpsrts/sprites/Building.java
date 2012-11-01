@@ -189,7 +189,9 @@ public class Building extends Sprite {
 		x = new_x;
 		y = new_y;
 		GridRegister();
-		move_hover = true;
+		if (GetOwner() == ObjectOwner.Player) {
+			move_hover = true;
+		}
 	}
 	
 	public boolean Recruiting() {

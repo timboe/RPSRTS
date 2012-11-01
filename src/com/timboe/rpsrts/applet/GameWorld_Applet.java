@@ -86,6 +86,7 @@ public class GameWorld_Applet extends GameWorld {
 	    
 	    theSceneRenderer = SceneRenderer_Applet.GetSceneRenderer_Applet();
 	}
+
 	
 //	public void HighlightTile(int _x, int _y, Graphics2D _g2, boolean _aa) {
 //	final int _ID = utility.XYtoID(_x, _y, world_tiles, tiles_size);

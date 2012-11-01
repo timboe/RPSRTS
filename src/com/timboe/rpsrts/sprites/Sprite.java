@@ -52,6 +52,11 @@ public class Sprite implements Comparable<Sprite> {
 
 	public boolean Attack(int _damage) {
 		health -= _damage;
+		if (GetOwner() == ObjectOwner.Player) {
+			resource_manager.ScorePoints(ObjectOwner.Enemy, _damage);
+		} else if (GetOwner() == ObjectOwner.Enemy) {
+			resource_manager.ScorePoints(ObjectOwner.Enemy, _damage);
+		}
 		flashTicks = 12;
 		if (health <= 0) {
 			Kill();
@@ -100,6 +105,7 @@ public class Sprite implements Comparable<Sprite> {
 		return loc;
 	}
 
+	//override
 	public ObjectOwner GetOwner() {
 		return null;
 	}

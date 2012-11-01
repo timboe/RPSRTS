@@ -52,7 +52,6 @@ public class TransformStore {
 	public void Reset() {
 		ZOOM=0.9f;
 		YSHEAR=0.6f;
-		ROTATE = 0f;
 		TRANSLATE_X = 0f;
 		TRANSLATE_Y = 0f;
 	}

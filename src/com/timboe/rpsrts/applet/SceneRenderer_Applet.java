@@ -111,8 +111,7 @@ public class SceneRenderer_Applet {
     	} else {
     		final int seeding = theSpriteManger.SeedWorld();
     		if (seeding == -1) { //Tits up - start again
-    			theSpriteManger.Reset();
-    			theWorld.Reset();
+    			utility._RPSRTS.genNewWorld();
     		}
     		drawSea(_g2,true);
     		drawBufferedBackground(_g2);
@@ -165,10 +164,25 @@ public class SceneRenderer_Applet {
 			clicked = drawButton(g2, 195, 500, 605, "LET ME TRY AGAIN!", 60);
 		}
 		if (clicked == true) {
-			theTransforms.Reset();
-			utility.gameMode = GameMode.titleScreen;
-			utility.SetTicksPerRender(utility.game_ticks_per_render);
+			utility._RPSRTS.genNewWorld();
+			utility.doWorldGen = false;
 		}
+		
+		if (utility.showRedScore == true) {
+			clicked = drawButton(g2, 10, 50, 480, "RED SCORE:"+resource_manager.GetScore(ObjectOwner.Player), 20);
+		} else {
+			clicked = drawButton(g2, 10, 50, 480, "BLU SCORE:"+resource_manager.GetScore(ObjectOwner.Enemy), 20);
+		}
+		if (clicked == true) {
+			utility.showRedScore = !utility.showRedScore;
+		}
+		
+		String cursor = "";
+		if ((System.currentTimeMillis() / 1000L) % 2 == 0) { // if even second
+			cursor = "|";
+		}
+		drawButton(g2, 500, 50, 480, "YOUR NAME:"+utility.playerName+cursor, 20);
+
 	}
 	
 	private void drawSea(Graphics2D _g2, boolean doStars) {
@@ -410,7 +424,7 @@ public class SceneRenderer_Applet {
 
 		_g2.drawString(resource_manager.GetResourceText(), 15, 20);
 		_g2.drawString(resource_manager.GetUnitText(), 15, 40);
-		_g2.drawString("SEED:"+utility.rndSeedTxt+" FPS:"+utility.FPS, 15, 60);
+		_g2.drawString("SEED:"+utility.rndSeedTxt+" FPS:"+utility.FPS+" Score:"+resource_manager.GetScore(ObjectOwner.Player), 15, 60);
 
     	_g2.setTransform(theTransforms.af_none);
 		_g2.translate(con_start_x + (0 * x_add), y_height/2);

@@ -11,7 +11,6 @@ import com.timboe.rpsrts.enumerators.ActorJob;
 import com.timboe.rpsrts.enumerators.ActorType;
 import com.timboe.rpsrts.enumerators.BiomeType;
 import com.timboe.rpsrts.enumerators.BuildingType;
-import com.timboe.rpsrts.enumerators.GameMode;
 import com.timboe.rpsrts.enumerators.ObjectOwner;
 import com.timboe.rpsrts.enumerators.ResourceType;
 import com.timboe.rpsrts.sprites.Actor;
@@ -697,8 +696,6 @@ public class SpriteManager {
 
 
 	public void Tick() {
-		if (utility.gameMode == GameMode.titleScreen) return;
-		if (utility.gamePaused == true) return;
 		
 		++TickCount;
 		if (TickCount % utility.ticks_per_tock/2 == 0) Tock();
