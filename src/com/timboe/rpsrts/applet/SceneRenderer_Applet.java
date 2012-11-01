@@ -435,7 +435,7 @@ public class SceneRenderer_Applet {
 		_g2.translate(con_start_x + (7 * x_add), y_height/2);
 		_g2.scale(3, 3);
 		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.paper_player, true);
-		if (resource_manager.GEN_PAPER_PLAYER == true) {
+		if (resource_manager.GetGeneratingPaper(ObjectOwner.Player) == true) {
 			theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.on, true);
 		} else {
 			theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.off, true);
@@ -444,7 +444,7 @@ public class SceneRenderer_Applet {
 		_g2.translate(con_start_x + (8 * x_add), y_height/2);
 		_g2.scale(3, 3);
 		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.rock_player, true);
-		if (resource_manager.GEN_ROCK_PLAYER == true) {
+		if (resource_manager.GetGeneratingRock(ObjectOwner.Player) == true) {
 			theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.on, true);
 		} else {
 			theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.off, true);
@@ -453,7 +453,7 @@ public class SceneRenderer_Applet {
 		_g2.translate(con_start_x + (9 * x_add), y_height/2);
 		_g2.scale(3, 3);
 		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.scissor_player, true);
-		if (resource_manager.GEN_SCISSORS_PLAYER == true) {
+		if (resource_manager.GetGeneratingScissors(ObjectOwner.Player) == true) {
 			theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.on, true);
 		} else {
 			theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.off, true);
@@ -557,11 +557,11 @@ public class SceneRenderer_Applet {
 			if (buildingToPlace == BuildingType.X) buildingToPlace = null;
 			else buildingToPlace = BuildingType.X;
 		} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (7 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (7 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
-			resource_manager.GEN_PAPER_PLAYER = !resource_manager.GEN_PAPER_PLAYER;
+			resource_manager.SetGeneratingPaper(ObjectOwner.Player, !resource_manager.GetGeneratingPaper(ObjectOwner.Player) );
 		} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (8 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (8 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
-			resource_manager.GEN_ROCK_PLAYER = !resource_manager.GEN_ROCK_PLAYER;
+			resource_manager.SetGeneratingRock(ObjectOwner.Player, !resource_manager.GetGeneratingRock(ObjectOwner.Player) );
 		} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (9 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (9 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
-			resource_manager.GEN_SCISSORS_PLAYER = !resource_manager.GEN_SCISSORS_PLAYER;
+			resource_manager.SetGeneratingScissors(ObjectOwner.Player, !resource_manager.GetGeneratingScissors(ObjectOwner.Player) );
 		} else {
 			utility.mouseClick = true;
 		}

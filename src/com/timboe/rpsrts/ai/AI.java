@@ -49,7 +49,7 @@ public class AI implements Runnable {
 	private ObjectOwner enemy;
 
 	public AI (ObjectOwner _playing_for) {
-		if (_playing_for == enemy) {
+		if (_playing_for == ObjectOwner.Enemy) {
 			me = ObjectOwner.Enemy;
 			enemy = ObjectOwner.Player;
 		} else {
@@ -150,7 +150,7 @@ public class AI implements Runnable {
 		Vector<ActorType> toAttackWith = new Vector<ActorType>();
 		
 		//grow to 50%, cap chance at 50%
-		float paper_chance = (((float) resource_manager.ENEMY_PAPER -2)/ (float)(utility.AI_TargetUnitMultipler * utility.EXTRA_Paper_PerWoodmill))/2f;
+		float paper_chance = (((float) resource_manager.GetNPaper(me) - 2)/ (float)(utility.AI_TargetUnitMultipler * utility.EXTRA_Paper_PerWoodmill))/2f;
 		if (paper_chance > 0.5) paper_chance = 0.5f;
 		if (utility.rnd() < paper_chance 
 				&& attack_paper == false 
@@ -160,7 +160,7 @@ public class AI implements Runnable {
 			System.out.println("ATTACK WITH: PAPER");
 		}
 		
-		float rock_chance = (((float) resource_manager.ENEMY_ROCK -2)/ (float)(utility.AI_TargetUnitMultipler * utility.EXTRA_Rock_PerRockery))/2f;
+		float rock_chance = (((float) resource_manager.GetNRock(me) - 2)/ (float)(utility.AI_TargetUnitMultipler * utility.EXTRA_Rock_PerRockery))/2f;
 		if (rock_chance > 0.5) rock_chance = 0.5f;
 		if (utility.rnd() < rock_chance 
 				&& attack_rock == false
@@ -170,7 +170,7 @@ public class AI implements Runnable {
 			System.out.println("ATTACK WITH: ROCK");
 		}
 		
-		float scissors_chance = (((float) resource_manager.ENEMY_SCISSORS -2)/ (float)(utility.AI_TargetUnitMultipler * utility.EXTRA_Scissors_PerSmelter))/2f;
+		float scissors_chance = (((float) resource_manager.GetNScissor(me) - 2)/ (float)(utility.AI_TargetUnitMultipler * utility.EXTRA_Scissors_PerSmelter))/2f;
 		if (scissors_chance > 0.5) scissors_chance = 0.5f;
 		if (utility.rnd() < scissors_chance 
 				&& attack_scissors == false 
@@ -340,25 +340,25 @@ public class AI implements Runnable {
 	
 	void DoUnitProduction() {
 		//if we're not _really_ short on people then turn off unit production if peeps too low
-		if (resource_manager.ENEMY_WOOD - utility.COST_Paper_Wood < utility.COST_AttractorPaper_Wood 
-				&& resource_manager.ENEMY_PAPER > 3) {
-			resource_manager.GEN_PAPER_ENEMY = false;
+		if (resource_manager.GetNWood(me) - utility.COST_Paper_Wood < utility.COST_AttractorPaper_Wood 
+				&& resource_manager.GetNPaper(me) > 3) {
+			resource_manager.SetGeneratingPaper(me, false);
 		} else {
-			resource_manager.GEN_PAPER_ENEMY = true;
+			resource_manager.SetGeneratingPaper(me, true);
 		}
 		//if we're not _really_ short on people then turn off unit production if peeps too low
-		if (resource_manager.ENEMY_IRON - utility.COST_Scissors_Iron < utility.COST_AttractorScissors_Iron 
-				&& resource_manager.ENEMY_SCISSORS > 3) {
-			resource_manager.GEN_SCISSORS_ENEMY = false;
+		if (resource_manager.GetNIron(me) - utility.COST_Scissors_Iron < utility.COST_AttractorScissors_Iron 
+				&& resource_manager.GetNScissor(me) > 3) {
+			resource_manager.SetGeneratingScissors(me, false);
 		} else {
-			resource_manager.GEN_SCISSORS_ENEMY = true;
+			resource_manager.SetGeneratingScissors(me, true);
 		}
 		//if we're not _really_ short on people then turn off unit production if peeps too low
-		if (resource_manager.ENEMY_STONE - utility.COST_Rock_Stone < utility.COST_AttractorRock_Stone 
-				&& resource_manager.ENEMY_ROCK > 3) {
-			resource_manager.GEN_ROCK_ENEMY = false;
+		if (resource_manager.GetNStone(me) - utility.COST_Rock_Stone < utility.COST_AttractorRock_Stone 
+				&& resource_manager.GetNRock(me) > 3) {
+			resource_manager.SetGeneratingRock(me, false);
 		} else {
-			resource_manager.GEN_ROCK_ENEMY = true;
+			resource_manager.SetGeneratingRock(me, true);
 		}
 	}
 	
@@ -505,20 +505,20 @@ public class AI implements Runnable {
 		if (resource_manager.CanAfford(BuildingType.Woodshop, me) == true
 				&& utility.rnd() < 0.1f
 				&& woodshop_countdown == 0
-				&& resource_manager.ENEMY_PAPER >= resource_manager.ENEMY_MAX_PAPER - utility.AI_NewUnitsWhenXClosetoCap) {
+				&& resource_manager.GetNPaper(me) >= resource_manager.GetMaxPaper(me) - utility.AI_NewUnitsWhenXClosetoCap) {
 				toPlace.add(BuildingType.Woodshop);
 
 		}
 		if (resource_manager.CanAfford(BuildingType.Smelter, me) == true
 				&& utility.rnd() < 0.1f
 				&& smelter_countdown == 0
-				&& resource_manager.ENEMY_SCISSORS >= resource_manager.ENEMY_MAX_SCISSORS - utility.AI_NewUnitsWhenXClosetoCap) {
+				&& resource_manager.GetNScissor(me) >= resource_manager.GetMaxScissor(me) - utility.AI_NewUnitsWhenXClosetoCap) {
 				toPlace.add(BuildingType.Smelter);
 		}
 		if (resource_manager.CanAfford(BuildingType.Rockery, me) == true
 				&& utility.rnd() < 0.1f
 				&& rockery_countdown == 0
-				&& resource_manager.ENEMY_ROCK >= resource_manager.ENEMY_MAX_ROCK - utility.AI_NewUnitsWhenXClosetoCap) {
+				&& resource_manager.GetNRock(me) >= resource_manager.GetMaxRock(me) - utility.AI_NewUnitsWhenXClosetoCap) {
 				toPlace.add(BuildingType.Rockery);
 		}
 		if (toPlace.size() > 0) {

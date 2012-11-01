@@ -34,7 +34,7 @@ public class Projectile_Applet extends Projectile {
 	public void Render(Graphics2D _g2, int _tick_count) {
 		if (dead == true) return;
 		
-		if (_tick_count % 2 == 0) {
+		if (_tick_count % 4 == 0) {
 			++animStep;
 		}
 		

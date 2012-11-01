@@ -37,11 +37,11 @@ public class Resource extends Sprite {
 	public void Add(int _n) {
 		stuff += _n;
 		if (type == ResourceType.Mine) {
-			resource_manager.GLOBAL_IRON += GetRemaining();
+			resource_manager.ModGlobalIron(_n);
 		} else if (type == ResourceType.Rockpile) {
-			resource_manager.GLOBAL_STONE += GetRemaining();
+			resource_manager.ModGlobalStone(_n);
 		} else { //cactus or tree
-			resource_manager.GLOBAL_WOOD += GetRemaining();
+			resource_manager.ModGlobalWood(_n);
 		}
 	}
 	
@@ -85,6 +85,13 @@ public class Resource extends Sprite {
 			stuff = 0;
 		}
 		//System.out.println("Resource: "+_requested+" given");
+		if (type == ResourceType.Mine) {
+			resource_manager.ModGlobalIron(-_requested);
+		} else if (type == ResourceType.Rockpile) {
+			resource_manager.ModGlobalStone(-_requested);
+		} else { //cactus or tree
+			resource_manager.ModGlobalWood(-_requested);
+		}
 		return _requested;
 	}
 

@@ -7,7 +7,7 @@ public class Projectile extends Sprite {
 	
 	protected Projectile(int _ID, Actor _source, int _r, Sprite _target) {
 		super(_ID, _source.GetX(), _source.GetY(), _r);
-		speed = 2;
+		speed = utility.projectile_speed;
 		target = _target;
 		strength = _source.GetStrength();
 		if (_source.GetIfPreferedTarget(_target) == true) {

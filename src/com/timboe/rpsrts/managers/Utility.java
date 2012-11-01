@@ -21,6 +21,7 @@ public class Utility {
 	//Global variables
 	public RPSRTS _RPSRTS;
 	public boolean dbg = true; //debug flag
+	public boolean noPlayers = true; //AI takes over both teams
 	public float rotateAngle = 0f; //copied here as ROTATE stored in Transform(awt) or Matrix(andorid) classes
 	public boolean doWorldGen = false; //proceed with building world
 	public int pathfind_counter = 0; //pathfinding counter
@@ -59,10 +60,7 @@ public class Utility {
 	public final int wg_DegInCircle = 360;
 	public final float island_scale = 0.75f; //Size of initial circular island w.r.t. world
 	public final float wg_CrinkleScale = 30; //Multiplier to Gaussian edge smear
-
-	
 	public final int wg_CrinkleCoarseness = 3; //Maximum gradient to smear under
-
 	public final float wg_kTStartPt = 1.f; //Min random chunk energy
 	public final float wg_kTEndPt = 10.f; //Max random chunk energy
 	public final float wg_kT_R =  14 * tiles_size; //kT algorithm R parameter  (derived)
@@ -86,6 +84,7 @@ public class Utility {
 	public final int resourceRadius = 3;
 	public final int resources_kept_away_from_base = 50; //clear area around main bases
 	public final int place_res_gaussian = 2;
+	public final float projectile_speed = 1f;
 	
 	//actor settings
 	public final int starting_actors = 2;
@@ -140,21 +139,20 @@ public class Utility {
 	public final int building_health_per_build_action = 5;
 	public final int building_max_health = 200;
 	public final int building_AI_openSpace = 4; //How many radii around building to leave clear
-
-	
 	public final int building_AI_GranularityToStudy = 10; //Higher value makes AI place quicker, but leaves sub-optimal placement
 	public final float building_refund_amount = 0.5f;
 	public final int building_no_resource_penalty = 50;//s
 	public final int building_Place_degrees = 32; //can-be-placed markers
 	public final int building_Place_degrees_show = 16; //can-be-placed markers
+	
 	//AI
 	public final int AI_BadBuilding_Before_Sell = 3; //building_no_resource_penalty seconds per tick
 	public final int AI_NewUnitsWhenXClosetoCap = 2;
 	public final int AI_BuildCooldown = 40;//tocks (applies per building type)
 	public final int AI_TargetUnitMultipler = 3;
+	
 	//COSTS
 	public final int StartingResources = 500;
-
 	public final int COST_Building_Base = 100;
 	public final int COST_Attractor_Base = 25;
 	public final int COST_Actor_Base = 20;
@@ -181,8 +179,8 @@ public class Utility {
 	public final int COST_AttractorScissors_Iron = COST_Attractor_Base;
 	public final int EXTRA_Paper_PerWoodmill = EXTRA_Base*2;
 	public final int EXTRA_Rock_PerRockery = EXTRA_Base/2;
-
 	public final int EXTRA_Scissors_PerSmelter = EXTRA_Base;
+	
 	private Utility() {
 		System.out.println("--- Utility spawned (depends on nothing): "+this);
 		SetDesiredFPS(_DESIRED_FPS); //To initially set desired TPS

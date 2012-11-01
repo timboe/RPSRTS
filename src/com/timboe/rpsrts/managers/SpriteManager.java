@@ -48,6 +48,8 @@ public class SpriteManager {
 	
 	Thread AI_thread;
 	AI theAI;
+	Thread AIHuman_thread;
+	AI theHumanAI;
 
 	public int GlobalSpriteCounter;
 
@@ -429,7 +431,7 @@ public class SpriteManager {
 				|| _bt == BuildingType.AttractorScissors) {
 			_r = utility.attractorRadius;
 		}
-		resource_manager.Buy(_bt, ObjectOwner.Enemy);
+		resource_manager.Buy(_bt, _oo);
 		final Building newBuilding = PlatformSpecific_PlaceBuilding(_p, _r, _bt, _oo);
 		synchronized (GetBuildingOjects()) {
 			GetBuildingOjects().add(newBuilding);
@@ -517,6 +519,8 @@ public class SpriteManager {
 		//Start the AI
 		theAI = new AI(ObjectOwner.Enemy); //AI playing as the bad guys (blue)
 		AI_thread = new Thread(theAI);
+		theHumanAI = new AI(ObjectOwner.Player);
+		AIHuman_thread = new Thread(theHumanAI);
 
 	}
 	
@@ -587,19 +591,19 @@ public class SpriteManager {
 			for (final WorldTile _t : render_tiles) {
 				ResourceType toPlant = null;
 				if (_t.GetBiomeType() == BiomeType.FORREST) {
-					if (resource_manager.GLOBAL_IRON > resource_manager.GLOBAL_WOOD) {
+					if (resource_manager.GetGlobalIron() > resource_manager.GetGlobalWood()) {
 						toPlant = ResourceType.Tree;
 					} else {
 						toPlant = ResourceType.Mine;
 					}
 				} else if (_t.GetBiomeType() == BiomeType.DESERT) {
-					if (resource_manager.GLOBAL_STONE > resource_manager.GLOBAL_WOOD) {
+					if (resource_manager.GetGlobalStone() > resource_manager.GetGlobalWood()) {
 						toPlant = ResourceType.Cactus;
 					} else {
 						toPlant = ResourceType.Rockpile;
 					}
 				} else if (_t.GetBiomeType() == BiomeType.GRASS) {
-					if (resource_manager.GLOBAL_STONE > resource_manager.GLOBAL_IRON) {
+					if (resource_manager.GetGlobalStone() > resource_manager.GetGlobalIron()) {
 						toPlant = ResourceType.Mine;
 					} else {
 						toPlant = ResourceType.Rockpile;
@@ -623,7 +627,7 @@ public class SpriteManager {
 					}
 				}
 			}
-			System.out.println("THERE IS IN THE WORLD: "+resource_manager.GLOBAL_WOOD+" WOOD, "+resource_manager.GLOBAL_IRON+" IRON AND "+resource_manager.GLOBAL_STONE+" STONE");
+			System.out.println("THERE IS IN THE WORLD: "+resource_manager.GetGlobalWood()+" WOOD, "+resource_manager.GetGlobalIron()+" IRON AND "+resource_manager.GetGlobalStone()+" STONE");
 //			float avRes = (resource_manager.GLOBAL_WOOD+resource_manager.GLOBAL_IRON+resource_manager.GLOBAL_STONE)/3.f;
 //			float resMult = utility.resource_desired_global / avRes;
 //			for (Resource _r : ResourceObjects) {
@@ -857,6 +861,7 @@ public class SpriteManager {
 			}
 
 			if (AI_thread.isAlive() == false) AI_thread.run();
+			if (utility.noPlayers == true && AIHuman_thread.isAlive() == false) AIHuman_thread.run();
 		}
 	}
 }

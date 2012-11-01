@@ -17,61 +17,165 @@ public class ResourceManager {
 	private final SpriteManager theSpriteManager = SpriteManager.GetSpriteManager();
 
 	//
-	public boolean GEN_PAPER_PLAYER = true;
-	public boolean GEN_ROCK_PLAYER = true;
-	public boolean GEN_SCISSORS_PLAYER= true;
+	private boolean GEN_PAPER_PLAYER = true;
+	private boolean GEN_ROCK_PLAYER = true;
+	private boolean GEN_SCISSORS_PLAYER= true;
 	
-	public boolean GEN_PAPER_ENEMY = true;
-	public boolean GEN_ROCK_ENEMY = true;
-	public boolean GEN_SCISSORS_ENEMY= true;
-	
-	//
-	
-	public int GLOBAL_WOOD = 0;
-	public int GLOBAL_STONE = 0;
-	public int GLOBAL_IRON = 0;
-
-	public int PLAYER_WOOD = 0;
-	public int PLAYER_STONE = 0;
-	public int PLAYER_IRON = 0;
-
-	public int ENEMY_WOOD = 0;
-	public int ENEMY_STONE = 0;
-	public int ENEMY_IRON = 0;
+	private boolean GEN_PAPER_ENEMY = true;
+	private boolean GEN_ROCK_ENEMY = true;
+	private boolean GEN_SCISSORS_ENEMY= true;
 	
 	//
 	
-	public int N_PLAYER_WOODSHOPS = 0;
-	public int N_PLAYER_PAPER_ATTRACTORS = 0;
-	public int N_PLAYER_SMELTERS = 0;
-	public int N_PLAYER_SCISSOR_ATTRACTORS = 0;
-	public int N_PLAYER_ROCKERY = 0;
-	public int N_PLAYER_ROCK_ATTRACTORS = 0;
+	private int GLOBAL_WOOD = 0;
+	private int GLOBAL_STONE = 0;
+	private int GLOBAL_IRON = 0;
+
+	private int PLAYER_WOOD = 0;
+	private int PLAYER_STONE = 0;
+	private int PLAYER_IRON = 0;
+
+	private int ENEMY_WOOD = 0;
+	private int ENEMY_STONE = 0;
+	private int ENEMY_IRON = 0;
 	
-	public int N_ENEMY_WOODSHOPS = 0;
-	public int N_ENEMY_PAPER_ATTRACTORS = 0;
-	public int N_ENEMY_SMELTERS = 0;
-	public int N_ENEMY_SCISSOR_ATTRACTORS = 0;
-	public int N_ENEMY_ROCKERY = 0;
-	public int N_ENEMY_ROCK_ATTRACTORS = 0;
+	//
+	
+	private int N_PLAYER_WOODSHOPS = 0;
+	private int N_PLAYER_PAPER_ATTRACTORS = 0;
+	private int N_PLAYER_SMELTERS = 0;
+	private int N_PLAYER_SCISSOR_ATTRACTORS = 0;
+	private int N_PLAYER_ROCKERY = 0;
+	private int N_PLAYER_ROCK_ATTRACTORS = 0;
+	
+	private int N_ENEMY_WOODSHOPS = 0;
+	private int N_ENEMY_PAPER_ATTRACTORS = 0;
+	private int N_ENEMY_SMELTERS = 0;
+	private int N_ENEMY_SCISSOR_ATTRACTORS = 0;
+	private int N_ENEMY_ROCKERY = 0;
+	private int N_ENEMY_ROCK_ATTRACTORS = 0;
 
 	//
 
-	public int PLAYER_MAX_SCISSORS;
-	public int PLAYER_MAX_ROCK;
-	public int PLAYER_MAX_PAPER;
+	private int PLAYER_MAX_SCISSORS;
+	private int PLAYER_MAX_ROCK;
+	private int PLAYER_MAX_PAPER;
 
-	public int ENEMY_MAX_SCISSORS;
-	public int ENEMY_MAX_ROCK;
-	public int ENEMY_MAX_PAPER;
+	private int ENEMY_MAX_SCISSORS;
+	private int ENEMY_MAX_ROCK;
+	private int ENEMY_MAX_PAPER;
 
-	public int PLAYER_SCISSORS;
-	public int PLAYER_ROCK;
-	public int PLAYER_PAPER;
+	private int PLAYER_SCISSORS;
+	private int PLAYER_ROCK;
+	private int PLAYER_PAPER;
 
-	public int ENEMY_SCISSORS;
-	public int ENEMY_ROCK;
-	public int ENEMY_PAPER;
+	private int ENEMY_SCISSORS;
+	private int ENEMY_ROCK;
+	private int ENEMY_PAPER;
+	
+	
+	
+	public int GetGlobalWood() {
+		return GLOBAL_WOOD;
+	}
+	
+	public void ModGlobalWood(int _mod) {
+		GLOBAL_WOOD += _mod;
+	}
+	
+	public int GetGlobalIron() {
+		return GLOBAL_IRON;
+	}
+	
+	public void ModGlobalIron(int _mod) {
+		GLOBAL_IRON += _mod;
+	}
+	
+	public int GetGlobalStone() {
+		return GLOBAL_STONE;
+	}
+	
+	public void ModGlobalStone(int _mod) {
+		GLOBAL_STONE += _mod;
+	}
+	
+	public boolean GetGeneratingPaper(ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return GEN_PAPER_ENEMY;
+		else return GEN_PAPER_PLAYER;
+	}
+	
+	public void SetGeneratingPaper(ObjectOwner _oo, boolean _set) {
+		if (_oo == ObjectOwner.Enemy) GEN_PAPER_ENEMY = _set;
+		else GEN_PAPER_PLAYER = _set;
+	}
+	
+	public boolean GetGeneratingRock(ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return GEN_ROCK_ENEMY;
+		else return GEN_ROCK_PLAYER;
+	}
+	
+	public void SetGeneratingRock(ObjectOwner _oo, boolean _set) {
+		if (_oo == ObjectOwner.Enemy) GEN_ROCK_ENEMY = _set;
+		else GEN_ROCK_PLAYER = _set;
+	}
+	
+	public boolean GetGeneratingScissors(ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return GEN_SCISSORS_ENEMY;
+		else return GEN_SCISSORS_PLAYER;
+	}
+	
+	public void SetGeneratingScissors(ObjectOwner _oo, boolean _set) {
+		if (_oo == ObjectOwner.Enemy) GEN_SCISSORS_ENEMY = _set;
+		else GEN_SCISSORS_PLAYER = _set;
+	}
+
+
+
+	
+	public int GetNWood(ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return ENEMY_WOOD;
+		else return PLAYER_WOOD;
+	}
+	
+	public int GetNStone(ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return ENEMY_STONE;
+		else return PLAYER_STONE;
+	}
+	
+	public int GetNIron(ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return ENEMY_IRON;
+		else return PLAYER_IRON;
+	}
+	
+	public int GetNPaper(ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return ENEMY_PAPER;
+		else return PLAYER_PAPER;
+	}
+	
+	public int GetNRock(ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return ENEMY_ROCK;
+		else return PLAYER_ROCK;
+	}
+	
+	public int GetNScissor(ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return ENEMY_SCISSORS;
+		else return PLAYER_SCISSORS;
+	}
+	
+	public int GetMaxPaper(ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return ENEMY_MAX_PAPER;
+		else return PLAYER_MAX_PAPER;
+	}
+	
+	public int GetMaxRock(ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return ENEMY_MAX_ROCK;
+		else return PLAYER_MAX_ROCK;
+	}
+	
+	public int GetMaxScissor(ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return ENEMY_MAX_SCISSORS;
+		else return PLAYER_MAX_SCISSORS;
+	}
 	
 	private ResourceManager() {
 		Reset();
