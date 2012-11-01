@@ -14,10 +14,15 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
-import com.timboeWeb.rpsrts.GameWorld_Applet;
-import com.timboeWeb.rpsrts.SceneRenderer_Applet;
-import com.timboeWeb.rpsrts.SpriteManager_Applet;
-import com.timboeWeb.rpsrts.TransformStore;
+import com.timboe.rpsrts.applet.GameWorld_Applet;
+import com.timboe.rpsrts.applet.SceneRenderer_Applet;
+import com.timboe.rpsrts.applet.SpriteManager_Applet;
+import com.timboe.rpsrts.applet.TransformStore;
+import com.timboe.rpsrts.enumerators.GameMode;
+import com.timboe.rpsrts.enumerators.ObjectOwner;
+import com.timboe.rpsrts.enumerators.ResourceType;
+import com.timboe.rpsrts.managers.ResourceManager;
+import com.timboe.rpsrts.managers.Utility;
 
 public class RPSRTS extends Applet implements Runnable, MouseWheelListener, MouseMotionListener, MouseListener, KeyListener {
 
@@ -25,12 +30,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	 *
 	 */
 	private static final long serialVersionUID = -4515697164989975837L;
-	private long _TIME_OF_LAST_TICK = 0; // Internal
-	private final int _DO_FPS_EVERY_X_TICKS = 6; // refresh FPS after X frames
-	private long _TIME_OF_NEXT_TICK; // Internal
-	private int _DESIRED_FPS = 300; // Frames per second to aim for
-	private int _TICKS_PER_RENDER = 2;
-	private int _DESIRED_TPS = _DESIRED_FPS * _TICKS_PER_RENDER;
+
 
 	int last_X = -1; //Mouse cursor historic
 	int last_Y = -1;
@@ -67,7 +67,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		theSpriteManger.Reset();
 		theWorld.Reset();
 		theSceneRenderer.background_buffered = null;
-		utility.TICK = 0;
+		utility._TICK = 0;
 	}
 
 	@Override
@@ -246,27 +246,27 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 		// run a long while (true) this means in our case "always"
 		while (true) {
-			if (_TIME_OF_NEXT_TICK > System.currentTimeMillis()) {
+			if (utility._TIME_OF_NEXT_TICK > System.currentTimeMillis()) {
 				// too soon to repaint, wait...
 				try {
-					Thread.sleep(Math.abs(_TIME_OF_NEXT_TICK
+					Thread.sleep(Math.abs(utility._TIME_OF_NEXT_TICK
 							- System.currentTimeMillis()));
 				} catch (final InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-			_TIME_OF_NEXT_TICK = System.currentTimeMillis()
-					+ Math.round(1000f / _DESIRED_TPS);
+			utility._TIME_OF_NEXT_TICK = System.currentTimeMillis()
+					+ Math.round(1000f / utility.GetDesiredTPS());
 			
-			++utility.TICK;
+			++utility._TICK;
 		    if (utility.gameMode != GameMode.titleScreen) theSpriteManger.Tick();
 
-			if (utility.TICK % _DO_FPS_EVERY_X_TICKS == 0) {
-				utility.FPS = Math.round((1. / (System.currentTimeMillis() - _TIME_OF_LAST_TICK)* 1000. * _DO_FPS_EVERY_X_TICKS) / _TICKS_PER_RENDER);
-				_TIME_OF_LAST_TICK = System.currentTimeMillis();
+			if (utility._TICK % utility.do_fps_every_x_ticks == 0) {
+				utility.FPS = Math.round((1. / (System.currentTimeMillis() - utility._TIME_OF_LAST_TICK)* 1000. * utility.do_fps_every_x_ticks) / utility.ticks_per_render);
+				utility._TIME_OF_LAST_TICK = System.currentTimeMillis();
 			}
 			
-			if (utility.TICK % _TICKS_PER_RENDER == 0) {
+			if (utility._TICK % utility.ticks_per_render == 0) {
 				repaint();
 			}
 			
