@@ -37,11 +37,7 @@ public class GameWorld {
 		//OVERRIDDEN
 	}
 	
-	public void Init() {
-		//OVERRIDDEN
-	}
-
- 	public boolean CheckSafeToPlaceTile(float _x, float _y, int _pice_radius) {
+	public boolean CheckSafeToPlaceTile(float _x, float _y, int _pice_radius) {
 		int _ID = -1;
 		//HACK!
 		//_x -= tiles_size;
@@ -67,7 +63,7 @@ public class GameWorld {
 		return true;
 	}
 
-	public int GenerateWorld() {
+ 	public int GenerateWorld() {
 		final float timeNow = (System.nanoTime() / 1000000000f);
 		float time_to_wait = utility.wg_seconds_to_wait;
 		if (utility.dbg == true) {
@@ -437,6 +433,20 @@ public class GameWorld {
 			}
 		}
 	}
+
+	private void GenerateWorld_RandomSeed() {
+		int BiomeID = 0;
+		for (final WorldChunk c : chunks) {
+			final int angle = c.GetAngle();
+			final float radius = (island_size/2) + island_offset[angle];
+			//System.out.println("RandSeed angle:"+angle+" has dev:"+island_offset[angle]+" and tot radius:"+radius);
+			if (c.GetDistanceFromPoint(0,0) < radius + chunks_size ) { //Only leaves the corners
+				c.SetState((utility.rnd()*(utility.wg_kTEndPt-utility.wg_kTStartPt))+utility.wg_kTStartPt);
+				c.SetBiomeID(++BiomeID);
+				//System.out.println("state:"+c.GetState()+" ID:"+c.GetBiomeID());
+			}
+		}
+	}
 	
 	private void GenerateWorld_TrimWater() {
 		for (final WorldTile t : tiles) {
@@ -456,21 +466,6 @@ public class GameWorld {
 	}
 
 
-
-
-	private void GenerateWorld_RandomSeed() {
-		int BiomeID = 0;
-		for (final WorldChunk c : chunks) {
-			final int angle = c.GetAngle();
-			final float radius = (island_size/2) + island_offset[angle];
-			//System.out.println("RandSeed angle:"+angle+" has dev:"+island_offset[angle]+" and tot radius:"+radius);
-			if (c.GetDistanceFromPoint(0,0) < radius + chunks_size ) { //Only leaves the corners
-				c.SetState((utility.rnd()*(utility.wg_kTEndPt-utility.wg_kTStartPt))+utility.wg_kTStartPt);
-				c.SetBiomeID(++BiomeID);
-				//System.out.println("state:"+c.GetState()+" ID:"+c.GetBiomeID());
-			}
-		}
-	}
 
 
 	public WorldPoint GetIdeadStartingLocation(ObjectOwner _o) {
@@ -526,6 +521,7 @@ public class GameWorld {
 		return _n_tiles;
 	}
 
+
 	public HashSet<WorldTile> GetRenderTiles() {
 		return render_tiles;
 	}
@@ -538,6 +534,10 @@ public class GameWorld {
 
 	public boolean GetWorldGenerated(){
 		return wg_finished;
+	}
+
+	public void Init() {
+		//OVERRIDDEN
 	}
 
 	private void MergeBiomes(int _b1, int _b2) {

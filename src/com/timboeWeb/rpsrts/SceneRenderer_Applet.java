@@ -73,44 +73,58 @@ public class SceneRenderer_Applet {
 		System.out.println("--- Scene renderer spawned (depends on Util,World,Bitmap,Sprite,Trans,Resource): "+this);
 	}
 	
-	public void sceneBlackout(Graphics2D g2) {
-		g2.setTransform(theTransforms.af_none);
-		g2.setColor (Color.black);
-		g2.fillRect (0, 0, utility.window_X, utility.window_Y);
-	}
-	
-	public void sceneTitle(Graphics2D g2) {
-		g2.setTransform(theTransforms.af);
-    	contentCreation(g2);
-    	if (utility.doWorldGen == false) {
-    		drawTitleScreen(g2);
-    	} else if (theSpriteManger.GetWorldSeeded() == true) {
-    		drawStartPlayingOption(g2);
+	private void contentCreation(Graphics2D _g2) {
+    	theTransforms.SetAA(_g2, false);
+    	theTransforms.modifyRotate(0.001f);
+    	if (theWorld.GetWorldGenerated() == false) {
+	    	final int status = theWorld.GenerateWorld();
+	    	if (status == 1) { //Object made, circle island, plane grid
+	    		theWorld.DrawChunks(_g2,true,theTransforms.GetAA());
+	    		theWorld.DrawIslandEdge(_g2);
+	    	} else if (status == 2) { //Island perimeter
+	    		theWorld.DrawChunks(_g2,true,theTransforms.GetAA());
+	    		theWorld.DrawIslandEdge(_g2);
+	    		drawTopText(_g2,"CRINKLING THE FJORDS");
+	    	} else if (status == 3) { //Chunks touching and inside perimeter, random energy
+	    		theWorld.DrawChunks(_g2,true,theTransforms.GetAA());
+	    		theWorld.DrawIslandEdge(_g2);
+	    		drawTopText(_g2,"SEEDING WORLD GRID");
+	    	} else if (status == 4) { //Doing kt
+	    		theWorld.DrawChunks(_g2,true,theTransforms.GetAA());
+	    		theWorld.DrawIslandEdge(_g2);
+	    		drawTopText(_g2,"RUNNING KT ALGORITHM");
+	    	} else if (status == 5) { //Doing kt
+	    		theWorld.DrawChunks(_g2,false,theTransforms.GetAA());
+	    		theWorld.DrawIslandEdge(_g2);
+	    		drawTopText(_g2,"RUNNING KT ALGORITHM");
+	    	} else if (status == 6) { //Doing biomes
+	    		drawSea(_g2,true);
+	    		theWorld.DrawTiles(_g2,false,theTransforms.GetAA());
+	    		theWorld.DrawIslandEdge(_g2);
+	    		drawTopText(_g2,"ASSIGNING LANDMASSES");
+	    	} else { //Eroding
+	    		drawSea(_g2,true);
+	    		theWorld.DrawTiles(_g2,false,theTransforms.GetAA());
+	    		theWorld.DrawIslandEdge(_g2);
+	    		drawTopText(_g2,"WEATHERING TERRAIN");
+	    	}
+    	} else {
+    		final int seeding = theSpriteManger.SeedWorld();
+    		if (seeding == -1) { //Tits up - start again
+    			theSpriteManger.Reset();
+    			theWorld.Reset();
+    		}
+    		drawSea(_g2,true);
+    		drawBufferedBackground(_g2);
+    		theWorld.DrawIslandEdge(_g2);
+    		theSpriteManger.Render(_g2);
+    		_g2.setTransform(theTransforms.af_none);
+    		if (theSpriteManger.GetWorldSeeded() == false) {
+    			drawTopText(_g2,"POPULATING THE ISLAND");
+    		} else if (utility.dbg == true) {
+    			utility.gameMode = GameMode.gameOn;
+    		}
     	}
-	}
-	
-	public void sceneGame(Graphics2D g2) {
-		g2.setTransform(theTransforms.af);
-    	drawBufferedBackground(g2);
-		if (utility.dbg == true) theSpriteManger.PlaceSpooge(100, 200, ObjectOwner.Player, 5, 1f); //test
-	    theSpriteManger.Render(g2);
-	    if (buildingToPlace != null) {
-	    	final boolean placed = theSpriteManger.TryPlaceItem(buildingToPlace, g2, (int)MouseTF.getX(), (int)MouseTF.getY(), utility.mouseClick);
-	    	if (placed == true) {
-	    		buildingToPlace = null;
-	    	}
-	    } else if (buildingToMove != null) {
-	    		buildingToMove.MoveBuilding((int)MouseTF.getX(), (int)MouseTF.getY());
-        } else if (utility.sendMouseDragPing == true) {
-	    	//am i over a building?
-	    	buildingToMove = theSpriteManger.GetBuildingAtMouse((int)MouseTF.getX(), (int)MouseTF.getY());
-	    	if (buildingToMove != null) {
-	    		if (buildingToMove.GetCollects().size() > 0) buildingToMove = null;
-	    		else if (buildingToMove.GetOwner() == ObjectOwner.Enemy) buildingToMove = null;
-	    		else if (buildingToMove.GetType() == BuildingType.Base) buildingToMove = null;
-	    	}
-        }
-	    drawTopBar(g2);
 	}
 	
 	public void doInverseMouseTransform() {
@@ -123,13 +137,67 @@ public class SceneRenderer_Applet {
 		}
 	}
 	
-	public void sceneGameOver(Graphics2D g2) {
-    	drawBufferedBackground(g2);
-	    theSpriteManger.Render(g2);
-	    drawTopBar(g2);
-	    if ( (System.currentTimeMillis() / 1000l) - utility.loose_time > 3) {
-	    	drawEndScreen(g2);
+	private void drawBufferedBackground(Graphics2D _g2) {
+    	if (background_buffered == null) {
+    		background_buffered = new BufferedImage(utility.world_size, utility.world_size, BufferedImage.TYPE_3BYTE_BGR);
+    		Graphics2D gc = background_buffered.createGraphics();
+    		gc.translate(utility.world_size2,utility.world_size2);
+			drawSea(gc,false);
+    		theWorld.DrawTiles(gc,false,true);
+			drawBufferedBackground(_g2); //recurse to actually draw
+    	} else {
+			drawSea(_g2,true);
+			_g2.setTransform(theTransforms.af_backing);
+			_g2.drawImage(background_buffered, null, 0, 0);
+			_g2.setTransform(theTransforms.af);
+    	}
+    }
+	
+	private void drawEndScreen(Graphics2D g2) {
+		if (utility.gameMode == GameMode.gameOverWon) {
+			g2.setTransform(theTransforms.af_none);
+			g2.drawImage(theBitmaps.WIN,0,0,null);
+		} else {
+			g2.setTransform(theTransforms.af_none);
+			g2.drawImage(theBitmaps.LOOSE,0,0,null);
+		}
+	}
+	
+	private void drawSea(Graphics2D _g2, boolean doStars) {
+	    final float D = utility.waterfall_disk_size * utility.world_size;
+	    if (doStars == true) {
+		    _g2.setTransform(theTransforms.af_translate_zoom);
+		    _g2.setPaint(dark_gradient);
+		    _g2.fillRect((int)-D, (int)0f, (int)(2*D), utility.waterfall_size); //Draw Column
+		    ///Do waterfall
+		    _g2.setClip((int)-D, (int)0f, (int)(2*D), utility.waterfall_size);
+		    _g2.setPaint(light_gradient);
+		    synchronized (theSpriteManger.GetWaterfallSplashObjects()) {
+			    for (WaterfallSplash _w :  theSpriteManger.GetWaterfallSplashObjects()) {
+			    	((WaterfallSplash_Applet)_w).Render(_g2);
+			    }
+		    }
+		    _g2.setTransform(theTransforms.af);
+		    _g2.setClip(null);
 	    }
+	    _g2.setColor(dsea_blue);
+	    _g2.fillOval ((int)(-D),(int)(-D),(int)(D*2),(int)(D*2));
+	    if (background_stars.size() == 0) { //get some stars!
+	    	for (int s=0; s<100; ++s) {
+	    		int radius = Math.round((utility.world_size*utility.waterfall_disk_size*1.1f) + utility.rndI(utility.world_size*4));
+	    		float angle = (float) (utility.rnd() * Math.PI * 2);
+	    		background_stars.add(new Point( (int)Math.round(radius*Math.cos(angle)) , (int)Math.round(radius*Math.sin(angle)) ));
+	    	}
+	    }
+	    if (doStars == true) {
+		    _g2.setTransform(theTransforms.af_translate_zoom);
+		    _g2.setColor(Color.white); //possibility to add stars
+		    for (Point _p : background_stars) {
+				Point2D transform = theTransforms.getTransformedPoint(_p.x, _p.y);
+		    	_g2.fillOval((int)transform.getX(),(int)transform.getY(),3,3);
+		    }
+		    _g2.setTransform(theTransforms.af);
+		}
 	}
 
 	private void drawStartPlayingOption(Graphics2D g2) {
@@ -202,12 +270,24 @@ public class SceneRenderer_Applet {
 		g2.setFont(myFont);
 	}
 
-	private void drawTopText(Graphics2D _g2, String _str) {
-		_g2.setTransform(theTransforms.af_none);
+	private void drawStatBox(Graphics2D _g2, String _s1, String _s2, String _s3, String _s4) {
+		int _x = (int)CurMouse.getX() - con_start_x/2 - x_add*3;
+		int _y = (int)CurMouse.getY() + x_add/2;
+		final int _os = 15;
+		final int box_w = 500;
+		int box_h = 70;
+		if (_s3 == "") {
+			box_h /= 2;
+		}
+		_g2.setColor(backing_brown);
+		_g2.fillRect(_x, _y, box_w, box_h);
 		_g2.setColor(Color.white);
-		_g2.setFont(myMediumFont);
-		_g2.drawString(_str, 20, 580);
-		_g2.setFont(myFont);
+		_g2.drawRect(_x, _y, box_w, box_h);
+		_g2.setColor(front_blue);
+		_g2.drawString(_s1,  _x + _os, _y + (_os * 1));
+		_g2.drawString(_s2,  _x + _os, _y + (_os * 2));
+		_g2.drawString(_s3,  _x + _os, _y + (_os * 3));
+		_g2.drawString(_s4,  _x + _os, _y + (_os * 4));
 	}
 	
 	private void drawTitleScreen(Graphics2D g2) {
@@ -287,86 +367,6 @@ public class SceneRenderer_Applet {
 		}
 		g2.drawString("ISLAND SEED:"+utility.rndSeedTxt+cursor, x+20, y+43);
 		g2.setFont(myFont);		
-	}
-	
-	private void drawEndScreen(Graphics2D g2) {
-		if (utility.gameMode == GameMode.gameOverWon) {
-			g2.setTransform(theTransforms.af_none);
-			g2.drawImage(theBitmaps.WIN,0,0,null);
-		} else {
-			g2.setTransform(theTransforms.af_none);
-			g2.drawImage(theBitmaps.LOOSE,0,0,null);
-		}
-	}
-	
-    private void drawBufferedBackground(Graphics2D _g2) {
-    	if (background_buffered == null) {
-    		background_buffered = new BufferedImage(utility.world_size, utility.world_size, BufferedImage.TYPE_3BYTE_BGR);
-    		Graphics2D gc = background_buffered.createGraphics();
-    		gc.translate(utility.world_size2,utility.world_size2);
-			drawSea(gc,false);
-    		theWorld.DrawTiles(gc,false,true);
-			drawBufferedBackground(_g2); //recurse to actually draw
-    	} else {
-			drawSea(_g2,true);
-			_g2.setTransform(theTransforms.af_backing);
-			_g2.drawImage(background_buffered, null, 0, 0);
-			_g2.setTransform(theTransforms.af);
-    	}
-    }
-    
-    private void contentCreation(Graphics2D _g2) {
-    	theTransforms.SetAA(_g2, false);
-    	theTransforms.modifyRotate(0.001f);
-    	if (theWorld.GetWorldGenerated() == false) {
-	    	final int status = theWorld.GenerateWorld();
-	    	if (status == 1) { //Object made, circle island, plane grid
-	    		theWorld.DrawChunks(_g2,true,theTransforms.GetAA());
-	    		theWorld.DrawIslandEdge(_g2);
-	    	} else if (status == 2) { //Island perimeter
-	    		theWorld.DrawChunks(_g2,true,theTransforms.GetAA());
-	    		theWorld.DrawIslandEdge(_g2);
-	    		drawTopText(_g2,"CRINKLING THE FJORDS");
-	    	} else if (status == 3) { //Chunks touching and inside perimeter, random energy
-	    		theWorld.DrawChunks(_g2,true,theTransforms.GetAA());
-	    		theWorld.DrawIslandEdge(_g2);
-	    		drawTopText(_g2,"SEEDING WORLD GRID");
-	    	} else if (status == 4) { //Doing kt
-	    		theWorld.DrawChunks(_g2,true,theTransforms.GetAA());
-	    		theWorld.DrawIslandEdge(_g2);
-	    		drawTopText(_g2,"RUNNING KT ALGORITHM");
-	    	} else if (status == 5) { //Doing kt
-	    		theWorld.DrawChunks(_g2,false,theTransforms.GetAA());
-	    		theWorld.DrawIslandEdge(_g2);
-	    		drawTopText(_g2,"RUNNING KT ALGORITHM");
-	    	} else if (status == 6) { //Doing biomes
-	    		drawSea(_g2,true);
-	    		theWorld.DrawTiles(_g2,false,theTransforms.GetAA());
-	    		theWorld.DrawIslandEdge(_g2);
-	    		drawTopText(_g2,"ASSIGNING LANDMASSES");
-	    	} else { //Eroding
-	    		drawSea(_g2,true);
-	    		theWorld.DrawTiles(_g2,false,theTransforms.GetAA());
-	    		theWorld.DrawIslandEdge(_g2);
-	    		drawTopText(_g2,"WEATHERING TERRAIN");
-	    	}
-    	} else {
-    		final int seeding = theSpriteManger.SeedWorld();
-    		if (seeding == -1) { //Tits up - start again
-    			theSpriteManger.Reset();
-    			theWorld.Reset();
-    		}
-    		drawSea(_g2,true);
-    		drawBufferedBackground(_g2);
-    		theWorld.DrawIslandEdge(_g2);
-    		theSpriteManger.Render(_g2);
-    		_g2.setTransform(theTransforms.af_none);
-    		if (theSpriteManger.GetWorldSeeded() == false) {
-    			drawTopText(_g2,"POPULATING THE ISLAND");
-    		} else if (utility.dbg == true) {
-    			utility.gameMode = GameMode.gameOn;
-    		}
-    	}
 	}
 	
 	private void drawTopBar(Graphics2D _g2) {
@@ -526,90 +526,15 @@ public class SceneRenderer_Applet {
 		}	
 	}
 	
-	private void drawStatBox(Graphics2D _g2, String _s1, String _s2, String _s3, String _s4) {
-		int _x = (int)CurMouse.getX() - con_start_x/2 - x_add*3;
-		int _y = (int)CurMouse.getY() + x_add/2;
-		final int _os = 15;
-		final int box_w = 500;
-		int box_h = 70;
-		if (_s3 == "") {
-			box_h /= 2;
-		}
-		_g2.setColor(backing_brown);
-		_g2.fillRect(_x, _y, box_w, box_h);
+    private void drawTopText(Graphics2D _g2, String _str) {
+		_g2.setTransform(theTransforms.af_none);
 		_g2.setColor(Color.white);
-		_g2.drawRect(_x, _y, box_w, box_h);
-		_g2.setColor(front_blue);
-		_g2.drawString(_s1,  _x + _os, _y + (_os * 1));
-		_g2.drawString(_s2,  _x + _os, _y + (_os * 2));
-		_g2.drawString(_s3,  _x + _os, _y + (_os * 3));
-		_g2.drawString(_s4,  _x + _os, _y + (_os * 4));
+		_g2.setFont(myMediumFont);
+		_g2.drawString(_str, 20, 580);
+		_g2.setFont(myFont);
 	}
-	
-	private void drawSea(Graphics2D _g2, boolean doStars) {
-	    final float D = utility.waterfall_disk_size * utility.world_size;
-	    if (doStars == true) {
-		    _g2.setTransform(theTransforms.af_translate_zoom);
-		    _g2.setPaint(dark_gradient);
-		    _g2.fillRect((int)-D, (int)0f, (int)(2*D), utility.waterfall_size); //Draw Column
-		    ///Do waterfall
-		    _g2.setClip((int)-D, (int)0f, (int)(2*D), utility.waterfall_size);
-		    _g2.setPaint(light_gradient);
-		    synchronized (theSpriteManger.GetWaterfallSplashObjects()) {
-			    for (WaterfallSplash _w :  theSpriteManger.GetWaterfallSplashObjects()) {
-			    	((WaterfallSplash_Applet)_w).Render(_g2);
-			    }
-		    }
-		    _g2.setTransform(theTransforms.af);
-		    _g2.setClip(null);
-	    }
-	    _g2.setColor(dsea_blue);
-	    _g2.fillOval ((int)(-D),(int)(-D),(int)(D*2),(int)(D*2));
-	    if (background_stars.size() == 0) { //get some stars!
-	    	for (int s=0; s<100; ++s) {
-	    		int radius = Math.round((utility.world_size*utility.waterfall_disk_size*1.1f) + utility.rndI(utility.world_size*4));
-	    		float angle = (float) (utility.rnd() * Math.PI * 2);
-	    		background_stars.add(new Point( (int)Math.round(radius*Math.cos(angle)) , (int)Math.round(radius*Math.sin(angle)) ));
-	    	}
-	    }
-	    if (doStars == true) {
-		    _g2.setTransform(theTransforms.af_translate_zoom);
-		    _g2.setColor(Color.white); //possibility to add stars
-		    for (Point _p : background_stars) {
-				Point2D transform = theTransforms.getTransformedPoint(_p.x, _p.y);
-		    	_g2.fillOval((int)transform.getX(),(int)transform.getY(),3,3);
-		    }
-		    _g2.setTransform(theTransforms.af);
-		}
-	}
-	
-	public void mouseMove() {
-		if (CurMouse.getX() > (con_start_x + (0 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (0 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
-			buildingStatBox = 1;
-		} else if (CurMouse.getX() > (con_start_x + (1 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (1 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
-			buildingStatBox = 2;
-		} else if (CurMouse.getX() > (con_start_x + (2 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (2 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
-			buildingStatBox = 3;
-		} else if (CurMouse.getX() > (con_start_x + (3 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (3 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
-			buildingStatBox = 4;
-		} else if (CurMouse.getX() > (con_start_x + (4 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (4 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
-			buildingStatBox = 5;
-		} else if (CurMouse.getX() > (con_start_x + (5 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (5 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
-			buildingStatBox = 6;
-		} else if (CurMouse.getX() > (con_start_x + (6 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (6 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
-			buildingStatBox = 7;
-		} else if (CurMouse.getX() > (con_start_x + (7 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (7 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
-			buildingStatBox = 8;
-		} else if (CurMouse.getX() > (con_start_x + (8 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (8 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
-			buildingStatBox = 9;
-		} else if (CurMouse.getX() > (con_start_x + (9 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (9 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
-			buildingStatBox = 10;
-		} else {
-			buildingStatBox = 0;
-		}
-	}
-	
-	public void mouseClick() {
+    
+    public void mouseClick() {
 	    if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (0 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (0 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 			if (buildingToPlace == BuildingType.Woodshop) buildingToPlace = null;
 			else buildingToPlace = BuildingType.Woodshop;
@@ -640,5 +565,80 @@ public class SceneRenderer_Applet {
 		} else {
 			utility.mouseClick = true;
 		}
+	}
+	
+	public void mouseMove() {
+		if (CurMouse.getX() > (con_start_x + (0 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (0 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+			buildingStatBox = 1;
+		} else if (CurMouse.getX() > (con_start_x + (1 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (1 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+			buildingStatBox = 2;
+		} else if (CurMouse.getX() > (con_start_x + (2 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (2 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+			buildingStatBox = 3;
+		} else if (CurMouse.getX() > (con_start_x + (3 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (3 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+			buildingStatBox = 4;
+		} else if (CurMouse.getX() > (con_start_x + (4 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (4 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+			buildingStatBox = 5;
+		} else if (CurMouse.getX() > (con_start_x + (5 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (5 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+			buildingStatBox = 6;
+		} else if (CurMouse.getX() > (con_start_x + (6 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (6 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+			buildingStatBox = 7;
+		} else if (CurMouse.getX() > (con_start_x + (7 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (7 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+			buildingStatBox = 8;
+		} else if (CurMouse.getX() > (con_start_x + (8 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (8 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+			buildingStatBox = 9;
+		} else if (CurMouse.getX() > (con_start_x + (9 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (9 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
+			buildingStatBox = 10;
+		} else {
+			buildingStatBox = 0;
+		}
+	}
+	
+	public void sceneBlackout(Graphics2D g2) {
+		g2.setTransform(theTransforms.af_none);
+		g2.setColor (Color.black);
+		g2.fillRect (0, 0, utility.window_X, utility.window_Y);
+	}
+	
+	public void sceneGame(Graphics2D g2) {
+		g2.setTransform(theTransforms.af);
+    	drawBufferedBackground(g2);
+		if (utility.dbg == true) theSpriteManger.PlaceSpooge(100, 200, ObjectOwner.Player, 5, 1f); //test
+	    theSpriteManger.Render(g2);
+	    if (buildingToPlace != null) {
+	    	final boolean placed = theSpriteManger.TryPlaceItem(buildingToPlace, g2, (int)MouseTF.getX(), (int)MouseTF.getY(), utility.mouseClick);
+	    	if (placed == true) {
+	    		buildingToPlace = null;
+	    	}
+	    } else if (buildingToMove != null) {
+	    		buildingToMove.MoveBuilding((int)MouseTF.getX(), (int)MouseTF.getY());
+        } else if (utility.sendMouseDragPing == true) {
+	    	//am i over a building?
+	    	buildingToMove = theSpriteManger.GetBuildingAtMouse((int)MouseTF.getX(), (int)MouseTF.getY());
+	    	if (buildingToMove != null) {
+	    		if (buildingToMove.GetCollects().size() > 0) buildingToMove = null;
+	    		else if (buildingToMove.GetOwner() == ObjectOwner.Enemy) buildingToMove = null;
+	    		else if (buildingToMove.GetType() == BuildingType.Base) buildingToMove = null;
+	    	}
+        }
+	    drawTopBar(g2);
+	}
+	
+	public void sceneGameOver(Graphics2D g2) {
+    	drawBufferedBackground(g2);
+	    theSpriteManger.Render(g2);
+	    drawTopBar(g2);
+	    if ( (System.currentTimeMillis() / 1000l) - utility.loose_time > 3) {
+	    	drawEndScreen(g2);
+	    }
+	}
+	
+	public void sceneTitle(Graphics2D g2) {
+		g2.setTransform(theTransforms.af);
+    	contentCreation(g2);
+    	if (utility.doWorldGen == false) {
+    		drawTitleScreen(g2);
+    	} else if (theSpriteManger.GetWorldSeeded() == true) {
+    		drawStartPlayingOption(g2);
+    	}
 	}
 }

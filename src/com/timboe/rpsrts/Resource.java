@@ -30,9 +30,33 @@ public class Resource extends Sprite {
 		}
 	}
 	
+	public void Add(int _n) {
+		stuff += _n;
+		if (type == ResourceType.Mine) {
+			resource_manager.GLOBAL_IRON += GetRemaining();
+		} else if (type == ResourceType.Rockpile) {
+			resource_manager.GLOBAL_STONE += GetRemaining();
+		} else { //cactus or tree
+			resource_manager.GLOBAL_WOOD += GetRemaining();
+		}
+	}
+	
 	@Override
 	public boolean GetIsResource() {
 		return true;
+	}
+	
+	public boolean GetReachable() {
+		if (not_reachable_penalty > 0) return false;
+		return true;
+	}
+
+	public int GetRemaining() {
+		return stuff;
+	}
+
+	public ResourceType GetType() {
+		return type;
 	}
 	
 	@Override
@@ -46,30 +70,6 @@ public class Resource extends Sprite {
 				_s.RemoveSprite(this);
 			}
 		}
-	}
-	
-	public void Add(int _n) {
-		stuff += _n;
-		if (type == ResourceType.Mine) {
-			resource_manager.GLOBAL_IRON += GetRemaining();
-		} else if (type == ResourceType.Rockpile) {
-			resource_manager.GLOBAL_STONE += GetRemaining();
-		} else { //cactus or tree
-			resource_manager.GLOBAL_WOOD += GetRemaining();
-		}
-	}
-
-	public boolean GetReachable() {
-		if (not_reachable_penalty > 0) return false;
-		return true;
-	}
-
-	public ResourceType GetType() {
-		return type;
-	}
-	
-	public int GetRemaining() {
-		return stuff;
 	}
 
 	public int Plunder(int _requested) {

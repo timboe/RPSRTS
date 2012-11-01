@@ -22,6 +22,39 @@ public class GameWorld_Applet extends GameWorld {
 		System.out.println("--- World Manager spawned (depends on Util,Scene[Linked on Init()]) : "+this);
 	}
 	
+	public void DrawChunks(Graphics2D _g2, boolean _useEnergy, boolean _aa) {
+		_g2.setFont(theSceneRenderer.myGridFont);
+		for (final WorldChunk_Applet c : (WorldChunk_Applet[]) chunks) {
+			c.DrawTileState(_g2, _useEnergy, _aa);
+		}
+		_g2.setFont(theSceneRenderer.myFont);	
+	}
+	
+	public void DrawIslandEdge(Graphics2D g2) {
+		g2.setColor (Color.white);
+		int angle = 0;
+		for (final long edge : island_offset) {
+			final int e = (int)edge;
+			final int new_radius = (island_size/2)+e;
+			g2.drawArc(-new_radius,-new_radius,2*new_radius,2*new_radius,angle,1);
+			++angle;
+		}
+	}
+	
+	public void DrawTiles(Graphics2D _g2, boolean _renderAll, boolean _aa) {
+		if (_renderAll == true) {
+			for (final WorldTile_Applet t : (WorldTile_Applet[]) tiles) {
+				t.DrawTile(_g2,_aa,false);
+			}
+		} else {
+			@SuppressWarnings({ "unchecked", "rawtypes" })
+			HashSet<WorldTile_Applet> render_tiles_app = (HashSet) render_tiles;
+			for (final WorldTile_Applet t : render_tiles_app) {
+				t.DrawTile(_g2,_aa,false);
+			}
+		}
+	}
+
 	@Override
 	public void Init() {
 		world_tiles = utility.world_tiles;
@@ -52,39 +85,6 @@ public class GameWorld_Applet extends GameWorld {
 	    }
 	    
 	    theSceneRenderer = SceneRenderer_Applet.GetSceneRenderer_Applet();
-	}
-	
-	public void DrawTiles(Graphics2D _g2, boolean _renderAll, boolean _aa) {
-		if (_renderAll == true) {
-			for (final WorldTile_Applet t : (WorldTile_Applet[]) tiles) {
-				t.DrawTile(_g2,_aa,false);
-			}
-		} else {
-			@SuppressWarnings({ "unchecked", "rawtypes" })
-			HashSet<WorldTile_Applet> render_tiles_app = (HashSet) render_tiles;
-			for (final WorldTile_Applet t : render_tiles_app) {
-				t.DrawTile(_g2,_aa,false);
-			}
-		}
-	}
-	
-	public void DrawChunks(Graphics2D _g2, boolean _useEnergy, boolean _aa) {
-		_g2.setFont(theSceneRenderer.myGridFont);
-		for (final WorldChunk_Applet c : (WorldChunk_Applet[]) chunks) {
-			c.DrawTileState(_g2, _useEnergy, _aa);
-		}
-		_g2.setFont(theSceneRenderer.myFont);	
-	}
-
-	public void DrawIslandEdge(Graphics2D g2) {
-		g2.setColor (Color.white);
-		int angle = 0;
-		for (final long edge : island_offset) {
-			final int e = (int)edge;
-			final int new_radius = (island_size/2)+e;
-			g2.drawArc(-new_radius,-new_radius,2*new_radius,2*new_radius,angle,1);
-			++angle;
-		}
 	}
 	
 //	public void HighlightTile(int _x, int _y, Graphics2D _g2, boolean _aa) {

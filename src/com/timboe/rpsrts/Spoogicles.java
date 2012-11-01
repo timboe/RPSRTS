@@ -40,6 +40,11 @@ public class Spoogicles extends Sprite {
 		
 	}
 	
+	@Override
+	public boolean GetIsSpoogicle() {
+		return true;
+	}
+	
 	public void Tick(int tick) {
 		for (int s = 0; s < nSpooge; ++s) {
 			if (isDead.get(s).get()  == true) continue;
@@ -57,10 +62,5 @@ public class Spoogicles extends Sprite {
 				spooge_y_vel.get(s).set( -Math.abs(spooge_y_vel.get(s).floatValue()) );
 			}
 		}
-	}
-	
-	@Override
-	public boolean GetIsSpoogicle() {
-		return true;
 	}
 }

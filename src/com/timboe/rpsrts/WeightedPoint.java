@@ -14,50 +14,46 @@ public class WeightedPoint {
 	HashSet<Sprite> mySprites = new HashSet<Sprite>();
 	HashSet<Sprite> myCollisions = new HashSet<Sprite>();
 
-	public void GiveSprite(Sprite _s) {
-		if (utility.Seperation(myLocation, _s.GetLoc()) < ( _s.GetR() + (2*utility.actorRadius)) ) { //TODO 2x?
-			myCollisions.add(_s);
-		}
-		mySprites.add(_s);
-	}
-	
-	public void GiveCollision(Sprite _s) {
-		if (utility.Seperation(myLocation, _s.GetLoc()) < ( _s.GetR() + (2*utility.actorRadius)) ) {//TODO 2x?
-			myCollisions.add(_s);
-		}	
-	}
-	
-	public void RemoveSprite(Sprite _s) {
-		myCollisions.remove(_s);
-		mySprites.remove(_s);
-	}
-	
-	public HashSet<Sprite> GetOwnedSprites() {
-		return mySprites;
-	}
-
-	
-	public boolean GetBad() { //If bad tile then bad, else if bad object
-		if (myCollisions.size() > 0) return true;
-		return false;
-	}
-	
-	public void AddNieghbour(WeightedPoint _n) {
-		nieghbour_collection.add(_n);
-	}
-	
-	public HashSet<WeightedPoint> GetNieghbours() {
-		return nieghbour_collection;
-	}
-
 	WeightedPoint(int _x, int _y) {
 		x = _x;
 		y = _y;
 		myLocation = new WorldPoint(_x, _y);
 	}
 	
+	public void AddNieghbour(WeightedPoint _n) {
+		nieghbour_collection.add(_n);
+	}
+	
+	@Override
+	public boolean equals(Object _to_compare) {
+		if (_to_compare.getClass() != this.getClass()) return false;
+		return (this.x == ((WeightedPoint)_to_compare).x && this.y == ((WeightedPoint)_to_compare).y);
+	}
+	
+	public boolean GetBad() { //If bad tile then bad, else if bad object
+		if (myCollisions.size() > 0) return true;
+		return false;
+	}
+
+	
 	public WorldPoint GetLoc() {
 		return myLocation;
+	}
+	
+	public HashSet<WeightedPoint> GetNieghbours() {
+		return nieghbour_collection;
+	}
+	
+	public HashSet<Sprite> GetOwnedSprites() {
+		return mySprites;
+	}
+
+	public WorldPoint GetPoint() {
+		return new WorldPoint(x,y);
+	}
+	
+	public int GetX() {
+		return x;
 	}
 	
 //	public void Render(Graphics2D _g2, AffineTransform _af) {
@@ -67,17 +63,14 @@ public class WeightedPoint {
 //		_g2.drawOval(x-1, y-1, 2, 2);
 //	}
 
-	@Override
-	public boolean equals(Object _to_compare) {
-		if (_to_compare.getClass() != this.getClass()) return false;
-		return (this.x == ((WeightedPoint)_to_compare).x && this.y == ((WeightedPoint)_to_compare).y);
+	public int GetY() {
+		return y;
 	}
 	
-	@Override
-	public int hashCode() {
-		//System.out.println("<HASHCODE CALLED>");
-		return (104527*x)+(103573*y);
-		//return new HashCode(83) .append(x).append(y).toHashCode();
+	public void GiveCollision(Sprite _s) {
+		if (utility.Seperation(myLocation, _s.GetLoc()) < ( _s.GetR() + (2*utility.actorRadius)) ) {//TODO 2x?
+			myCollisions.add(_s);
+		}	
 	}
 
 
@@ -110,17 +103,24 @@ public class WeightedPoint {
 //		return -1;
 //	}
 
-	public WorldPoint GetPoint() {
-		return new WorldPoint(x,y);
+	public void GiveSprite(Sprite _s) {
+		if (utility.Seperation(myLocation, _s.GetLoc()) < ( _s.GetR() + (2*utility.actorRadius)) ) { //TODO 2x?
+			myCollisions.add(_s);
+		}
+		mySprites.add(_s);
 	}
 
-	public int GetX() {
-		return x;
+	@Override
+	public int hashCode() {
+		//System.out.println("<HASHCODE CALLED>");
+		return (104527*x)+(103573*y);
+		//return new HashCode(83) .append(x).append(y).toHashCode();
 	}
 
 
-	public int GetY() {
-		return y;
+	public void RemoveSprite(Sprite _s) {
+		myCollisions.remove(_s);
+		mySprites.remove(_s);
 	}
 
 //	public void SetCameFrom(int ID, WeightedPoint _cf) {

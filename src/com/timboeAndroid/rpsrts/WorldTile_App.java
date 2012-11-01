@@ -1,10 +1,10 @@
 package com.timboeAndroid.rpsrts;
 
-import com.timboe.rpsrts.WorldTile;
-
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+
+import com.timboe.rpsrts.WorldTile;
 
 public class WorldTile_App extends WorldTile {
 	
@@ -34,13 +34,6 @@ public class WorldTile_App extends WorldTile {
 	}
 	
 	@Override
-	public void SetColour(int R, int G, int B) {
-		r = R;
-		g = G;
-		b = B;
-	}
-	
-	@Override
 	public void Reset() {
 		r = 50;
 		g = 50;
@@ -48,6 +41,13 @@ public class WorldTile_App extends WorldTile {
 		part_of_biome = false;
 		canWalk = false;
 		ownedBy = null;
+	}
+	
+	@Override
+	public void SetColour(int R, int G, int B) {
+		r = R;
+		g = G;
+		b = B;
 	}
 
 }

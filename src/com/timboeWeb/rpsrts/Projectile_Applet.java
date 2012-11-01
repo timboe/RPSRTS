@@ -10,7 +10,6 @@ import com.timboe.rpsrts.ActorType;
 import com.timboe.rpsrts.ObjectOwner;
 import com.timboe.rpsrts.Projectile;
 import com.timboe.rpsrts.Sprite;
-import com.timboeWeb.rpsrts.Bitmaps_Applet;
 
 public class Projectile_Applet extends Projectile {
 	

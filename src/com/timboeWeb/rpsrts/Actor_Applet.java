@@ -2,9 +2,9 @@ package com.timboeWeb.rpsrts;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
-import java.awt.geom.Point2D;
 
 import com.timboe.rpsrts.Actor;
 import com.timboe.rpsrts.ActorType;
@@ -13,11 +13,25 @@ import com.timboe.rpsrts.WorldPoint;
 
 public class Actor_Applet extends Actor {
 	
-	BufferedImage[] spriteGraphic;	
+	public static void recolourImage(BufferedImage img, int r, int g, int b) {
+        for(int x=0;x<img.getWidth();x++){
+            for(int y=0;y<img.getHeight();y++){
+                int px = img.getRGB(x, y);
+                int alpha = (px >> 24) & 0xFF;
+                int red = (px >> 16) & 0xFF;
+                int green = (px >> 8) & 0xFF;
+                int blue = px & 0xFF;
+                int pixel = (alpha<<24) + (Math.max(Math.min((red+r),255),0)<<16) + (Math.max(Math.min((green+g),255),0)<<8) + Math.max(Math.min((blue+b),255),0);
+                img.setRGB(x, y, pixel);
+            }
+        }
+    }	
+	BufferedImage[] spriteGraphic;
 	protected Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();
 	protected TransformStore theTransforms = TransformStore.GetTransformStore();
-	RescaleOp colourChange;
 
+	RescaleOp colourChange;
+		
 	public Actor_Applet(int _ID, int _x, int _y, int _r, ActorType _at, ObjectOwner _oo) {
 		super(_ID, _x, _y, _r, _at, _oo);
 		
@@ -44,8 +58,8 @@ public class Actor_Applet extends Actor {
 
 		}
 	}
-		
-	public void Render(Graphics2D _g2, int _frame_count) {
+	
+    public void Render(Graphics2D _g2, int _frame_count) {
 		if (dead == true) return;
 		Point2D transform = theTransforms.getTransformedPoint(x, y);
 		final int _x = (int)Math.round(transform.getX());
@@ -131,18 +145,4 @@ public class Actor_Applet extends Actor {
 			_g2.fillOval(x - 1, y - 1, 2, 2);
 		}
 	}
-	
-    public static void recolourImage(BufferedImage img, int r, int g, int b) {
-        for(int x=0;x<img.getWidth();x++){
-            for(int y=0;y<img.getHeight();y++){
-                int px = img.getRGB(x, y);
-                int alpha = (px >> 24) & 0xFF;
-                int red = (px >> 16) & 0xFF;
-                int green = (px >> 8) & 0xFF;
-                int blue = px & 0xFF;
-                int pixel = (alpha<<24) + (Math.max(Math.min((red+r),255),0)<<16) + (Math.max(Math.min((green+g),255),0)<<8) + Math.max(Math.min((blue+b),255),0);
-                img.setRGB(x, y, pixel);
-            }
-        }
-    }
 }

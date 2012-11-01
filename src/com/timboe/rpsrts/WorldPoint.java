@@ -4,11 +4,29 @@ public class WorldPoint {
 	int x;
 	int y;
 	
+	public WorldPoint() {
+		x = 0;
+		y = 0;
+	}
+	
+	public WorldPoint(int _x, int _y) {
+		x = _x;
+		y = _y;
+	}
+	
 	@Override
 	public boolean equals(Object _to_compare) {
 		//System.out.println(": IN COMPARE :");
 		if (_to_compare.getClass() != this.getClass()) return false;
 		return (this.x == ((WorldPoint) _to_compare).x && this.y == ((WorldPoint) _to_compare).y);
+	}
+	
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
 	}
 	
 	@Override
@@ -17,16 +35,14 @@ public class WorldPoint {
 		return (1000000*x)+y;
 	}
 	
-	public WorldPoint(int _x, int _y) {
-		x = _x;
-		y = _y;
+	public void incrimentX(int _x) {
+		x += _x;
 	}
 	
-	public WorldPoint() {
-		x = 0;
-		y = 0;
+	public void incrimentY(int _y) {
+		y += _y;
 	}
-
+	
 	public void setLocation(int _x, int _y) {
 		x = _x;
 		y = _y;
@@ -38,22 +54,6 @@ public class WorldPoint {
 	
 	public void setY(int _y) {
 		y = _y;
-	}
-	
-	public void incrimentX(int _x) {
-		x += _x;
-	}
-	
-	public void incrimentY(int _y) {
-		y += _y;
-	}
-	
-	public int getX() {
-		return x;
-	}
-	
-	public int getY() {
-		return y;
 	}
 
 }

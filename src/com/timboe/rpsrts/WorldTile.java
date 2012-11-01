@@ -78,6 +78,16 @@ public class WorldTile {
 	}
 
 
+	public void Reset() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void SetColour(int R, int G, int B) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	public void SetPartOfBiome(Biome _biome) {
 		part_of_biome = true;
 		ownedBy = _biome;
@@ -89,16 +99,6 @@ public class WorldTile {
 
 	public void SetWalkable(boolean _canWalk) {
 		canWalk = _canWalk;
-	}
-
-	public void Reset() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void SetColour(int R, int G, int B) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	

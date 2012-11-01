@@ -57,77 +57,6 @@ public class SpriteManager {
 	protected SpriteManager() {
 	}
 
-	public WeightedPoint ClipToGrid(WorldPoint _P) {
-		int _snap_x = _P.getX();
-		int _snap_y = _P.getY();
-
-		_snap_x = _snap_x - (_snap_x % theWorld.tiles_size) + (theWorld.tiles_size/2);
-		_snap_y = _snap_y - (_snap_y % theWorld.tiles_size) + (theWorld.tiles_size/2);
-		
-		//System.out.println("SNAP ("+_snap_x+","+_snap_y+")");
-		WeightedPoint snap = thePathfinderGrid.point_collection_map.get(new WorldPoint(_snap_x,_snap_y));
-		
-		if (snap != null) { 
-			//System.out.println("SNAPPED AT i ("+i+")");
-			return snap;
-		}
-		return null;
-	}
-	
-	public Building GetBuildingAtMouse(int _x, int _y) {
-		WorldPoint _mouse = new WorldPoint(_x, _y);
-		synchronized (GetBuildingOjects()) {
-			for (Building _b : GetBuildingOjects()) {
-				if (utility.Seperation(_b.GetLoc(), _mouse) < utility.buildingRadius) return _b;
-			}
-		}
-
-		return null;
-	}
-
-	public boolean CheckSafe(boolean RESOURCEBUILD, boolean ACTOR,
-			int _x, int _y, float _r, int _ID1_to_ignore_collision_of, int _ID2_to_ignore_collision_of) { //TODO this is now double _r
-		//NO LONGER NEEDED - CANNOT JUMP TO INVALID NODE
-//		if (TILE == true && theWorld.CheckSafeToPlaceTile(_x, _y, (int)Math.round(_r)) == false) {
-//			//System.out.println("Tile is bad, place/move DENIED");
-//			return false;
-//		}
-		WorldPoint _me = new WorldPoint(_x,_y);
-		WeightedPoint _loc = ClipToGrid( _me );
-		if (_loc == null) return false;
-
-		if (RESOURCEBUILD == true) {
-			for (Sprite _s : _loc.GetOwnedSprites()) {
-				if (utility.Seperation(_me, _s.GetLoc()) < _r + _s.GetR() ) return false;
-			}
-			for (WeightedPoint _p : _loc.GetNieghbours()) {
-				for (Sprite _s : _p.GetOwnedSprites()) {
-					if (utility.Seperation(_me, _s.GetLoc()) < _r + _s.GetR() ) return false;
-				}
-			}			
-
-		}
-		if (ACTOR == true) {
-			synchronized (GetActorObjects()) {
-				for (final Actor _a : GetActorObjects()) {
-					if (_ID1_to_ignore_collision_of == _a.GetID()) {
-						continue;
-					}
-					if (_ID2_to_ignore_collision_of == _a.GetID()) {
-						continue;
-					}
-					final int _x_d = _a.GetX() - _x;
-					final int _y_d = _a.GetY() - _y;
-					final float sep = (float) Math.sqrt( (_x_d * _x_d) + (_y_d * _y_d) );
-					final float combRad = _r + _a.GetR();
-					if (sep < combRad) return false;
-				}
-			}
-		}
-		//System.out.println("Place/Move ALLOWED");
-		return true;
-	}
-
 	private void CheckActorCombat(){
 		synchronized (GetActorObjects()) {
 			for (final Actor _a : GetActorObjects()) {
@@ -194,26 +123,66 @@ public class SpriteManager {
 		}
 	}
 	
-//	public boolean CheckSafeIncludingActors(boolean DELETEME, int _x, int _y, float _r, int _ID_to_ignore_collision_of) {
-//		//final boolean normalSafe = CheckSafe(_x, _y, _r, _ID_to_ignore_collision_of, 0);
-//		if (normalSafe == false) return false;
-//		for (final Actor _a : ActorObjects) {
-//			if (_ID_to_ignore_collision_of == _a.GetID()) {
-//				continue;
-//			}
-//			final int _x_d = _a.GetX() - _x;
-//			final int _y_d = _a.GetY() - _y;
-//			final float sep = Math.sqrt( (_x_d * _x_d) + (_y_d * _y_d) );
-//			final float combRad = _r + _a.GetR();
-//			if (sep < combRad) return false;
+	public boolean CheckSafe(boolean RESOURCEBUILD, boolean ACTOR,
+			int _x, int _y, float _r, int _ID1_to_ignore_collision_of, int _ID2_to_ignore_collision_of) { //TODO this is now double _r
+		//NO LONGER NEEDED - CANNOT JUMP TO INVALID NODE
+//		if (TILE == true && theWorld.CheckSafeToPlaceTile(_x, _y, (int)Math.round(_r)) == false) {
+//			//System.out.println("Tile is bad, place/move DENIED");
+//			return false;
 //		}
-//		return true;
-//	}
+		WorldPoint _me = new WorldPoint(_x,_y);
+		WeightedPoint _loc = ClipToGrid( _me );
+		if (_loc == null) return false;
 
-	WorldPoint FindSpotForResource(WorldPoint _loc) {
-		return FindGoodSpot(_loc, utility.resourceRadius, utility.tiles_size, true);
+		if (RESOURCEBUILD == true) {
+			for (Sprite _s : _loc.GetOwnedSprites()) {
+				if (utility.Seperation(_me, _s.GetLoc()) < _r + _s.GetR() ) return false;
+			}
+			for (WeightedPoint _p : _loc.GetNieghbours()) {
+				for (Sprite _s : _p.GetOwnedSprites()) {
+					if (utility.Seperation(_me, _s.GetLoc()) < _r + _s.GetR() ) return false;
+				}
+			}			
+
+		}
+		if (ACTOR == true) {
+			synchronized (GetActorObjects()) {
+				for (final Actor _a : GetActorObjects()) {
+					if (_ID1_to_ignore_collision_of == _a.GetID()) {
+						continue;
+					}
+					if (_ID2_to_ignore_collision_of == _a.GetID()) {
+						continue;
+					}
+					final int _x_d = _a.GetX() - _x;
+					final int _y_d = _a.GetY() - _y;
+					final float sep = (float) Math.sqrt( (_x_d * _x_d) + (_y_d * _y_d) );
+					final float combRad = _r + _a.GetR();
+					if (sep < combRad) return false;
+				}
+			}
+		}
+		//System.out.println("Place/Move ALLOWED");
+		return true;
 	}
-	
+
+	public WeightedPoint ClipToGrid(WorldPoint _P) {
+		int _snap_x = _P.getX();
+		int _snap_y = _P.getY();
+
+		_snap_x = _snap_x - (_snap_x % theWorld.tiles_size) + (theWorld.tiles_size/2);
+		_snap_y = _snap_y - (_snap_y % theWorld.tiles_size) + (theWorld.tiles_size/2);
+		
+		//System.out.println("SNAP ("+_snap_x+","+_snap_y+")");
+		WeightedPoint snap = thePathfinderGrid.point_collection_map.get(new WorldPoint(_snap_x,_snap_y));
+		
+		if (snap != null) { 
+			//System.out.println("SNAPPED AT i ("+i+")");
+			return snap;
+		}
+		return null;
+	}
+
 	//TODO CHECK THAT CHANGING THIS TO INCLUDE ACTORS IN THE CHECK WAS A GOOD IDEA (has overhead)
 	WorldPoint FindGoodSpot(WorldPoint location, int _r, int _search_size, boolean is_resource) {
 		//is_resource == true prevents function returning true in vicinity of home base
@@ -236,7 +205,27 @@ public class SpriteManager {
 		}
 		return null;
 	}
+	
+//	public boolean CheckSafeIncludingActors(boolean DELETEME, int _x, int _y, float _r, int _ID_to_ignore_collision_of) {
+//		//final boolean normalSafe = CheckSafe(_x, _y, _r, _ID_to_ignore_collision_of, 0);
+//		if (normalSafe == false) return false;
+//		for (final Actor _a : ActorObjects) {
+//			if (_ID_to_ignore_collision_of == _a.GetID()) {
+//				continue;
+//			}
+//			final int _x_d = _a.GetX() - _x;
+//			final int _y_d = _a.GetY() - _y;
+//			final float sep = Math.sqrt( (_x_d * _x_d) + (_y_d * _y_d) );
+//			final float combRad = _r + _a.GetR();
+//			if (sep < combRad) return false;
+//		}
+//		return true;
+//	}
 
+	WorldPoint FindSpotForResource(WorldPoint _loc) {
+		return FindGoodSpot(_loc, utility.resourceRadius, utility.tiles_size, true);
+	}
+	
 	public void Garbage() {
 		final Vector<Sprite> toKill = new Vector<Sprite>();
 		synchronized (GetResourceObjects()) {
@@ -301,36 +290,35 @@ public class SpriteManager {
 		toKill.clear();
 	}
 
+	public Collection<Actor> GetActorObjects() {
+		return ActorObjectsSync;
+	}
+
 	public Building GetBase(ObjectOwner _oo) {
 		if (_oo == ObjectOwner.Player) return player_base;
 		return enemy_base;
 	}
 
 	
-	public Collection<Actor> GetActorObjects() {
-		return ActorObjectsSync;
-	}
-	
-	public Collection<Spoogicles> GetSpoogiclesObjects() {
-		return SpoogicleObjectsSync;
-	}
-	
-	public Collection<WaterfallSplash> GetWaterfallSplashObjects() {
-		return WaterfallSplahsObjectsSync;
+	public Building GetBuildingAtMouse(int _x, int _y) {
+		WorldPoint _mouse = new WorldPoint(_x, _y);
+		synchronized (GetBuildingOjects()) {
+			for (Building _b : GetBuildingOjects()) {
+				if (utility.Seperation(_b.GetLoc(), _mouse) < utility.buildingRadius) return _b;
+			}
+		}
+
+		return null;
 	}
 	
 	public Collection<Building> GetBuildingOjects() {
 		return BuildingOjectsSync;
 	}
-
+	
 	public Collection<Sprite> GetCollisionObjects() {
 		return CollisionObjectsSync;
 	}
 	
-	public Collection<Projectile> GetProjectileObjects() {
-		return ProjectileObjectsSync;
-	}
-
 	public Resource GetNearestResource(Building _b, Actor _a, int maxDistance) {
 		float _dist = utility.minimiser_start;
 		Resource r = null;
@@ -351,16 +339,16 @@ public class SpriteManager {
 		else return null;
 	}
 
+	public Collection<Projectile> GetProjectileObjects() {
+		return ProjectileObjectsSync;
+	}
+	
 	public Collection<Resource> GetResourceObjects() {
 		return ResourceObjectsSync;
 	}
-	
-	public HashSet<Resource> GetTempResourceObjects() {
-		return TempResourceHolder;
-	}
 
-	public boolean GetWorldSeeded() {
-		return worldSeeded;
+	public Collection<Spoogicles> GetSpoogiclesObjects() {
+		return SpoogicleObjectsSync;
 	}
 
 	public TreeSet<Sprite> GetSpritesZOrdered() {
@@ -393,6 +381,44 @@ public class SpriteManager {
 		return ZOrder;
 	}
 	
+	public HashSet<Resource> GetTempResourceObjects() {
+		return TempResourceHolder;
+	}
+
+	public Collection<WaterfallSplash> GetWaterfallSplashObjects() {
+		return WaterfallSplahsObjectsSync;
+	}
+
+	public boolean GetWorldSeeded() {
+		return worldSeeded;
+	}
+	
+	protected Actor PlaceActor(WorldPoint starting_troops, ActorType scissors, ObjectOwner oo) {
+		//OVERRIDE
+		return null;
+	}
+
+	protected Building PlaceBuilding(WorldPoint enemy_location, BuildingType base, ObjectOwner enemy) {
+		//OVERRIDE
+		return null;
+	}
+
+	protected void PlaceProjectile(Actor _source, Sprite _target) {
+		//OVER RIDE
+	}
+
+	protected Resource PlaceResource(WorldPoint ideal_resource_loation,	ResourceType toPlant, boolean AddToTempList) {
+		return null;		
+	}
+	
+	protected void PlaceSpooge(int _x, int _y, ObjectOwner _oo, int _n, float _scale) {
+		//OVER RIDE
+	}
+
+	protected void PlaceWaterfallSplash(int _x, int _y, int _r) {
+		//OVER RIDE
+	}
+
 	public void Reset() {
 		ws_step = 0;
 		player_base = null;
@@ -413,7 +439,7 @@ public class SpriteManager {
 		AI_thread = new Thread(theAI);
 
 	}
-
+	
 	public int SeedWorld() {
 		//System.out.println("ENTER SEED");
 		final WorldPoint player_starting = theWorld.GetIdeadStartingLocation(ObjectOwner.Player);
@@ -579,32 +605,6 @@ public class SpriteManager {
 		}
 
 		return ws_step;
-	}
-
-	protected Resource PlaceResource(WorldPoint ideal_resource_loation,	ResourceType toPlant, boolean AddToTempList) {
-		return null;		
-	}
-
-	protected void PlaceProjectile(Actor _source, Sprite _target) {
-		//OVER RIDE
-	}
-	
-	protected void PlaceSpooge(int _x, int _y, ObjectOwner _oo, int _n, float _scale) {
-		//OVER RIDE
-	}
-
-	protected void PlaceWaterfallSplash(int _x, int _y, int _r) {
-		//OVER RIDE
-	}
-
-	protected Actor PlaceActor(WorldPoint starting_troops, ActorType scissors, ObjectOwner oo) {
-		//OVERRIDE
-		return null;
-	}
-	
-	protected Building PlaceBuilding(WorldPoint enemy_location, BuildingType base, ObjectOwner enemy) {
-		//OVERRIDE
-		return null;
 	}
 
 

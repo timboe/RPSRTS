@@ -66,91 +66,13 @@ public class ResourceManager {
 	public int ENEMY_ROCK;
 	public int ENEMY_PAPER;
 	
-	public void AddBuildingToTally(ObjectOwner _oo, BuildingType _bt) {
-		AddRmBuildingToTally(_oo, _bt, +1);
-	}
-	
-	public void RemoveBuildingFromTally(ObjectOwner _oo, BuildingType _bt) {
-		AddRmBuildingToTally(_oo, _bt, -1);
-	}
-	
-	private void AddRmBuildingToTally(ObjectOwner _oo, BuildingType _bt, int _amount) {
-		if (_oo == ObjectOwner.Player) {
-			if (_bt == BuildingType.AttractorPaper) N_PLAYER_PAPER_ATTRACTORS += _amount;
-			else if (_bt  == BuildingType.AttractorRock) N_PLAYER_ROCK_ATTRACTORS += _amount;
-			else if (_bt ==  BuildingType.AttractorScissors) N_PLAYER_SCISSOR_ATTRACTORS += _amount;
-			else if (_bt == BuildingType.Woodshop)	N_PLAYER_WOODSHOPS += _amount;
-			else if (_bt == BuildingType.Rockery) N_PLAYER_ROCKERY += _amount;
-			else if (_bt == BuildingType.Smelter) N_PLAYER_SMELTERS += _amount;
-		} else {
-			if (_bt == BuildingType.AttractorPaper) N_ENEMY_PAPER_ATTRACTORS += _amount;
-			else if (_bt  == BuildingType.AttractorRock) N_ENEMY_ROCK_ATTRACTORS += _amount;
-			else if (_bt ==  BuildingType.AttractorScissors) N_ENEMY_SCISSOR_ATTRACTORS += _amount;
-			else if (_bt == BuildingType.Woodshop)	N_ENEMY_WOODSHOPS += _amount;
-			else if (_bt == BuildingType.Rockery) N_ENEMY_ROCKERY += _amount;
-			else if (_bt == BuildingType.Smelter) N_ENEMY_SMELTERS += _amount;
-		}
-	}
-	
-	public int GetActorsPerAttractor(ObjectOwner _oo, BuildingType _bt) {
-		int amount_per_attractor = 0;
-		if (_oo == ObjectOwner.Player) {
-			if (_bt == BuildingType.AttractorPaper) {
-				amount_per_attractor = PLAYER_PAPER;
-				amount_per_attractor -= (N_PLAYER_ROCKERY * utility.building_gatherers_per_site);
-				if (N_PLAYER_PAPER_ATTRACTORS > 0) amount_per_attractor /= N_PLAYER_PAPER_ATTRACTORS;
-			} else if (_bt == BuildingType.AttractorRock) {
-				amount_per_attractor = PLAYER_ROCK;
-				amount_per_attractor -= (N_PLAYER_SMELTERS * utility.building_gatherers_per_site);
-				if (N_PLAYER_ROCK_ATTRACTORS > 0) amount_per_attractor /= N_PLAYER_ROCK_ATTRACTORS;			
-			} else if (_bt == BuildingType.AttractorScissors) {
-				amount_per_attractor = PLAYER_SCISSORS;
-				amount_per_attractor -= (N_PLAYER_WOODSHOPS * utility.building_gatherers_per_site);
-				if (N_PLAYER_SCISSOR_ATTRACTORS > 0) amount_per_attractor /= N_PLAYER_SCISSOR_ATTRACTORS;
-			}
-		} else if (_oo == ObjectOwner.Enemy) {
-			if (_bt == BuildingType.AttractorPaper) {
-				amount_per_attractor = ENEMY_PAPER;
-				amount_per_attractor -= (N_ENEMY_WOODSHOPS * utility.building_gatherers_per_site);
-				if (N_ENEMY_PAPER_ATTRACTORS > 0) amount_per_attractor /= N_ENEMY_PAPER_ATTRACTORS;
-			} else if (_bt == BuildingType.AttractorRock) {
-				amount_per_attractor = ENEMY_ROCK;
-				amount_per_attractor -= (N_ENEMY_ROCKERY * utility.building_gatherers_per_site);
-				if (N_ENEMY_ROCK_ATTRACTORS > 0) amount_per_attractor /= N_ENEMY_ROCK_ATTRACTORS;			
-			} else if (_bt == BuildingType.AttractorScissors) {
-				amount_per_attractor = ENEMY_SCISSORS;
-				amount_per_attractor -= (N_ENEMY_SMELTERS * utility.building_gatherers_per_site);
-				if (N_ENEMY_SCISSOR_ATTRACTORS > 0) amount_per_attractor /= N_ENEMY_SCISSOR_ATTRACTORS;			
-			}			
-		}
-		return amount_per_attractor;
-	}
-
 	private ResourceManager() {
 		Reset();
 		System.out.println("--- Resource Manager spawned (depends on Util,Sprite) : "+this);
 	}
 	
-	public void Reset() {
-		PLAYER_IRON = utility.StartingResources;
-		PLAYER_STONE = utility.StartingResources;
-		PLAYER_WOOD = utility.StartingResources;
-		ENEMY_IRON = utility.StartingResources;
-		ENEMY_STONE = utility.StartingResources;
-		ENEMY_WOOD = utility.StartingResources;
-
-		PLAYER_MAX_SCISSORS = utility.starting_actors;
-		PLAYER_MAX_ROCK = utility.starting_actors;
-		PLAYER_MAX_PAPER = utility.starting_actors;
-		ENEMY_MAX_SCISSORS = utility.starting_actors;
-		ENEMY_MAX_ROCK = utility.starting_actors;
-		ENEMY_MAX_PAPER = utility.starting_actors;
-		PLAYER_SCISSORS = utility.starting_actors;
-		PLAYER_ROCK = utility.starting_actors;
-		PLAYER_PAPER = utility.starting_actors;
-		ENEMY_SCISSORS = utility.starting_actors;
-		ENEMY_ROCK = utility.starting_actors;
-		ENEMY_PAPER = utility.starting_actors;
+	public void AddBuildingToTally(ObjectOwner _oo, BuildingType _bt) {
+		AddRmBuildingToTally(_oo, _bt, +1);
 	}
 	
 	public void AddResources(ResourceType _rt, int _amount, ObjectOwner _oo) {
@@ -176,6 +98,24 @@ public class ResourceManager {
 				ENEMY_WOOD += _amount;
 				GLOBAL_WOOD -= _amount;
 			}
+		}
+	}
+	
+	private void AddRmBuildingToTally(ObjectOwner _oo, BuildingType _bt, int _amount) {
+		if (_oo == ObjectOwner.Player) {
+			if (_bt == BuildingType.AttractorPaper) N_PLAYER_PAPER_ATTRACTORS += _amount;
+			else if (_bt  == BuildingType.AttractorRock) N_PLAYER_ROCK_ATTRACTORS += _amount;
+			else if (_bt ==  BuildingType.AttractorScissors) N_PLAYER_SCISSOR_ATTRACTORS += _amount;
+			else if (_bt == BuildingType.Woodshop)	N_PLAYER_WOODSHOPS += _amount;
+			else if (_bt == BuildingType.Rockery) N_PLAYER_ROCKERY += _amount;
+			else if (_bt == BuildingType.Smelter) N_PLAYER_SMELTERS += _amount;
+		} else {
+			if (_bt == BuildingType.AttractorPaper) N_ENEMY_PAPER_ATTRACTORS += _amount;
+			else if (_bt  == BuildingType.AttractorRock) N_ENEMY_ROCK_ATTRACTORS += _amount;
+			else if (_bt ==  BuildingType.AttractorScissors) N_ENEMY_SCISSOR_ATTRACTORS += _amount;
+			else if (_bt == BuildingType.Woodshop)	N_ENEMY_WOODSHOPS += _amount;
+			else if (_bt == BuildingType.Rockery) N_ENEMY_ROCKERY += _amount;
+			else if (_bt == BuildingType.Smelter) N_ENEMY_SMELTERS += _amount;
 		}
 	}
 
@@ -233,7 +173,7 @@ public class ResourceManager {
 		}
 		return true;
 	}
-
+	
 	public void DecreaseMaxUnits(BuildingType _bt, ObjectOwner _oo) {
 		if (_oo == ObjectOwner.Player) {
 			if (_bt == BuildingType.Woodshop) {
@@ -252,6 +192,40 @@ public class ResourceManager {
 				ENEMY_MAX_SCISSORS -= utility.EXTRA_Scissors_PerSmelter;
 			}
 		}
+	}
+	
+	public int GetActorsPerAttractor(ObjectOwner _oo, BuildingType _bt) {
+		int amount_per_attractor = 0;
+		if (_oo == ObjectOwner.Player) {
+			if (_bt == BuildingType.AttractorPaper) {
+				amount_per_attractor = PLAYER_PAPER;
+				amount_per_attractor -= (N_PLAYER_ROCKERY * utility.building_gatherers_per_site);
+				if (N_PLAYER_PAPER_ATTRACTORS > 0) amount_per_attractor /= N_PLAYER_PAPER_ATTRACTORS;
+			} else if (_bt == BuildingType.AttractorRock) {
+				amount_per_attractor = PLAYER_ROCK;
+				amount_per_attractor -= (N_PLAYER_SMELTERS * utility.building_gatherers_per_site);
+				if (N_PLAYER_ROCK_ATTRACTORS > 0) amount_per_attractor /= N_PLAYER_ROCK_ATTRACTORS;			
+			} else if (_bt == BuildingType.AttractorScissors) {
+				amount_per_attractor = PLAYER_SCISSORS;
+				amount_per_attractor -= (N_PLAYER_WOODSHOPS * utility.building_gatherers_per_site);
+				if (N_PLAYER_SCISSOR_ATTRACTORS > 0) amount_per_attractor /= N_PLAYER_SCISSOR_ATTRACTORS;
+			}
+		} else if (_oo == ObjectOwner.Enemy) {
+			if (_bt == BuildingType.AttractorPaper) {
+				amount_per_attractor = ENEMY_PAPER;
+				amount_per_attractor -= (N_ENEMY_WOODSHOPS * utility.building_gatherers_per_site);
+				if (N_ENEMY_PAPER_ATTRACTORS > 0) amount_per_attractor /= N_ENEMY_PAPER_ATTRACTORS;
+			} else if (_bt == BuildingType.AttractorRock) {
+				amount_per_attractor = ENEMY_ROCK;
+				amount_per_attractor -= (N_ENEMY_ROCKERY * utility.building_gatherers_per_site);
+				if (N_ENEMY_ROCK_ATTRACTORS > 0) amount_per_attractor /= N_ENEMY_ROCK_ATTRACTORS;			
+			} else if (_bt == BuildingType.AttractorScissors) {
+				amount_per_attractor = ENEMY_SCISSORS;
+				amount_per_attractor -= (N_ENEMY_SMELTERS * utility.building_gatherers_per_site);
+				if (N_ENEMY_SCISSOR_ATTRACTORS > 0) amount_per_attractor /= N_ENEMY_SCISSOR_ATTRACTORS;			
+			}			
+		}
+		return amount_per_attractor;
 	}
 
 	public String GetResourceText() {
@@ -294,6 +268,32 @@ public class ResourceManager {
 				ENEMY_MAX_SCISSORS += utility.EXTRA_Scissors_PerSmelter;
 			}
 		}
+	}
+
+	public void RemoveBuildingFromTally(ObjectOwner _oo, BuildingType _bt) {
+		AddRmBuildingToTally(_oo, _bt, -1);
+	}
+
+	public void Reset() {
+		PLAYER_IRON = utility.StartingResources;
+		PLAYER_STONE = utility.StartingResources;
+		PLAYER_WOOD = utility.StartingResources;
+		ENEMY_IRON = utility.StartingResources;
+		ENEMY_STONE = utility.StartingResources;
+		ENEMY_WOOD = utility.StartingResources;
+
+		PLAYER_MAX_SCISSORS = utility.starting_actors;
+		PLAYER_MAX_ROCK = utility.starting_actors;
+		PLAYER_MAX_PAPER = utility.starting_actors;
+		ENEMY_MAX_SCISSORS = utility.starting_actors;
+		ENEMY_MAX_ROCK = utility.starting_actors;
+		ENEMY_MAX_PAPER = utility.starting_actors;
+		PLAYER_SCISSORS = utility.starting_actors;
+		PLAYER_ROCK = utility.starting_actors;
+		PLAYER_PAPER = utility.starting_actors;
+		ENEMY_SCISSORS = utility.starting_actors;
+		ENEMY_ROCK = utility.starting_actors;
+		ENEMY_PAPER = utility.starting_actors;
 	}
 
 	public void TryToSpawnUnit(Building _b) {

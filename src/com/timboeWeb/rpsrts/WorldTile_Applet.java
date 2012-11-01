@@ -27,16 +27,16 @@ public class WorldTile_Applet extends WorldTile {
 	}
 	
 	@Override
-	public void SetColour(int R, int G, int B) {
-		c = new Color(R,G,B);
-	}
-	
-	@Override
 	public void Reset() {
 		c = Color.DARK_GRAY;
 		part_of_biome = false;
 		canWalk = false;
 		ownedBy = null;
+	}
+	
+	@Override
+	public void SetColour(int R, int G, int B) {
+		c = new Color(R,G,B);
 	}
 
 }

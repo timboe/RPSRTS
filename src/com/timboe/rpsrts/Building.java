@@ -72,28 +72,10 @@ public class Building extends Sprite {
 		animStep = utility.rndI(animSteps);
 	}
 
-	private void GridRegister() {
-		//snap me to the world grid
-		WeightedPoint _my_snap = theSpriteManager.ClipToGrid(this.GetLoc());
-		if (_my_snap != null) {
-			_my_snap.GiveSprite(this);
-			for (WeightedPoint _s : _my_snap.GetNieghbours()) {
-				_s.GiveCollision(this);
-			}
-		}
+	public void AddEmployee(Actor _a) {
+		employees.add(_a);
 	}
 	
-	private void GridDeRegister() {
-		//snap me to the world grid
-		WeightedPoint _my_snap = theSpriteManager.ClipToGrid(this.GetLoc());
-		_my_snap.RemoveSprite(this);
-		if (_my_snap != null) {
-			for (WeightedPoint _s : _my_snap.GetNieghbours()) {
-				_s.RemoveSprite(this);
-			}
-		}
-	}
-
 	public void BuildAction() {
 		if (underConstruction == false) return;
 		health += utility.building_health_per_build_action;
@@ -104,38 +86,18 @@ public class Building extends Sprite {
 		}
 	}
 
-	public void MoveBuilding(int new_x, int new_y) {
-		if (x == new_x && y == new_y) return;
-    	if (theSpriteManager.CheckSafe(true
-    			, true
-    			, new_x
-    			, new_y
-    			, r
-    			, ID
-    			, 0) == false) { 
-    		return;
-    	}
-		//de-register
-		GridDeRegister();
-		//move
-		x = new_x;
-		y = new_y;
-		//register
-		GridRegister();
-	}
-	
 	public void DeleteHover() {
 		delete_hover = true;
-	}
-
-	public Boolean GetBeingBuilt() {
-		return underConstruction;
 	}
 
 	public HashSet<ActorType> GetAttracts() {
 		return iAttract;
 	}
 	
+	public Boolean GetBeingBuilt() {
+		return underConstruction;
+	}
+
 	public HashSet<ResourceType> GetCollects(){
 		return iCollect;
 	}
@@ -143,7 +105,7 @@ public class Building extends Sprite {
 	public int GetEmployees() {
 		return employees.size();
 	}
-
+	
 	@ Override
 	public boolean GetIsBuilding() {
 		return true;
@@ -169,6 +131,28 @@ public class Building extends Sprite {
 		return type;
 	}
 
+	private void GridDeRegister() {
+		//snap me to the world grid
+		WeightedPoint _my_snap = theSpriteManager.ClipToGrid(this.GetLoc());
+		_my_snap.RemoveSprite(this);
+		if (_my_snap != null) {
+			for (WeightedPoint _s : _my_snap.GetNieghbours()) {
+				_s.RemoveSprite(this);
+			}
+		}
+	}
+
+	private void GridRegister() {
+		//snap me to the world grid
+		WeightedPoint _my_snap = theSpriteManager.ClipToGrid(this.GetLoc());
+		if (_my_snap != null) {
+			_my_snap.GiveSprite(this);
+			for (WeightedPoint _s : _my_snap.GetNieghbours()) {
+				_s.GiveCollision(this);
+			}
+		}
+	}
+
 	@Override
 	public void Kill() {
 		if (dead == true) return;
@@ -183,21 +167,37 @@ public class Building extends Sprite {
 		GridDeRegister();
 	}
 	
-	public void RemoveEmployee(Actor _a) {
-		employees.remove(_a);
-	}
-	
-	public void AddEmployee(Actor _a) {
-		employees.add(_a);
-	}
-
-	public void Tick(int _tick_count) {
-		if ((_tick_count + tick_offset) % ticks_per_tock == 0) Tock();
+	public void MoveBuilding(int new_x, int new_y) {
+		if (x == new_x && y == new_y) return;
+    	if (theSpriteManager.CheckSafe(true
+    			, true
+    			, new_x
+    			, new_y
+    			, r
+    			, ID
+    			, 0) == false) { 
+    		return;
+    	}
+		//de-register
+		GridDeRegister();
+		//move
+		x = new_x;
+		y = new_y;
+		//register
+		GridRegister();
 	}
 	
 	public boolean Recruiting() {
 		if (no_local_resource_penalty > 0) return false;
 		return true;
+	}
+
+	public void RemoveEmployee(Actor _a) {
+		employees.remove(_a);
+	}
+	
+	public void Tick(int _tick_count) {
+		if ((_tick_count + tick_offset) % ticks_per_tock == 0) Tock();
 	}
 	
 	public void Tock() {

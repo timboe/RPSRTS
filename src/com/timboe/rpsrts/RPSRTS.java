@@ -50,6 +50,26 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
     @Override
 	public void destroy() { }
 
+	public void doWinLoose() {
+		if (theSpriteManger.enemy_base != null && theSpriteManger.enemy_base.GetDead() == true) {
+			utility.gameMode = GameMode.gameOverWon;
+			utility.loose_time = System.currentTimeMillis() / 1000l;
+		} else if (theSpriteManger.player_base != null && theSpriteManger.player_base.GetDead() == true) {
+			utility.gameMode = GameMode.gameOverLost;
+			utility.loose_time = System.currentTimeMillis() / 1000l;
+		}
+	}
+
+	public void genNewWorld() {
+		utility.gameMode = GameMode.titleScreen;
+		utility.doWorldGen = true;
+		utility.setSeed();
+		theSpriteManger.Reset();
+		theWorld.Reset();
+		theSceneRenderer.background_buffered = null;
+		utility.TICK = 0;
+	}
+
 	@Override
 	public void init() {
 		
@@ -72,7 +92,6 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			genNewWorld();
 		}
 	}
-
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (utility.gameMode == GameMode.titleScreen) {
@@ -103,14 +122,14 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			}
 		}
 	}
-
 	@Override
 	public void keyReleased(KeyEvent e) {}
+
 	@Override
 	public void keyTyped(KeyEvent e) {}
+
 	@Override
 	public void mouseClicked(MouseEvent e) {}
-
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		theSceneRenderer.CurMouse = e.getPoint();
@@ -147,6 +166,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 
 	@Override
 	public void mouseEntered(MouseEvent arg0) {}
+
 	@Override
 	public void mouseExited(MouseEvent arg0) {}
 
@@ -164,7 +184,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			utility.mouseClick = true;
 		}
 	}
-
+	
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		utility.mouseDrag = false;
@@ -184,26 +204,6 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			theTransforms.zoomOut(false);
 		}
 
-	}
-	
-	public void genNewWorld() {
-		utility.gameMode = GameMode.titleScreen;
-		utility.doWorldGen = true;
-		utility.setSeed();
-		theSpriteManger.Reset();
-		theWorld.Reset();
-		theSceneRenderer.background_buffered = null;
-		utility.TICK = 0;
-	}
-
-	public void doWinLoose() {
-		if (theSpriteManger.enemy_base != null && theSpriteManger.enemy_base.GetDead() == true) {
-			utility.gameMode = GameMode.gameOverWon;
-			utility.loose_time = System.currentTimeMillis() / 1000l;
-		} else if (theSpriteManger.player_base != null && theSpriteManger.player_base.GetDead() == true) {
-			utility.gameMode = GameMode.gameOverLost;
-			utility.loose_time = System.currentTimeMillis() / 1000l;
-		}
 	}
 	
 	@Override

@@ -27,12 +27,12 @@ public class SpriteManager_App extends SpriteManager {
 		return singleton;
 	}
 
+	Bitmaps_App theBitmaps = Bitmaps_App.GetBitmaps_App();
+
 	private SpriteManager_App() {
 		super();
 		this_object = (SpriteManager)this; 
 	}
-
-	Bitmaps_App theBitmaps = Bitmaps_App.GetBitmaps_App();
 	
 	@Override
 	public Actor PlaceActor(WorldPoint _p, ActorType _at, ObjectOwner _o) {

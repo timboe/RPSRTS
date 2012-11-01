@@ -8,7 +8,6 @@ import java.awt.image.BufferedImage;
 
 import com.timboe.rpsrts.Resource;
 import com.timboe.rpsrts.ResourceType;
-import com.timboeWeb.rpsrts.Bitmaps_Applet;
 
 public class Resource_Applet extends Resource {
 	

@@ -1,5 +1,6 @@
 package com.timboe.rpsrts;
 
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Vector;
@@ -154,40 +155,6 @@ public class Actor extends Sprite {
 		return type;
 	}
 
-	@Override
-	public void Kill() {
-		if (dead == true) return;
-		theSpriteManager.PlaceSpooge(x, y, GetOwner(), utility.spooges_actor_death, 0.8f);
-		QuitJob(true);
-		dead = true;
-		resource_manager.UnitDeath(type,owner);
-	}
-	
-	private void Job_Build() {
-		if (boss == null || boss.GetBeingBuilt() == false) { /* SAFETY CHECK */
-			//System.out.println("FATAL Boss is dead or building is constructed");
-			QuitJob(true);
-		}
-		if (tick == true && behaviour == ActorBehaviour.DoingNothing) { //Get a new assignment - come to build
-			if (navagate_status == PathfindStatus.NotRun) {
-				SetDestinationInitial(boss);
-				return;
-			} else if (navagate_status == PathfindStatus.Failed) {//Navagation failed - I quit!
-				QuitJob(false);
-			} else if (navagate_status == PathfindStatus.Passed) { //navagation good
-				behaviour = ActorBehaviour.MovingToTarget;
-			}
-		} else if (tick == true && behaviour == ActorBehaviour.MovingToTarget) {
-			final boolean arrivedAtTarget = Move();
-			if (arrivedAtTarget == true) {
-				behaviour = ActorBehaviour.Constructing;
-			}
-		} else if (tock == true && behaviour == ActorBehaviour.Constructing) {
-			boss.BuildAction();
-			++animStep;
-		}
-	}
-	
 	private void Job_Attack(){
 		if (attack_target.GetDead() == true) {
 			attack_target = null;
@@ -213,14 +180,11 @@ public class Actor extends Sprite {
 		}
 	}
 	
-	private void Job_Idle() {
-		if (tick == true) {
-			WanderAbout(theSpriteManager.GetBase(owner), utility.wander_radius, utility.wander_pull_to_target);
+	private void Job_Build() {
+		if (boss == null || boss.GetBeingBuilt() == false) { /* SAFETY CHECK */
+			//System.out.println("FATAL Boss is dead or building is constructed");
+			QuitJob(true);
 		}
-		//TODO Add code here to try and drop off resources
-	}
-	
-	private void Job_Guard() {
 		if (tick == true && behaviour == ActorBehaviour.DoingNothing) { //Get a new assignment - come to build
 			if (navagate_status == PathfindStatus.NotRun) {
 				SetDestinationInitial(boss);
@@ -233,14 +197,11 @@ public class Actor extends Sprite {
 		} else if (tick == true && behaviour == ActorBehaviour.MovingToTarget) {
 			final boolean arrivedAtTarget = Move();
 			if (arrivedAtTarget == true) {
-				behaviour = ActorBehaviour.Guarding;
+				behaviour = ActorBehaviour.Constructing;
 			}
-		} else if (tick == true && behaviour == ActorBehaviour.Guarding) {
-			if (utility.Seperation(GetLoc(), boss.GetLoc()) > 2 * utility.wander_radius) {
-				behaviour = ActorBehaviour.DoingNothing;
-				return;
-			}
-			WanderAbout(boss, utility.wander_radius, utility.wander_pull_to_target);
+		} else if (tock == true && behaviour == ActorBehaviour.Constructing) {
+			boss.BuildAction();
+			++animStep;
 		}
 	}
 	
@@ -338,6 +299,37 @@ public class Actor extends Sprite {
 		}
 	}
 	
+	private void Job_Guard() {
+		if (tick == true && behaviour == ActorBehaviour.DoingNothing) { //Get a new assignment - come to build
+			if (navagate_status == PathfindStatus.NotRun) {
+				SetDestinationInitial(boss);
+				return;
+			} else if (navagate_status == PathfindStatus.Failed) {//Navagation failed - I quit!
+				QuitJob(false);
+			} else if (navagate_status == PathfindStatus.Passed) { //navagation good
+				behaviour = ActorBehaviour.MovingToTarget;
+			}
+		} else if (tick == true && behaviour == ActorBehaviour.MovingToTarget) {
+			final boolean arrivedAtTarget = Move();
+			if (arrivedAtTarget == true) {
+				behaviour = ActorBehaviour.Guarding;
+			}
+		} else if (tick == true && behaviour == ActorBehaviour.Guarding) {
+			if (utility.Seperation(GetLoc(), boss.GetLoc()) > 2 * utility.wander_radius) {
+				behaviour = ActorBehaviour.DoingNothing;
+				return;
+			}
+			WanderAbout(boss, utility.wander_radius, utility.wander_pull_to_target);
+		}
+	}
+	
+	private void Job_Idle() {
+		if (tick == true) {
+			WanderAbout(theSpriteManager.GetBase(owner), utility.wander_radius, utility.wander_pull_to_target);
+		}
+		//TODO Add code here to try and drop off resources
+	}
+	
 	public void Job_Stuck() {
 		if (tick == true) {
 			--stuck_wander_ticks;
@@ -346,6 +338,15 @@ public class Actor extends Sprite {
 				SetDestination(destination);
 			}
 		}
+	}
+	
+	@Override
+	public void Kill() {
+		if (dead == true) return;
+		theSpriteManager.PlaceSpooge(x, y, GetOwner(), utility.spooges_actor_death, 0.8f);
+		QuitJob(true);
+		dead = true;
+		resource_manager.UnitDeath(type,owner);
 	}
 
 	public boolean Move() { //Goal in mind pathfinding

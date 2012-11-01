@@ -15,21 +15,46 @@ public class Bitmaps_Applet extends Bitmaps {
 	
 	private static Bitmaps_Applet singleton = new Bitmaps_Applet();
 	
+	public static BufferedImage clip(BufferedImage src, int x, int y, int w, int h) { //Stolen from notch
+        final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        BufferedImage newImage = null;
+
+        try
+        {
+            final GraphicsDevice screen = ge.getDefaultScreenDevice();
+            final GraphicsConfiguration gc = screen.getDefaultConfiguration();
+            newImage = gc.createCompatibleImage(w, h, Transparency.BITMASK);
+        }
+        catch (final Exception e)
+        {
+        }
+
+        if (newImage == null)
+        {
+            newImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        }
+
+        final int[] pixels = new int[w * h];
+        src.getRGB(x, y, w, h, pixels, 0, w);
+        newImage.setRGB(0, 0, w, h, pixels, 0, w);
+
+        return newImage;
+    }
+	
 	public static Bitmaps_Applet GetBitmaps_Applet() {
 		return singleton;
 	}
-	
 	public BufferedImage off[];
+	
 	public BufferedImage on[];
-	
 	public BufferedImage WIN;
-	public BufferedImage LOOSE;
 	
+	public BufferedImage LOOSE;
 	public BufferedImage tree[];
 	public BufferedImage cactus[];
 	public BufferedImage mine[];
-	public BufferedImage stone[];
 	
+	public BufferedImage stone[];
 	public BufferedImage base_player[];
 	public BufferedImage base_enemy[];
 	public BufferedImage construction_player[];
@@ -39,31 +64,32 @@ public class Bitmaps_Applet extends Bitmaps {
 	public BufferedImage woodshop_player[];
 	public BufferedImage woodshop_enemy[];
 	public BufferedImage rockery_player[];
-	public BufferedImage rockery_enemy[];
 	
+	public BufferedImage rockery_enemy[];
 	public BufferedImage attractor_scissors_player[];
 	public BufferedImage attractor_paper_player[];
 	public BufferedImage attractor_rock_player[];
 	public BufferedImage attractor_scissors_enemy[];
 	public BufferedImage attractor_paper_enemy[];
-	public BufferedImage attractor_rock_enemy[];
 	
+	public BufferedImage attractor_rock_enemy[];
 	public BufferedImage scissor_player[];
 	public BufferedImage scissor_enemy[];
 	public BufferedImage paper_player[];
 	public BufferedImage paper_enemy[];
 	public BufferedImage rock_player[];
-	public BufferedImage rock_enemy[];
 	
+	public BufferedImage rock_enemy[];
 	public BufferedImage proj_scissor_player[];
 	public BufferedImage proj_scissor_enemy[];
 	public BufferedImage proj_paper_player[];
 	public BufferedImage proj_paper_enemy[];
 	public BufferedImage proj_rock_player[];
+
 	public BufferedImage proj_rock_enemy[];
 
 	public BufferedImage X[];
-
+	
 	private Bitmaps_Applet() {
 		super();
 		
@@ -213,31 +239,5 @@ public class Bitmaps_Applet extends Bitmaps {
 		}
 
 	}
-	
-	public static BufferedImage clip(BufferedImage src, int x, int y, int w, int h) { //Stolen from notch
-        final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        BufferedImage newImage = null;
-
-        try
-        {
-            final GraphicsDevice screen = ge.getDefaultScreenDevice();
-            final GraphicsConfiguration gc = screen.getDefaultConfiguration();
-            newImage = gc.createCompatibleImage(w, h, Transparency.BITMASK);
-        }
-        catch (final Exception e)
-        {
-        }
-
-        if (newImage == null)
-        {
-            newImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        }
-
-        final int[] pixels = new int[w * h];
-        src.getRGB(x, y, w, h, pixels, 0, w);
-        newImage.setRGB(0, 0, w, h, pixels, 0, w);
-
-        return newImage;
-    }
 
 }

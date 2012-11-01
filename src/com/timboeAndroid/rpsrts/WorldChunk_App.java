@@ -1,10 +1,10 @@
 package com.timboeAndroid.rpsrts;
 
-import com.timboe.rpsrts.WorldChunk;
-
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+
+import com.timboe.rpsrts.WorldChunk;
 
 public class WorldChunk_App extends WorldChunk {
 

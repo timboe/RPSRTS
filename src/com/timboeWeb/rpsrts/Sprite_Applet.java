@@ -1,6 +1,7 @@
 package com.timboeWeb.rpsrts;
 
 import java.awt.Graphics2D;
+
 import com.timboe.rpsrts.Sprite;
 
 public class Sprite_Applet extends Sprite {

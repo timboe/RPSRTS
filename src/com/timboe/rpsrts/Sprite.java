@@ -53,6 +53,12 @@ public class Sprite implements Comparable<Sprite> {
 		return false;
 	}
 
+	@Override
+	public int compareTo(Sprite comp) {
+		//return (int) (this.GetZOrder() - comp.GetZOrder());
+		return (int) (( comp.GetZOrder() - GetZOrder() )*100000);
+	}
+
 	public boolean GetDead() {
 		return dead;
 	}
@@ -64,23 +70,23 @@ public class Sprite implements Comparable<Sprite> {
 	public boolean GetIsActor() {
 		return false;
 	}
-
+	
 	public boolean GetIsBuilding() {
-		return false;
-	}
-	
-	public boolean GetIsResource() {
-		return false;
-	}
-	
-	public boolean GetIsSpoogicle() {
 		return false;
 	}
 	
 	public boolean GetIsProjectile() {
 		return false;
 	}
+	
+	public boolean GetIsResource() {
+		return false;
+	}
 
+
+	public boolean GetIsSpoogicle() {
+		return false;
+	}
 
 	public WorldPoint GetLoc() {
 		loc.setLocation(x, y);
@@ -91,6 +97,14 @@ public class Sprite implements Comparable<Sprite> {
 		return null;
 	}
 
+	public float GetPreciseX() {
+		return x_prec;
+	}
+
+	public float GetPreciseY() {
+		return y_prec;
+	}
+	
 	public int GetR() {
 		return r;
 	}
@@ -102,28 +116,14 @@ public class Sprite implements Comparable<Sprite> {
 	public int GetY() {
 		return y;
 	}
-	
-	public float GetPreciseX() {
-		return x_prec;
-	}
-
-	public float GetPreciseY() {
-		return y_prec;
-	}
-
-	public void Kill() {
-		dead = true;
-	}
 
 	public float GetZOrder() {
 		return (float) ( -1f * (x_prec * Math.sin(utility.rotateAngle) + (y_prec * Math.cos(utility.rotateAngle))) );
 
 	}
 	
-	@Override
-	public int compareTo(Sprite comp) {
-		//return (int) (this.GetZOrder() - comp.GetZOrder());
-		return (int) (( comp.GetZOrder() - GetZOrder() )*100000);
+	public void Kill() {
+		dead = true;
 	}
 
 

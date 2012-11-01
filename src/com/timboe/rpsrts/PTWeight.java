@@ -15,7 +15,19 @@ public class PTWeight implements Comparable<PTWeight> {
 //		return (this.x == ((WorldPoint) _to_compare).x && this.y == ((WorldPoint) _to_compare).y);
 //	}
 	
-//	@Override
+public PTWeight(float _g, float _h, float _f) {
+//		super(_x, _y); 
+		g_score = _g;
+		h_score = _h;
+		f_score = _f;
+		came_from = null;
+	}
+	@Override
+	public int compareTo(PTWeight arg0) {
+		return (int) (this.f_score - arg0.f_score);
+	}
+	
+	//	@Override
 //	public int hashCode() {
 //		//System.out.println("<HASHCODE CALLED>");
 //		return (1000000*x)+y;
@@ -27,18 +39,6 @@ public class PTWeight implements Comparable<PTWeight> {
 	public void SetLoc(int _x, int _y) {
 		X = _x;
 		Y = _y;
-	}
-	
-	public PTWeight(float _g, float _h, float _f) {
-//		super(_x, _y); 
-		g_score = _g;
-		h_score = _h;
-		f_score = _f;
-		came_from = null;
-	}
-	@Override
-	public int compareTo(PTWeight arg0) {
-		return (int) (this.f_score - arg0.f_score);
 	}
 	
 }

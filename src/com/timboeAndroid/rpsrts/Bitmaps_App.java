@@ -1,6 +1,7 @@
 package com.timboeAndroid.rpsrts;
 
 import android.graphics.Bitmap;
+
 import com.timboe.rpsrts.Bitmaps;
 
 public class Bitmaps_App extends Bitmaps {

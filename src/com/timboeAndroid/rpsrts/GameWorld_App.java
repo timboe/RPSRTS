@@ -2,15 +2,15 @@ package com.timboeAndroid.rpsrts;
 
 import java.util.HashSet;
 
-import com.timboe.rpsrts.GameWorld;
-import com.timboe.rpsrts.WorldTile;
-import com.timboeWeb.rpsrts.WorldChunk_Applet;
-import com.timboeWeb.rpsrts.WorldTile_Applet;
-
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+
+import com.timboe.rpsrts.GameWorld;
+import com.timboe.rpsrts.WorldTile;
+import com.timboeWeb.rpsrts.WorldChunk_Applet;
+import com.timboeWeb.rpsrts.WorldTile_Applet;
 
 public class GameWorld_App extends GameWorld {
 
@@ -18,6 +18,43 @@ public class GameWorld_App extends GameWorld {
 		super();
 	}
 	
+	public void DrawChunks(Canvas canvas, boolean _useEnergy, boolean _aa) {
+		
+		for (final WorldChunk_App c : (WorldChunk_App[]) chunks) {
+			c.DrawTileState(canvas, _useEnergy, _aa);
+		}
+	}
+	
+	public void DrawIslandEdge(Canvas canvas) {
+		Paint paint = new Paint();
+		paint.setColor(Color.WHITE);
+		paint.setStyle(Paint.Style.STROKE);
+		int angle = 0;
+		for (final long edge : island_offset) {
+			final int e = (int)edge;
+			final int new_radius = (island_size/2)+e;
+			RectF _rect = new RectF(-new_radius, -new_radius, new_radius, new_radius);
+			int toDraw = angle + 30;
+			if (toDraw > 360) toDraw -= 360;
+			canvas.drawArc(_rect, toDraw, 1, false, paint);
+			++angle;
+		}
+	}
+	
+	public void DrawTiles(Canvas canvas, boolean _renderAll, boolean _aa) {
+		if (_renderAll == true) {
+			for (final WorldTile_App t : (WorldTile_App[]) tiles) {
+				t.DrawTile(canvas,_aa,false);
+			}
+		} else {
+			@SuppressWarnings({ "unchecked", "rawtypes" })
+			HashSet<WorldTile_App> render_tiles_app = (HashSet) render_tiles;
+			for (final WorldTile_App t : render_tiles_app) {
+				t.DrawTile(canvas,_aa,false);
+			}
+		}
+	}
+
 	@Override
 	public void Init() {
 		world_tiles = utility.world_tiles;
@@ -45,43 +82,6 @@ public class GameWorld_App extends GameWorld {
 		    	chunks[ID++] = new WorldChunk_App(x,y,chunks_size,ID);
 		    }
 	    }
-	}
-	
-	public void DrawTiles(Canvas canvas, boolean _renderAll, boolean _aa) {
-		if (_renderAll == true) {
-			for (final WorldTile_App t : (WorldTile_App[]) tiles) {
-				t.DrawTile(canvas,_aa,false);
-			}
-		} else {
-			@SuppressWarnings({ "unchecked", "rawtypes" })
-			HashSet<WorldTile_App> render_tiles_app = (HashSet) render_tiles;
-			for (final WorldTile_App t : render_tiles_app) {
-				t.DrawTile(canvas,_aa,false);
-			}
-		}
-	}
-	
-	public void DrawChunks(Canvas canvas, boolean _useEnergy, boolean _aa) {
-		
-		for (final WorldChunk_App c : (WorldChunk_App[]) chunks) {
-			c.DrawTileState(canvas, _useEnergy, _aa);
-		}
-	}
-
-	public void DrawIslandEdge(Canvas canvas) {
-		Paint paint = new Paint();
-		paint.setColor(Color.WHITE);
-		paint.setStyle(Paint.Style.STROKE);
-		int angle = 0;
-		for (final long edge : island_offset) {
-			final int e = (int)edge;
-			final int new_radius = (island_size/2)+e;
-			RectF _rect = new RectF(-new_radius, -new_radius, new_radius, new_radius);
-			int toDraw = angle + 30;
-			if (toDraw > 360) toDraw -= 360;
-			canvas.drawArc(_rect, toDraw, 1, false, paint);
-			++angle;
-		}
 	}
 	
 //	public void HighlightTile(int _x, int _y, Graphics2D _g2, boolean _aa) {
