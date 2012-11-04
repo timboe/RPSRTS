@@ -1,8 +1,8 @@
 package com.timboe.rpsrts.world;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Vector;
 
 import com.timboe.rpsrts.managers.PathfinderGrid;
 import com.timboe.rpsrts.managers.SpriteManager;
@@ -14,7 +14,7 @@ public class Pathfinder implements Runnable {
 	private final SpriteManager theSpriteManager = SpriteManager.GetSpriteManager();
 	private final PathfinderGrid thePathfinderGrid = PathfinderGrid.GetPathfinderGrid();
 	
-	private Vector<WorldPoint> result = null; //TODO make me something better
+	private ArrayList<WorldPoint> result = null; //TODO make me something better
 	private final WorldPoint fromLoc;
 	private final WorldPoint toLoc;
 	private final int r_from;
@@ -45,7 +45,7 @@ public class Pathfinder implements Runnable {
     	r_to = _r;
     }
 
-    public Vector<WorldPoint> GetResult() {
+    public ArrayList<WorldPoint> GetResult() {
     	return result;
     }
 
@@ -171,7 +171,7 @@ public class Pathfinder implements Runnable {
 		}
 
 		if (soloution != null) {
-			result = new Vector<WorldPoint>();
+			result = new ArrayList<WorldPoint>();
 			result.add(soloution.GetLoc());
 			PTWeight p = soloution.came_from;
 			while (true) {

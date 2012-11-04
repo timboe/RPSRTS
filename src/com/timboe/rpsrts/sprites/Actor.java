@@ -1,7 +1,7 @@
 package com.timboe.rpsrts.sprites;
 
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Vector;
 
 import com.timboe.rpsrts.enumerators.ActorBehaviour;
 import com.timboe.rpsrts.enumerators.ActorJob;
@@ -16,17 +16,17 @@ import com.timboe.rpsrts.world.WorldPoint;
 public class Actor extends Sprite {
 	protected ObjectOwner owner;
 	protected ActorType type;
-	ActorJob job; //what i do for a living
-	ActorBehaviour behaviour; //my current activity
-	Building boss; //building employed by
-	HashSet<Building> previous_bad_employers;
-	Sprite target; //building designated target
-	public Sprite attack_target; //Who i'm wailing on
-	int attack_range;
+	protected ActorJob job; //what i do for a living
+	protected ActorBehaviour behaviour; //my current activity
+	protected Building boss; //building employed by
+	protected HashSet<Building> previous_bad_employers;
+	protected Sprite target; //building designated target
+	protected Sprite attack_target; //Who i'm wailing on
+	protected int attack_range;
 
 	float RPS;
 	
-	Vector<ResourceType> iCollect = new Vector<ResourceType>(); //things this actor collects
+	ArrayList<ResourceType> iCollect = new ArrayList<ResourceType>(); //things this actor collects
 	ResourceType carrying; //resource type in hands
 	protected int carryAmount; //amount in `hands'
 	protected int strength; //amount actor can carry / attack
@@ -34,7 +34,7 @@ public class Actor extends Sprite {
 	boolean tick;
 	boolean tock;
 	
-	protected Vector<WorldPoint> waypoint_list_sync = null;  //pahfinding list ---may need thread protection---
+	protected ArrayList<WorldPoint> waypoint_list_sync = null;  //pahfinding list ---may need thread protection---
 	protected Sprite destination; //final pathfind destination
 	protected WorldPoint waypoint;  //current pathfind destination
 	Thread pathfinding_thread = null;
@@ -109,7 +109,13 @@ public class Actor extends Sprite {
 	public void ClearDestination() {
 		destination = null;
 		waypoint = null;
-		waypoint_list_sync = null;
+		if (waypoint_list_sync != null) {
+			synchronized (waypoint_list_sync) {
+				waypoint_list_sync = null;
+			}
+		} else {
+			waypoint_list_sync = null; //just to make sure
+		}
 		if (pathfinder != null) {
 			pathfinder.Kill();
 		}
@@ -118,7 +124,7 @@ public class Actor extends Sprite {
 		navagate_status = PathfindStatus.NotRun;
 	}
 
-	public Vector<ResourceType> GetCollects(){
+	public ArrayList<ResourceType> GetCollects(){
 		return iCollect;
 	}
 
@@ -360,31 +366,35 @@ public class Actor extends Sprite {
 			//System.out.println("moveLoop FIRST WAYPOINT WP("+waypoint.getX()+","+waypoint.getY()+") POS ("+x_prec+","+y_prec+")");
 			final float _hypotenuse = utility.Seperation(x_prec, waypoint.getX(), y_prec, waypoint.getY()); //  // Math.sqrt( Math.pow(x_prec - destination_list.lastElement().getX(),2) +  Math.pow(y_prec - destination_list.lastElement().getY(),2) );
 			float radiusToAchieve = 1f; //If pathfinding to pathfind node
-			//synchronized (waypoint_list_sync) {
-				if (waypoint_list_sync == null || waypoint_list_sync.size() == 0)	 {
-					radiusToAchieve = utility.tiles_size + r + destination.GetR(); //If final target (pathfinding accuracy now tiles_size)
+			if (waypoint_list_sync != null) {
+				synchronized (waypoint_list_sync) {
+					if (waypoint_list_sync.size() == 0)	 {
+						radiusToAchieve = utility.tiles_size + r + destination.GetR(); //If final target (pathfinding accuracy now tiles_size)
+					}
 				}
-			//}
+			}
 			if (_hypotenuse <= radiusToAchieve) { //At waypoint?
 				//Is there another waypoint?
-				//synchronized (waypoint_list_sync) {
-					if (waypoint_list_sync != null && waypoint_list_sync.size() > 0) {
-						//Set to go here - next waypoint
-						waypoint = ((Vector<WorldPoint>) waypoint_list_sync).lastElement();
-						waypoint_list_sync.remove( waypoint_list_sync.size() - 1 );
-					} else {
-						//OK, so no more waypoints - are we there?
-						if (utility.Seperation(waypoint, destination.GetLoc()) < r + destination.GetR()) {
-							//Reached final destination
-							//System.out.println("INFO REACHED FINAL DESTINATION");
-							ClearDestination();
-							return true;
-						} else {
-							//NOPE, GO STRAIGHT LINE - IF WE HIT SOMETHING THEN ROUTE GETS RECALCULATED
-							waypoint = destination.GetLoc();
+				boolean more = false;
+				if (waypoint_list_sync != null) {
+					synchronized (waypoint_list_sync) {
+						if (waypoint_list_sync.size() > 0) {
+							waypoint = waypoint_list_sync.remove( waypoint_list_sync.size() - 1 );
+							more = true;
 						}
 					}
-				//}
+				}
+				if (more == false) {
+					//OK, so no more waypoints - are we there?
+					if (utility.Seperation(waypoint, destination.GetLoc()) < r + destination.GetR()) {
+						//System.out.println("INFO REACHED FINAL DESTINATION");
+						ClearDestination();
+						return true;
+					} else {
+						//NOPE, GO STRAIGHT LINE - IF WE HIT SOMETHING THEN ROUTE GETS RECALCULATED
+						waypoint = destination.GetLoc();
+					}
+				}
 				return false;
 			}
 
@@ -459,7 +469,7 @@ public class Actor extends Sprite {
 		wander = null;
 	}
 
-	public void Tick(int _tick_count) {
+	public synchronized void Tick(int _tick_count) {
 		if ((_tick_count + tick_offset) % ticks_per_tock == 0) Tock();
 		tick = true;
 		tock = false;
@@ -472,14 +482,16 @@ public class Actor extends Sprite {
 			if (pathfinding_thread.isAlive() == true) return;
 			else {
 				//System.out.println("PATHFINDING DONE! Result is:" + pathfinder.GetResult());
+				//TODO figure out how to protect this line
 				waypoint_list_sync = pathfinder.GetResult();
+		
 				if (waypoint_list_sync == null) {
 					navagate_status = PathfindStatus.Failed;
 					destination = null;
 					waypoint = null;
 				} else {
 					synchronized (waypoint_list_sync) {
-						waypoint = ((Vector<WorldPoint>) waypoint_list_sync).lastElement();
+						waypoint = waypoint_list_sync.get( waypoint_list_sync.size() - 1 );
 					}
 					navagate_status = PathfindStatus.Passed;
 				}
@@ -557,6 +569,10 @@ public class Actor extends Sprite {
 		if (allowed == false) {
 			wander = null;
 		}
+	}
+
+	public Sprite GetAttackTarget() {
+		return attack_target;
 	}
 }
 

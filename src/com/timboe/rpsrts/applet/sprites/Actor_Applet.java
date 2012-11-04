@@ -1,4 +1,4 @@
-package com.timboe.rpsrts.applet;
+package com.timboe.rpsrts.applet.sprites;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -6,6 +6,8 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 
+import com.timboe.rpsrts.applet.managers.Bitmaps_Applet;
+import com.timboe.rpsrts.applet.managers.TransformStore;
 import com.timboe.rpsrts.enumerators.ActorType;
 import com.timboe.rpsrts.enumerators.ObjectOwner;
 import com.timboe.rpsrts.sprites.Actor;
@@ -59,7 +61,7 @@ public class Actor_Applet extends Actor {
 		}
 	}
 	
-    public void Render(Graphics2D _g2, int _frame_count) {
+    public synchronized void Render(Graphics2D _g2, int _frame_count) {
 		if (dead == true) return;
 		Point2D transform = theTransforms.getTransformedPoint(x, y);
 		final int _x = (int)Math.round(transform.getX());
@@ -122,13 +124,11 @@ public class Actor_Applet extends Actor {
 				_g2.setColor(Color.blue);
 			}
 			if (waypoint_list_sync != null) {
-				synchronized (waypoint_list_sync) {
-					for (final WorldPoint p : waypoint_list_sync) {
-						if (p == null) {
-							continue;
-						}
-						_g2.fillRect((int) p.getX()-1, (int) p.getY()-1, 2, 2);
+				for (final WorldPoint p : waypoint_list_sync) {
+					if (p == null) {
+						continue;
 					}
+					_g2.fillRect((int) p.getX()-1, (int) p.getY()-1, 2, 2);
 				}
 			}
 			if (waypoint != null) {
@@ -136,6 +136,10 @@ public class Actor_Applet extends Actor {
 			}
 			if (destination != null) {
 				_g2.drawOval(destination.GetX()-4, destination.GetY()-4, 8, 8);
+			}
+			if (boss != null) {
+				_g2.setColor(Color.magenta);
+				_g2.drawLine(x, y, boss.GetX(), boss.GetY());
 			}
 		}			
 		

@@ -1,16 +1,17 @@
-package com.timboe.rpsrts.applet;
+package com.timboe.rpsrts.applet.sprites;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 
+import com.timboe.rpsrts.applet.managers.TransformStore;
 import com.timboe.rpsrts.enumerators.ObjectOwner;
 import com.timboe.rpsrts.sprites.Spoogicles;
 
 public class Spoogicles_Applet extends Spoogicles {
 	protected TransformStore theTransforms = TransformStore.GetTransformStore();
 
-	protected Spoogicles_Applet(int _ID, int _x, int _y, ObjectOwner _oo, int _spoogicles, float _scale) {
+	public Spoogicles_Applet(int _ID, int _x, int _y, ObjectOwner _oo, int _spoogicles, float _scale) {
 		super(_ID, _x, _y, _oo, _spoogicles, _scale);
 	}
 	

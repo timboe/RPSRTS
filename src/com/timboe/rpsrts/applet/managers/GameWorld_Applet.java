@@ -1,9 +1,11 @@
-package com.timboe.rpsrts.applet;
+package com.timboe.rpsrts.applet.managers;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.HashSet;
 
+import com.timboe.rpsrts.applet.world.WorldChunk_Applet;
+import com.timboe.rpsrts.applet.world.WorldTile_Applet;
 import com.timboe.rpsrts.managers.GameWorld;
 import com.timboe.rpsrts.world.Biome;
 import com.timboe.rpsrts.world.WorldTile;

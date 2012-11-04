@@ -1,5 +1,6 @@
 package com.timboe.rpsrts.managers;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -572,7 +573,7 @@ public class SpriteManager {
 		if (ws_step == 1) {
 			if (pathfinding_thread.isAlive() == true) return ws_step;
 			else {
-				Vector<WorldPoint> waypoint_list = pathfinder.GetResult();
+				ArrayList<WorldPoint> waypoint_list = pathfinder.GetResult();
 				if (waypoint_list == null) {
 					System.out.println("---- !!!! ---- BASES NON NAVAGABLE");
 					return -1; //FAILED

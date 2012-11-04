@@ -1,5 +1,6 @@
 package com.timboe.rpsrts.sprites;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Vector;
 
@@ -17,7 +18,7 @@ public class Building extends Sprite {
 	protected ObjectOwner owner;
 	protected boolean delete_hover = false;
 	protected boolean move_hover = false;
-	Vector<Actor> employees = new Vector<Actor>();
+	ArrayList<Actor> employees = new ArrayList<Actor>();
 	protected boolean underConstruction;
 	protected int y_offset;
 	
@@ -231,7 +232,7 @@ public class Building extends Sprite {
 		} else if (getiAttract().size() > 0 && GetEmployees() > 0) { //if attractor w employees
 			if (GetEmployees() > resource_manager.GetActorsPerAttractor(owner, type)) {
 				//Fire unit
-				employees.elementAt(0).QuitJob(true);
+				employees.get(0).QuitJob(true);
 			}
 		}
 	}

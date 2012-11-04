@@ -1,10 +1,12 @@
-package com.timboe.rpsrts.applet;
+package com.timboe.rpsrts.applet.sprites;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
+import com.timboe.rpsrts.applet.managers.ShapeStore;
+import com.timboe.rpsrts.applet.managers.TransformStore;
 import com.timboe.rpsrts.sprites.WaterfallSplash;
 
 public class WaterfallSplash_Applet extends WaterfallSplash {

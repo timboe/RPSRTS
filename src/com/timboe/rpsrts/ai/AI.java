@@ -1,15 +1,14 @@
 package com.timboe.rpsrts.ai;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
-import com.timboe.rpsrts.enumerators.ActorBehaviour;
 import com.timboe.rpsrts.enumerators.ActorType;
 import com.timboe.rpsrts.enumerators.BuildingType;
 import com.timboe.rpsrts.enumerators.ObjectOwner;
 import com.timboe.rpsrts.enumerators.PathfindStatus;
 import com.timboe.rpsrts.enumerators.ResourceType;
 import com.timboe.rpsrts.managers.GameWorld;
-import com.timboe.rpsrts.managers.PathfinderGrid;
 import com.timboe.rpsrts.managers.ResourceManager;
 import com.timboe.rpsrts.managers.SpriteManager;
 import com.timboe.rpsrts.managers.Utility;
@@ -27,50 +26,51 @@ public class AI implements Runnable {
 	private final ResourceManager resource_manager = ResourceManager.GetResourceManager();
 //	private final PathfinderGrid thePathfinderGrid = PathfinderGrid.GetPathfinderGrid();
 	
-	Thread pathfinding_thread_rock;
-	Thread pathfinding_thread_paper;
-	Thread pathfinding_thread_scisors;
+	ArrayList<Thread> pathfinding_thread = new ArrayList<Thread>();
+	//Thread pathfinding_thread_paper;
+	//Thread pathfinding_thread_scisors;
 
-	Pathfinder pathfinder_rock;
-	Pathfinder pathfinder_paper;
-	Pathfinder pathfinder_scissors;
+	ArrayList<Pathfinder> pathfinder = new ArrayList<Pathfinder>();
+	//Pathfinder pathfinder_paper;
+	//Pathfinder pathfinder_scissors;
 
-	PathfindStatus navagate_status_rock = PathfindStatus.NotRun;
-	PathfindStatus navagate_status_paper = PathfindStatus.NotRun;
-	PathfindStatus navagate_status_scissors = PathfindStatus.NotRun;
+	ArrayList<PathfindStatus> navagate_status = new ArrayList<PathfindStatus>();// {PathfindStatus.NotRun,PathfindStatus.NotRun,PathfindStatus.NotRun};
+	//PathfindStatus navagate_status_paper = PathfindStatus.NotRun;
+	//PathfindStatus navagate_status_scissors = PathfindStatus.NotRun;
 
-	protected Vector<WorldPoint> waypoint_list_paper = null;
-	protected Vector<WorldPoint> waypoint_list_rock = null;
-	protected Vector<WorldPoint> waypoint_list_scissors = null;
+	//bit more ugly TODO Change to List?
+	ArrayList<ArrayList<WorldPoint>> waypoint_list = new ArrayList<ArrayList<WorldPoint>>();
+	//protected Vector<WorldPoint>[] waypoint_list = new Vector<WorldPoint>[3]; 
+	//protected Vector<WorldPoint> waypoint_list_rock = null;
+	//protected Vector<WorldPoint> waypoint_list_scissors = null;
 	
-	
-
-
 	
 	int woodshop_countdown = 0;
 	int rockery_countdown = 0;
 	int smelter_countdown = 0;
 	
-	float paper_attractor_speed = 0;
-	float rock_attractor_speed = 0;
-	float scissor_attractor_speed = 0;
+	int paper_attractor_speed = 0;
+	int rock_attractor_speed = 0;
+	int scissor_attractor_speed = 0;
 	
 	boolean attack_paper = false;
 	boolean attack_rock = false;
 	boolean attack_scissors = false;
 	
-	WorldPoint attack_paper_dest;
-	WorldPoint attack_rock_dest;
-	WorldPoint attack_scissors_dest;
-	WorldPoint attack_paper_source;
-	WorldPoint attack_rock_source;
-	WorldPoint attack_scissors_source;
+	ArrayList<WorldPoint> attack_dest = new ArrayList<WorldPoint>();
+//	WorldPoint attack_rock_dest;
+//	WorldPoint attack_scissors_dest;
+	ArrayList<WorldPoint> attack_source = new ArrayList<WorldPoint>();
+//	WorldPoint attack_rock_source;
+//	WorldPoint attack_scissors_source;
 	
-	Vector<Building> attack_attractors = new Vector<Building>();
-	Vector<Building> defence_attractors = new Vector<Building>();
+	ArrayList<Building> attack_attractors = new ArrayList<Building>();
+	ArrayList<Building> defence_attractors = new ArrayList<Building>();
 	
 	private ObjectOwner me;
 	private ObjectOwner enemy;
+	
+	int AICount = 0;
 
 	public AI (ObjectOwner _playing_for) {
 		if (_playing_for == ObjectOwner.Enemy) {
@@ -80,12 +80,25 @@ public class AI implements Runnable {
 			me = ObjectOwner.Player;
 			enemy = ObjectOwner.Enemy;
 		}
+		
+		//These need to be appended for later storage
+		for (int i=0; i<3; ++i) {
+			pathfinding_thread.add(null);
+			pathfinder.add(null);
+			navagate_status.add(PathfindStatus.NotRun);
+			waypoint_list.add(null);
+			attack_dest.add(null);
+			attack_source.add(null);
+		}
+		
 	}
 
 	void CheckOffenceAttractors() {
 		//OFFENCE//
 		final Vector<Sprite> toRemove = new Vector<Sprite>();
 		for (Building _b : attack_attractors) {
+			Enum<BuildingType> _bt = _b.GetType();
+			
 			//Clean up any of our attack attractors which have been taken down
 			if (_b.GetDead() == true) {
 				System.out.println("--AI["+me+"]: ATTACK ATTRACTOR IS DEAD! - "+_b.GetType());
@@ -96,14 +109,7 @@ public class AI implements Runnable {
 				continue;
 			}
 			
-			//Continue if attractor has not reached final destination
-			if (_b.GetType() == BuildingType.AttractorPaper) {
-				if (waypoint_list_paper == null || waypoint_list_paper.size() > 0) continue;
-			} else if (_b.GetType() == BuildingType.AttractorRock) {
-				if (waypoint_list_rock == null || waypoint_list_rock.size() > 0) continue;
-			} else if (_b.GetType() == BuildingType.AttractorScissors) {
-				if (waypoint_list_scissors == null || waypoint_list_scissors.size() > 0) continue;
-			}
+			if (waypoint_list.get(_bt.ordinal()) == null || waypoint_list.get(_bt.ordinal()).size() > 0) continue;
 
 			//Is everything fine with this attractor? (we know it's at its final destination)
 			boolean aOK = false;
@@ -128,8 +134,8 @@ public class AI implements Runnable {
 				toAttackType = BuildingType.Woodshop;
 			}
 			Building toAttack = getWhatToAttack(toAttackType);
-			if (toAttack == null) {
-				toAttack = theSpriteManager.GetBase(enemy);
+			if (toAttack == null && utility.rnd() < 0.75f) {
+				toAttack = theSpriteManager.GetBase(enemy); //Go all out?
 			}
 			WorldPoint new_destination_location = null;
 			new_destination_location = theSpriteManager.FindGoodSpot(toAttack.GetLoc(), utility.attractorRadius, 2 * utility.wander_radius, false);
@@ -141,25 +147,11 @@ public class AI implements Runnable {
 			} else {
 				//now I go after yooo!
 				System.out.println("--AI["+me+"]: ATTACK ATTRACTOR "+_b.GetType()+" HAS A NEW TARGET: "+toAttack.GetType());
-				if (_b.GetType() == BuildingType.AttractorPaper) {
-					attack_paper_source = attack_paper_dest;
-					attack_paper_dest = new_destination_location;
-					pathfinding_thread_paper = null;
-					waypoint_list_paper = null;
-					navagate_status_paper = PathfindStatus.NotRun;
-				} else if (_b.GetType() == BuildingType.AttractorRock) {
-					attack_rock_source = attack_rock_dest;
-					attack_rock_dest = new_destination_location;
-					pathfinding_thread_rock = null;
-					waypoint_list_rock = null;
-					navagate_status_rock = PathfindStatus.NotRun;	
-				} else if (_b.GetType() == BuildingType.AttractorScissors) {
-					attack_scissors_source = attack_scissors_dest;
-					attack_scissors_dest = new_destination_location;
-					pathfinding_thread_scisors = null;
-					waypoint_list_scissors = null;
-					navagate_status_scissors = PathfindStatus.NotRun;			
-				}
+				attack_source.set(_bt.ordinal(), attack_dest.get(_bt.ordinal()) );
+				attack_dest.set(_bt.ordinal(), new_destination_location);
+				pathfinding_thread.set(_bt.ordinal(), null);
+				waypoint_list.set(_bt.ordinal(), null);
+				navagate_status.set(_bt.ordinal(), PathfindStatus.NotRun);
 			}
 		}
 		for (Sprite _s : toRemove) {
@@ -229,26 +221,25 @@ public class AI implements Runnable {
 			boolean rush = false;
 			if (utility.rnd() < 0.5f) rush = true;
 			
-			float _multiplier = 0.2f * utility.ticks_per_tock;
 			if (rush == true) { //everyone goes max speed
-				paper_attractor_speed = _multiplier * 2f;
-				rock_attractor_speed = _multiplier * 0.5f;
-				scissor_attractor_speed = _multiplier * 1f;
+				paper_attractor_speed = 1;
+				rock_attractor_speed = 3;
+				scissor_attractor_speed = 2;
 				System.out.println("----AI["+me+"]: RUSH ATTACK");
 			} else { //go speed on slowest
 				System.out.println("----AI["+me+"]: SLOW ATTACK");
 				if (toAttackWith.contains(ActorType.Rock)) {
-					paper_attractor_speed = _multiplier * 0.5f;
-					rock_attractor_speed = _multiplier * 0.5f;
-					scissor_attractor_speed = _multiplier * 0.5f;
+					paper_attractor_speed = 3;
+					rock_attractor_speed = 3;
+					scissor_attractor_speed = 3;
 				} else if (toAttackWith.contains(ActorType.Scissors)) {
-					paper_attractor_speed = _multiplier * 1f;
-					rock_attractor_speed = _multiplier * 1f;
-					scissor_attractor_speed = _multiplier * 1f;
+					paper_attractor_speed = 2;
+					rock_attractor_speed = 2;
+					scissor_attractor_speed = 2;
 				} else if (toAttackWith.contains(ActorType.Paper)) {
-					paper_attractor_speed = _multiplier * 2f;
-					rock_attractor_speed = _multiplier * 2f;
-					scissor_attractor_speed = _multiplier * 2f;
+					paper_attractor_speed = 1;
+					rock_attractor_speed = 1;
+					scissor_attractor_speed = 1;
 				}
 			}
 			
@@ -277,27 +268,18 @@ public class AI implements Runnable {
 				if (destination_location != null && starting_location != null) {
 					Building attackor = theSpriteManager.PlaceBuilding(starting_location, toBuild, me);
 					attack_attractors.add(attackor);
+					
+					attack_dest.set(toBuild.ordinal(), destination_location);
+					attack_source.set(toBuild.ordinal(), starting_location);
+					pathfinding_thread.set(toBuild.ordinal(), null);
+					waypoint_list.set(toBuild.ordinal(), null);
+					navagate_status.set(toBuild.ordinal(), PathfindStatus.NotRun);
 					if (_t == ActorType.Paper) {
-						attack_paper_dest = destination_location;
-						attack_paper_source = starting_location;
 						attack_paper = true;
-						pathfinding_thread_paper = null;
-						waypoint_list_paper = null;
-						navagate_status_paper = PathfindStatus.NotRun;
 					} else if (_t == ActorType.Rock) {
-						attack_rock_dest = destination_location;
-						attack_rock_source = starting_location;
 						attack_rock = true;
-						pathfinding_thread_rock = null;
-						waypoint_list_rock = null;
-						navagate_status_rock = PathfindStatus.NotRun;
 					} else if (_t == ActorType.Scissors) {
-						attack_scissors_dest = destination_location;
-						attack_scissors_source = starting_location;
 						attack_scissors = true;
-						pathfinding_thread_scisors = null;
-						waypoint_list_scissors = null;
-						navagate_status_scissors = PathfindStatus.NotRun;
 					}
 					System.out.println("------AI["+me+"]: "+_t+" WILL BE ATTACKING "+toAttack.GetType());
 				} else {
@@ -320,7 +302,7 @@ public class AI implements Runnable {
 		synchronized (theSpriteManager.GetActorObjects()) {
 			for (Actor _a : theSpriteManager.GetActorObjects()) {
 				if (_a.GetOwner() == me) continue; ///THIS WAS ObjectOwner.ENEMY(me) TODO CHECK AS I THINK IT SHOULD BE PLAYER (enemy)
-				if (_a.attack_target == null) continue;
+				if (_a.GetAttackTarget() == null) continue;
 				//Get if close to a target.
 				//EXTRA ALLOWANCE FOR DEFENCE, * 4 RATHER THAN * 2 TO KEEP CLEAR OF CURRENT WARZONES
 				boolean aOK = false;
@@ -367,54 +349,27 @@ public class AI implements Runnable {
 	}
 	
 	void CheckPathfindingThreads() {
-		//Check threads PAPER
-		if (pathfinding_thread_paper != null) {
-			if (pathfinding_thread_paper.isAlive() == true) {
-				navagate_status_paper = PathfindStatus.Running;
-				return; //Am currently path finding
-			} else {
-				waypoint_list_paper = pathfinder_paper.GetResult();
-				if (waypoint_list_paper == null) {
-					navagate_status_paper = PathfindStatus.Failed;
+		for (BuildingType _bt : BuildingType.values()) {
+			if (_bt.ordinal() > BuildingType.AttractorRock.ordinal()) { //Only do ATTRACTOR types
+				continue;
+			}
+			if (pathfinding_thread.get(_bt.ordinal()) != null) {
+				if (pathfinding_thread.get(_bt.ordinal()).isAlive() == true) {
+					navagate_status.set(_bt.ordinal(), PathfindStatus.Running);
+					return; //Am currently path finding
 				} else {
-					navagate_status_paper = PathfindStatus.Passed;
+					waypoint_list.set(_bt.ordinal(), pathfinder.get(_bt.ordinal()).GetResult());
+					if (waypoint_list.get(_bt.ordinal()) == null) {
+						navagate_status.set(_bt.ordinal(), PathfindStatus.Failed);
+					} else {
+						navagate_status.set(_bt.ordinal(), PathfindStatus.Passed);
+					}
+					pathfinder.set(_bt.ordinal(), null);
+					pathfinding_thread.set(_bt.ordinal(), null);
 				}
-				pathfinder_paper = null;
-				pathfinding_thread_paper = null;
 			}
 		}
-		//Check threads SCISSORS
-		if (pathfinding_thread_scisors != null) {
-			if (pathfinding_thread_scisors.isAlive() == true) {
-				navagate_status_scissors = PathfindStatus.Running;
-				return; //Am currently path finding
-			} else {
-				waypoint_list_scissors = pathfinder_scissors.GetResult();
-				if (waypoint_list_scissors == null) {
-					navagate_status_scissors = PathfindStatus.Failed;
-				} else {
-					navagate_status_scissors = PathfindStatus.Passed;
-				}
-				pathfinder_scissors = null;
-				pathfinding_thread_scisors = null;
-			}
-		}
-		//Check threads ROCK
-		if (pathfinding_thread_rock != null) {
-			if (pathfinding_thread_rock.isAlive() == true) {
-				navagate_status_rock = PathfindStatus.Running;
-				return; //Am currently path finding
-			} else {
-				waypoint_list_rock = pathfinder_rock.GetResult();
-				if (waypoint_list_rock == null) {
-					navagate_status_rock = PathfindStatus.Failed;
-				} else {
-					navagate_status_rock = PathfindStatus.Passed;
-				}
-				pathfinder_rock = null;
-				pathfinding_thread_rock = null;
-			}
-		}
+
 	}
 
 	void DoAttractorMoving() {
@@ -422,43 +377,30 @@ public class AI implements Runnable {
 		
 		if (attack_attractors.size() > 0) {
 			for (Building _b : attack_attractors) {
-				PathfindStatus navagate_status = null; 
-				if (_b.GetType() == BuildingType.AttractorPaper) {
-					navagate_status = navagate_status_paper;
-				} else if (_b.GetType() == BuildingType.AttractorRock) {
-					navagate_status = navagate_status_rock;
-				} else if (_b.GetType() == BuildingType.AttractorScissors ) {
-					navagate_status = navagate_status_scissors;
+				BuildingType _bt  = _b.GetType();
+				if (_bt == BuildingType.AttractorPaper) {
+					if (AICount % paper_attractor_speed != 0) continue;
+				} else if (_bt == BuildingType.AttractorRock) {
+					if (AICount % rock_attractor_speed != 0) continue;
+				} else if (_bt == BuildingType.AttractorScissors) {
+					if (AICount % scissor_attractor_speed != 0) continue;
 				}
-
 				//have I pathfinded-yet?
-				if (navagate_status == PathfindStatus.NotRun) {
-					if (_b.GetType() == BuildingType.AttractorPaper) {
-						pathfinder_paper = new Pathfinder(attack_paper_source, attack_paper_dest, utility.attractorRadius);
-						pathfinding_thread_paper = new Thread(pathfinder_paper);
-						pathfinding_thread_paper.start();
-					} else if (_b.GetType() == BuildingType.AttractorRock) {
-						pathfinder_rock = new Pathfinder(attack_rock_source, attack_rock_dest, utility.attractorRadius);
-						pathfinding_thread_rock = new Thread(pathfinder_rock);
-						pathfinding_thread_rock.start();
-					} else if (_b.GetType() == BuildingType.AttractorScissors ) {
-						pathfinder_scissors = new Pathfinder(attack_scissors_source, attack_scissors_dest, utility.attractorRadius);
-						pathfinding_thread_scisors = new Thread(pathfinder_scissors);
-						pathfinding_thread_scisors.start();
-					}					
-				} else if (navagate_status == PathfindStatus.Failed) {
-					//Navagation failed
+				if (navagate_status.get(_bt.ordinal()) == PathfindStatus.NotRun) {
+					pathfinder.set(_bt.ordinal(), new Pathfinder(attack_source.get(_bt.ordinal()), attack_dest.get(_bt.ordinal()), utility.attractorRadius) );
+					pathfinding_thread.set(_bt.ordinal(), new Thread(pathfinder.get(_bt.ordinal())) );
+					pathfinding_thread.get(_bt.ordinal()).start();
+				} else if (navagate_status.get(_bt.ordinal()) == PathfindStatus.Failed) {
+					//Navigation failed
 					Refund(_b); //can i get some cash back on that one?
-				} else if (navagate_status == PathfindStatus.Passed) {
-					//navagation good - Move to next waypoint
+				} else if (navagate_status.get(_bt.ordinal()) == PathfindStatus.Passed) {
+					//Navigation good - Move to next waypoint
 					WorldPoint waypoint = null;
-					if (_b.GetType() == BuildingType.AttractorPaper && waypoint_list_paper.size() > 0) {
-						waypoint = waypoint_list_paper.remove( waypoint_list_paper.size() - 1 );
-					} else if (_b.GetType() == BuildingType.AttractorRock && waypoint_list_rock.size() > 0) {
-						waypoint = waypoint_list_rock.remove( waypoint_list_rock.size() - 1 );
-					} else if (_b.GetType() == BuildingType.AttractorScissors && waypoint_list_scissors.size() > 0) {
-						waypoint = waypoint_list_scissors.remove( waypoint_list_scissors.size() - 1 );
+					
+					if (waypoint_list.get(_bt.ordinal()).size() > 0) {
+						waypoint = waypoint_list.get(_bt.ordinal()).remove( waypoint_list.get(_bt.ordinal()).size() - 1 );
 					}
+					
 					if (waypoint != null) {
 						_b.MoveBuilding(waypoint.getX(), waypoint.getY());
 					}
@@ -618,6 +560,7 @@ public class AI implements Runnable {
 	
 	@Override
 	public void run() {
+		++AICount;
 		//System.out.println("AI TICK");
 		
 		//Can we get rid of old building?

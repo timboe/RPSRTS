@@ -1,4 +1,4 @@
-package com.timboe.rpsrts.applet;
+package com.timboe.rpsrts.applet.managers;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -14,14 +14,17 @@ import java.util.HashSet;
 
 import javax.imageio.ImageIO;
 
+import com.timboe.rpsrts.applet.HighScore;
 import com.timboe.rpsrts.enumerators.BuildingType;
 import com.timboe.rpsrts.enumerators.GameMode;
 import com.timboe.rpsrts.enumerators.ObjectOwner;
+import com.timboe.rpsrts.managers.Bitmaps;
 import com.timboe.rpsrts.managers.ResourceManager;
 import com.timboe.rpsrts.managers.Utility;
-import com.timboe.rpsrts.sprites.Bitmaps;
 import com.timboe.rpsrts.sprites.Building;
 import com.timboe.rpsrts.sprites.WaterfallSplash;
+import com.timboe.rpsrts.applet.sprites.WaterfallSplash_Applet;
+
 
 public class SceneRenderer_Applet {
 	private static SceneRenderer_Applet singleton = new SceneRenderer_Applet();

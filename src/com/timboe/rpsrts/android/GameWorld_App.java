@@ -7,8 +7,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 
-import com.timboe.rpsrts.applet.WorldChunk_Applet;
-import com.timboe.rpsrts.applet.WorldTile_Applet;
 import com.timboe.rpsrts.managers.GameWorld;
 import com.timboe.rpsrts.world.WorldTile;
 
@@ -65,8 +63,8 @@ public class GameWorld_App extends GameWorld {
 		world_size = world_tiles * tiles_size;
 		island_size = (int) Math.round(utility.island_scale * world_size);
 		
-		tiles = new WorldTile_Applet[world_tiles*world_tiles];
-		chunks = new WorldChunk_Applet[world_chunks*world_chunks];
+		tiles = new WorldTile_App[world_tiles*world_tiles];
+		chunks = new WorldChunk_App[world_chunks*world_chunks];
 		render_tiles = new HashSet<WorldTile>();
 		
 		int ID = 0;

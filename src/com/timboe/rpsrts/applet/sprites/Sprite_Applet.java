@@ -1,4 +1,4 @@
-package com.timboe.rpsrts.applet;
+package com.timboe.rpsrts.applet.sprites;
 
 import java.awt.Graphics2D;
 

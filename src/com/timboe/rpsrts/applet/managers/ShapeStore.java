@@ -1,4 +1,4 @@
-package com.timboe.rpsrts.applet;
+package com.timboe.rpsrts.applet.managers;
 
 import java.awt.geom.GeneralPath;
 

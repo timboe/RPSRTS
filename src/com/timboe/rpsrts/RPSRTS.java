@@ -17,11 +17,12 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.util.Locale;
 
-import com.timboe.rpsrts.applet.GameWorld_Applet;
-import com.timboe.rpsrts.applet.SceneRenderer_Applet;
-import com.timboe.rpsrts.applet.ShapeStore;
-import com.timboe.rpsrts.applet.SpriteManager_Applet;
-import com.timboe.rpsrts.applet.TransformStore;
+
+import com.timboe.rpsrts.applet.managers.GameWorld_Applet;
+import com.timboe.rpsrts.applet.managers.SceneRenderer_Applet;
+import com.timboe.rpsrts.applet.managers.ShapeStore;
+import com.timboe.rpsrts.applet.managers.SpriteManager_Applet;
+import com.timboe.rpsrts.applet.managers.TransformStore;
 import com.timboe.rpsrts.enumerators.GameMode;
 import com.timboe.rpsrts.enumerators.ObjectOwner;
 import com.timboe.rpsrts.enumerators.ResourceType;

@@ -1,4 +1,4 @@
-package com.timboe.rpsrts.applet;
+package com.timboe.rpsrts.applet.managers;
 
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -9,7 +9,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import com.timboe.rpsrts.sprites.Bitmaps;
+import com.timboe.rpsrts.managers.Bitmaps;
 
 public class Bitmaps_Applet extends Bitmaps {
 	

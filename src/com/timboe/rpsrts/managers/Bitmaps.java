@@ -1,4 +1,4 @@
-package com.timboe.rpsrts.sprites;
+package com.timboe.rpsrts.managers;
 
 public class Bitmaps {
 	

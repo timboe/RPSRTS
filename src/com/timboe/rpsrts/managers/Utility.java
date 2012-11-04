@@ -131,11 +131,11 @@ public class Utility {
 	public final int spooges_building_death = 200;// 200;
 	public final int spooges_totem_death = 0; //30
 	public final int spooges_base_death = 1000;
-	public final float spooges_scale_actor_death = 1f;
-	public final float spooges_scale_hit = 1f;
-	public final float spooges_scale_building_death = 1f;
-	public final float spooges_scale_totem_death = 1f;
-	public final float spooges_scale_base_death = 1f;
+	public final float spooges_scale_actor_death = 0.1f;
+	public final float spooges_scale_hit = 0.05f;
+	public final float spooges_scale_building_death = 0.3f;
+	public final float spooges_scale_totem_death = 0.2f;
+	public final float spooges_scale_base_death = 0.5f;
 	
 	//score settings
 	public final int extra_score_mins = 10; //how many mins until no quick win bonus

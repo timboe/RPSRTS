@@ -1,10 +1,12 @@
-package com.timboe.rpsrts.applet;
+package com.timboe.rpsrts.applet.sprites;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
+import com.timboe.rpsrts.applet.managers.Bitmaps_Applet;
+import com.timboe.rpsrts.applet.managers.TransformStore;
 import com.timboe.rpsrts.enumerators.ActorType;
 import com.timboe.rpsrts.enumerators.ObjectOwner;
 import com.timboe.rpsrts.sprites.Actor;

@@ -1,4 +1,4 @@
-package com.timboe.rpsrts.applet;
+package com.timboe.rpsrts.applet.world;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
