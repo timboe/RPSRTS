@@ -2,11 +2,14 @@ package com.timboe.rpsrts.ai;
 
 import java.util.Vector;
 
+import com.timboe.rpsrts.enumerators.ActorBehaviour;
 import com.timboe.rpsrts.enumerators.ActorType;
 import com.timboe.rpsrts.enumerators.BuildingType;
 import com.timboe.rpsrts.enumerators.ObjectOwner;
+import com.timboe.rpsrts.enumerators.PathfindStatus;
 import com.timboe.rpsrts.enumerators.ResourceType;
 import com.timboe.rpsrts.managers.GameWorld;
+import com.timboe.rpsrts.managers.PathfinderGrid;
 import com.timboe.rpsrts.managers.ResourceManager;
 import com.timboe.rpsrts.managers.SpriteManager;
 import com.timboe.rpsrts.managers.Utility;
@@ -14,6 +17,7 @@ import com.timboe.rpsrts.sprites.Actor;
 import com.timboe.rpsrts.sprites.Building;
 import com.timboe.rpsrts.sprites.Resource;
 import com.timboe.rpsrts.sprites.Sprite;
+import com.timboe.rpsrts.world.Pathfinder;
 import com.timboe.rpsrts.world.WorldPoint;
 
 public class AI implements Runnable {
@@ -21,6 +25,26 @@ public class AI implements Runnable {
 	private final GameWorld theWorld = GameWorld.GetGameWorld();
 	protected final SpriteManager theSpriteManager = SpriteManager.GetSpriteManager();
 	private final ResourceManager resource_manager = ResourceManager.GetResourceManager();
+//	private final PathfinderGrid thePathfinderGrid = PathfinderGrid.GetPathfinderGrid();
+	
+	Thread pathfinding_thread_rock;
+	Thread pathfinding_thread_paper;
+	Thread pathfinding_thread_scisors;
+
+	Pathfinder pathfinder_rock;
+	Pathfinder pathfinder_paper;
+	Pathfinder pathfinder_scissors;
+
+	PathfindStatus navagate_status_rock = PathfindStatus.NotRun;
+	PathfindStatus navagate_status_paper = PathfindStatus.NotRun;
+	PathfindStatus navagate_status_scissors = PathfindStatus.NotRun;
+
+	protected Vector<WorldPoint> waypoint_list_paper = null;
+	protected Vector<WorldPoint> waypoint_list_rock = null;
+	protected Vector<WorldPoint> waypoint_list_scissors = null;
+	
+	
+
 
 	
 	int woodshop_countdown = 0;
@@ -58,17 +82,30 @@ public class AI implements Runnable {
 		}
 	}
 
-	void CheckAttractors() {
-		//OFFENCE
+	void CheckOffenceAttractors() {
+		//OFFENCE//
+		final Vector<Sprite> toRemove = new Vector<Sprite>();
 		for (Building _b : attack_attractors) {
-			if (_b.GetType() == BuildingType.AttractorPaper) {
-				if (attack_paper_source != attack_paper_dest) continue;
-			} else if (_b.GetType() == BuildingType.AttractorRock) {
-				if (attack_rock_source != attack_rock_dest) continue;
-			} else if (_b.GetType() == BuildingType.AttractorScissors) {
-				if (attack_scissors_source != attack_scissors_dest) continue;
+			//Clean up any of our attack attractors which have been taken down
+			if (_b.GetDead() == true) {
+				System.out.println("--AI["+me+"]: ATTACK ATTRACTOR IS DEAD! - "+_b.GetType());
+				toRemove.add(_b);
+				if(_b.GetType() == BuildingType.AttractorPaper) attack_paper = false;
+				else if(_b.GetType() == BuildingType.AttractorRock) attack_rock = false;
+				else if(_b.GetType() == BuildingType.AttractorScissors) attack_scissors = false;
+				continue;
 			}
 			
+			//Continue if attractor has not reached final destination
+			if (_b.GetType() == BuildingType.AttractorPaper) {
+				if (waypoint_list_paper == null || waypoint_list_paper.size() > 0) continue;
+			} else if (_b.GetType() == BuildingType.AttractorRock) {
+				if (waypoint_list_rock == null || waypoint_list_rock.size() > 0) continue;
+			} else if (_b.GetType() == BuildingType.AttractorScissors) {
+				if (waypoint_list_scissors == null || waypoint_list_scissors.size() > 0) continue;
+			}
+
+			//Is everything fine with this attractor? (we know it's at its final destination)
 			boolean aOK = false;
 			synchronized (theSpriteManager.GetBuildingOjects()) {
 				for (Building _bb : theSpriteManager.GetBuildingOjects()) {
@@ -79,10 +116,9 @@ public class AI implements Runnable {
 					}
 				}	
 			}
-			if (aOK == true) continue;
-			
-			//if no nearby enemy buildings then not aOK
-			//find something new to attack
+			if (aOK == true) continue; //There is an enemy building nearby - good!
+		
+			//If this is executing then there is no enemy building nearby - can we move?
 			BuildingType toAttackType = null;
 			if (_b.GetType() == BuildingType.AttractorPaper) {
 				toAttackType = BuildingType.Rockery;
@@ -92,23 +128,46 @@ public class AI implements Runnable {
 				toAttackType = BuildingType.Woodshop;
 			}
 			Building toAttack = getWhatToAttack(toAttackType);
-			WorldPoint destination_location= null;
-			
-			if (toAttack != null) {
-				destination_location = theSpriteManager.FindGoodSpot(toAttack.GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
+			if (toAttack == null) {
+				toAttack = theSpriteManager.GetBase(enemy);
 			}
+			WorldPoint new_destination_location = null;
+			new_destination_location = theSpriteManager.FindGoodSpot(toAttack.GetLoc(), utility.attractorRadius, 2 * utility.wander_radius, false);
 			
-			if (toAttack == null || destination_location == null) {
-				//refund plz
+			if (new_destination_location == null) {
+				//bah! refund then please
+				System.out.println("--AI["+me+"]: ATTACK ATTRACTOR "+_b.GetType()+" CAN NOT FIND ALT TARGET, REFUNDING.");
 				Refund(_b);
 			} else {
-				//now I go after yooo
-				if (_b.GetType() == BuildingType.AttractorPaper) attack_paper_dest = destination_location;
-				else if (_b.GetType() == BuildingType.AttractorRock) attack_rock_dest = destination_location;
-				else if (_b.GetType() == BuildingType.AttractorScissors) attack_scissors_dest = destination_location;
+				//now I go after yooo!
+				System.out.println("--AI["+me+"]: ATTACK ATTRACTOR "+_b.GetType()+" HAS A NEW TARGET: "+toAttack.GetType());
+				if (_b.GetType() == BuildingType.AttractorPaper) {
+					attack_paper_source = attack_paper_dest;
+					attack_paper_dest = new_destination_location;
+					pathfinding_thread_paper = null;
+					waypoint_list_paper = null;
+					navagate_status_paper = PathfindStatus.NotRun;
+				} else if (_b.GetType() == BuildingType.AttractorRock) {
+					attack_rock_source = attack_rock_dest;
+					attack_rock_dest = new_destination_location;
+					pathfinding_thread_rock = null;
+					waypoint_list_rock = null;
+					navagate_status_rock = PathfindStatus.NotRun;	
+				} else if (_b.GetType() == BuildingType.AttractorScissors) {
+					attack_scissors_source = attack_scissors_dest;
+					attack_scissors_dest = new_destination_location;
+					pathfinding_thread_scisors = null;
+					waypoint_list_scissors = null;
+					navagate_status_scissors = PathfindStatus.NotRun;			
+				}
 			}
 		}
-
+		for (Sprite _s : toRemove) {
+			attack_attractors.remove(_s);
+		}
+	}
+	
+	private void CheckDefenceAttractors() {
 		//DEFENCE
 		for (Building _b : defence_attractors) {
 			boolean enemy_troop_nearby = false;
@@ -132,65 +191,52 @@ public class AI implements Runnable {
 	void CheckIfAttack() {
 		
 		if (utility.rnd() > 0.01f) return; //only try attack 1% of tocks
-		System.out.println("TRY ATTACK");
+		System.out.println("AI["+me+"]: TRY ATTACK");
 
-		final Vector<Sprite> toKill = new Vector<Sprite>();
-		for (Building _b : attack_attractors) {
-			if (_b.GetDead() == true) {
-				toKill.add(_b);
-				if(_b.GetType() == BuildingType.AttractorPaper) attack_paper = false;
-				else if(_b.GetType() == BuildingType.AttractorRock) attack_rock = false;
-				else if(_b.GetType() == BuildingType.AttractorScissors) attack_scissors = false;
-			}
-		}
-		for (Sprite _s : toKill) {
-			attack_attractors.remove(_s);
-		}
-
+		//Now to see with what to attack
 		Vector<ActorType> toAttackWith = new Vector<ActorType>();
-		
-		//grow to 50%, cap chance at 50%
-		float paper_chance = (((float) resource_manager.GetNPaper(me) - 2)/ (float)(utility.AI_TargetUnitMultipler * utility.EXTRA_Paper_PerWoodmill))/2f;
-		if (paper_chance > 0.5) paper_chance = 0.5f;
-		if (utility.rnd() < paper_chance 
+		if (utility.rnd() < GetAttackChance(ActorType.Paper) 
 				&& attack_paper == false 
 				&& resource_manager.CanAfford(BuildingType.AttractorPaper, me) == true) {
-			attack_paper = true;
 			toAttackWith.add(ActorType.Paper);
-			System.out.println("ATTACK WITH: PAPER");
+			System.out.println("--AI["+me+"]: ATTACK WITH: PAPER (Attack chance "+GetAttackChance(ActorType.Paper) +")");
 		}
 		
-		float rock_chance = (((float) resource_manager.GetNRock(me) - 2)/ (float)(utility.AI_TargetUnitMultipler * utility.EXTRA_Rock_PerRockery))/2f;
-		if (rock_chance > 0.5) rock_chance = 0.5f;
-		if (utility.rnd() < rock_chance 
+		if (utility.rnd() < GetAttackChance(ActorType.Rock)
 				&& attack_rock == false
 				&& resource_manager.CanAfford(BuildingType.AttractorRock, me) == true) {
-			attack_rock = true;
 			toAttackWith.add(ActorType.Rock);
-			System.out.println("ATTACK WITH: ROCK");
+			System.out.println("--AI["+me+"]: ATTACK WITH: ROCK (Attack chance "+GetAttackChance(ActorType.Rock) +")");
 		}
 		
-		float scissors_chance = (((float) resource_manager.GetNScissor(me) - 2)/ (float)(utility.AI_TargetUnitMultipler * utility.EXTRA_Scissors_PerSmelter))/2f;
-		if (scissors_chance > 0.5) scissors_chance = 0.5f;
-		if (utility.rnd() < scissors_chance 
+		if (utility.rnd() < GetAttackChance(ActorType.Scissors) 
 				&& attack_scissors == false 
 				&& resource_manager.CanAfford(BuildingType.AttractorScissors, me) == true) {
-			attack_scissors = true;
 			toAttackWith.add(ActorType.Scissors);
-			System.out.println("ATTACK WITH: SCISSORS");
+			System.out.println("--AI["+me+"]: ATTACK WITH: SCISSORS (Attack chance "+GetAttackChance(ActorType.Scissors) +")");
+		}
+		
+		//Prefer to attack with multiple. 70% chance of calling off attack if only one type involved
+		if (toAttackWith.size() == 1) {
+			if (utility.rnd() < 0.7f) {
+				toAttackWith.clear();
+				System.out.println("----AI["+me+"]: ATTACK CANCELLED DUE TO POOR PARTICIPATION OF RPS");
+			}
 		}
 		
 		if (toAttackWith.size() > 0) {
 			//decide rush or careful
 			boolean rush = false;
-			if (utility.rnd() > 0.5) rush = true;
+			if (utility.rnd() < 0.5f) rush = true;
 			
 			float _multiplier = 0.2f * utility.ticks_per_tock;
 			if (rush == true) { //everyone goes max speed
 				paper_attractor_speed = _multiplier * 2f;
 				rock_attractor_speed = _multiplier * 0.5f;
 				scissor_attractor_speed = _multiplier * 1f;
+				System.out.println("----AI["+me+"]: RUSH ATTACK");
 			} else { //go speed on slowest
+				System.out.println("----AI["+me+"]: SLOW ATTACK");
 				if (toAttackWith.contains(ActorType.Rock)) {
 					paper_attractor_speed = _multiplier * 0.5f;
 					rock_attractor_speed = _multiplier * 0.5f;
@@ -205,7 +251,6 @@ public class AI implements Runnable {
 					scissor_attractor_speed = _multiplier * 2f;
 				}
 			}
-			
 			
 			for (ActorType _t : toAttackWith) {
 				BuildingType toAttackType = null;
@@ -222,26 +267,41 @@ public class AI implements Runnable {
 				}			
 				//find a place to attack
 				Building toAttack = getWhatToAttack(toAttackType);
-				//since 1st attack then if this comes back nill, go for base!
+				//if this comes back nill, go for base!
 				if (toAttack == null) {
 					toAttack = theSpriteManager.GetBase(enemy);
 				}
 
-				WorldPoint destination_location = theSpriteManager.FindGoodSpot(toAttack.GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
-				WorldPoint starting_location = theSpriteManager.FindGoodSpot(theSpriteManager.GetBase(me).GetLoc(), utility.attractorRadius, utility.attractorRadius*10, false);
+				WorldPoint destination_location = theSpriteManager.FindGoodSpot(toAttack.GetLoc(), utility.attractorRadius, 2 * utility.wander_radius, false);
+				WorldPoint starting_location = theSpriteManager.FindGoodSpot(theSpriteManager.GetBase(me).GetLoc(), utility.attractorRadius, 2 * utility.wander_radius, false);
 				if (destination_location != null && starting_location != null) {
 					Building attackor = theSpriteManager.PlaceBuilding(starting_location, toBuild, me);
 					attack_attractors.add(attackor);
 					if (_t == ActorType.Paper) {
 						attack_paper_dest = destination_location;
 						attack_paper_source = starting_location;
+						attack_paper = true;
+						pathfinding_thread_paper = null;
+						waypoint_list_paper = null;
+						navagate_status_paper = PathfindStatus.NotRun;
 					} else if (_t == ActorType.Rock) {
 						attack_rock_dest = destination_location;
 						attack_rock_source = starting_location;
+						attack_rock = true;
+						pathfinding_thread_rock = null;
+						waypoint_list_rock = null;
+						navagate_status_rock = PathfindStatus.NotRun;
 					} else if (_t == ActorType.Scissors) {
 						attack_scissors_dest = destination_location;
 						attack_scissors_source = starting_location;
+						attack_scissors = true;
+						pathfinding_thread_scisors = null;
+						waypoint_list_scissors = null;
+						navagate_status_scissors = PathfindStatus.NotRun;
 					}
+					System.out.println("------AI["+me+"]: "+_t+" WILL BE ATTACKING "+toAttack.GetType());
+				} else {
+					System.out.println("------AI["+me+"]: "+_t+" ATTACK FAILED DUE TO LACK OF GOOD LOCATION");
 				}
 			}
 		}
@@ -306,61 +366,128 @@ public class AI implements Runnable {
 		
 	}
 	
+	void CheckPathfindingThreads() {
+		//Check threads PAPER
+		if (pathfinding_thread_paper != null) {
+			if (pathfinding_thread_paper.isAlive() == true) {
+				navagate_status_paper = PathfindStatus.Running;
+				return; //Am currently path finding
+			} else {
+				waypoint_list_paper = pathfinder_paper.GetResult();
+				if (waypoint_list_paper == null) {
+					navagate_status_paper = PathfindStatus.Failed;
+				} else {
+					navagate_status_paper = PathfindStatus.Passed;
+				}
+				pathfinder_paper = null;
+				pathfinding_thread_paper = null;
+			}
+		}
+		//Check threads SCISSORS
+		if (pathfinding_thread_scisors != null) {
+			if (pathfinding_thread_scisors.isAlive() == true) {
+				navagate_status_scissors = PathfindStatus.Running;
+				return; //Am currently path finding
+			} else {
+				waypoint_list_scissors = pathfinder_scissors.GetResult();
+				if (waypoint_list_scissors == null) {
+					navagate_status_scissors = PathfindStatus.Failed;
+				} else {
+					navagate_status_scissors = PathfindStatus.Passed;
+				}
+				pathfinder_scissors = null;
+				pathfinding_thread_scisors = null;
+			}
+		}
+		//Check threads ROCK
+		if (pathfinding_thread_rock != null) {
+			if (pathfinding_thread_rock.isAlive() == true) {
+				navagate_status_rock = PathfindStatus.Running;
+				return; //Am currently path finding
+			} else {
+				waypoint_list_rock = pathfinder_rock.GetResult();
+				if (waypoint_list_rock == null) {
+					navagate_status_rock = PathfindStatus.Failed;
+				} else {
+					navagate_status_rock = PathfindStatus.Passed;
+				}
+				pathfinder_rock = null;
+				pathfinding_thread_rock = null;
+			}
+		}
+	}
+
 	void DoAttractorMoving() {
+		CheckPathfindingThreads();
+		
 		if (attack_attractors.size() > 0) {
 			for (Building _b : attack_attractors) {
-				WorldPoint _d = null;
-				WorldPoint _f = null;
-				float _speed = 0;
+				PathfindStatus navagate_status = null; 
 				if (_b.GetType() == BuildingType.AttractorPaper) {
-					_d = attack_paper_dest;
-					_f = attack_paper_source;
-					_speed = paper_attractor_speed;
+					navagate_status = navagate_status_paper;
 				} else if (_b.GetType() == BuildingType.AttractorRock) {
-					_d = attack_rock_dest;
-					_f = attack_rock_source;
-					_speed = rock_attractor_speed;
+					navagate_status = navagate_status_rock;
 				} else if (_b.GetType() == BuildingType.AttractorScissors ) {
-					_d = attack_scissors_dest;
-					_f = attack_scissors_source;
-					_speed = scissor_attractor_speed;
+					navagate_status = navagate_status_scissors;
 				}
-				
-				if (utility.Seperation(_d, _f) > _b.GetR() * 5) { //try move me closer
-					final float _hypotenuse = utility.Seperation(_b.GetLoc(), _d);
-					final int new_x = (int) (_f.getX() - ((_f.getX() - _d.getX()) / _hypotenuse) * _speed);
-					final int new_y = (int) (_f.getX() - ((_f.getX() - _d.getY()) / _hypotenuse) * _speed);
-					
-					_f.setLocation(new_x, new_y);					
-					_b.MoveBuilding(new_x, new_y);
-				} else {
-					_f = _d;
+
+				//have I pathfinded-yet?
+				if (navagate_status == PathfindStatus.NotRun) {
+					if (_b.GetType() == BuildingType.AttractorPaper) {
+						pathfinder_paper = new Pathfinder(attack_paper_source, attack_paper_dest, utility.attractorRadius);
+						pathfinding_thread_paper = new Thread(pathfinder_paper);
+						pathfinding_thread_paper.start();
+					} else if (_b.GetType() == BuildingType.AttractorRock) {
+						pathfinder_rock = new Pathfinder(attack_rock_source, attack_rock_dest, utility.attractorRadius);
+						pathfinding_thread_rock = new Thread(pathfinder_rock);
+						pathfinding_thread_rock.start();
+					} else if (_b.GetType() == BuildingType.AttractorScissors ) {
+						pathfinder_scissors = new Pathfinder(attack_scissors_source, attack_scissors_dest, utility.attractorRadius);
+						pathfinding_thread_scisors = new Thread(pathfinder_scissors);
+						pathfinding_thread_scisors.start();
+					}					
+				} else if (navagate_status == PathfindStatus.Failed) {
+					//Navagation failed
+					Refund(_b); //can i get some cash back on that one?
+				} else if (navagate_status == PathfindStatus.Passed) {
+					//navagation good - Move to next waypoint
+					WorldPoint waypoint = null;
+					if (_b.GetType() == BuildingType.AttractorPaper && waypoint_list_paper.size() > 0) {
+						waypoint = waypoint_list_paper.remove( waypoint_list_paper.size() - 1 );
+					} else if (_b.GetType() == BuildingType.AttractorRock && waypoint_list_rock.size() > 0) {
+						waypoint = waypoint_list_rock.remove( waypoint_list_rock.size() - 1 );
+					} else if (_b.GetType() == BuildingType.AttractorScissors && waypoint_list_scissors.size() > 0) {
+						waypoint = waypoint_list_scissors.remove( waypoint_list_scissors.size() - 1 );
+					}
+					if (waypoint != null) {
+						_b.MoveBuilding(waypoint.getX(), waypoint.getY());
+					}
 				}
 			}
 		}
 	}
 	
 	void DoUnitProduction() {
-		//if we're not _really_ short on people then turn off unit production if peeps too low
-		if (resource_manager.GetNWood(me) - utility.COST_Paper_Wood < utility.COST_AttractorPaper_Wood 
-				&& resource_manager.GetNPaper(me) > 3) {
-			resource_manager.SetGeneratingPaper(me, false);
-		} else {
+		//If we have enough resources to make a new unit and still have enough left for an attractor
+		//OR there are less than AI_MinUnits left, then make units.
+		
+		if ((resource_manager.GetNWood(me) - utility.COST_Paper_Wood) > utility.COST_AttractorPaper_Wood 
+				|| resource_manager.GetNPaper(me) < utility.AI_MinUnits) {
 			resource_manager.SetGeneratingPaper(me, true);
-		}
-		//if we're not _really_ short on people then turn off unit production if peeps too low
-		if (resource_manager.GetNIron(me) - utility.COST_Scissors_Iron < utility.COST_AttractorScissors_Iron 
-				&& resource_manager.GetNScissor(me) > 3) {
-			resource_manager.SetGeneratingScissors(me, false);
 		} else {
+			resource_manager.SetGeneratingPaper(me, false);
+		}
+		if ((resource_manager.GetNIron(me) - utility.COST_Scissors_Iron) > utility.COST_AttractorScissors_Iron 
+				|| resource_manager.GetNScissor(me) < utility.AI_MinUnits) {
 			resource_manager.SetGeneratingScissors(me, true);
-		}
-		//if we're not _really_ short on people then turn off unit production if peeps too low
-		if (resource_manager.GetNStone(me) - utility.COST_Rock_Stone < utility.COST_AttractorRock_Stone 
-				&& resource_manager.GetNRock(me) > 3) {
-			resource_manager.SetGeneratingRock(me, false);
 		} else {
+			resource_manager.SetGeneratingScissors(me, false);
+		}
+		if ((resource_manager.GetNStone(me) - utility.COST_Rock_Stone) > utility.COST_AttractorRock_Stone 
+				|| resource_manager.GetNRock(me) < utility.AI_MinUnits) {
 			resource_manager.SetGeneratingRock(me, true);
+		} else {
+			resource_manager.SetGeneratingRock(me, false);
 		}
 	}
 	
@@ -431,6 +558,7 @@ public class AI implements Runnable {
 	}
 	
 	Building getWhatToAttack(BuildingType toAttackType) {
+		//Find nearest of building type to my base
 		Building toAttack = null;
 		float distanceToTarget = utility.minimiser_start;
 		synchronized (theSpriteManager.GetBuildingOjects()) {
@@ -445,6 +573,29 @@ public class AI implements Runnable {
 			}
 		}
 		return toAttack;
+	}
+	
+	public float GetAttackChance(ActorType _actor_type) {
+		float _units = 0;
+		float _desired_cap = 0;
+		if (_actor_type == ActorType.Paper) {
+			_units = resource_manager.GetNPaper(me);
+			_desired_cap = utility.AI_TargetUnitMultipler * utility.EXTRA_Paper_PerWoodmill;
+		} else if (_actor_type == ActorType.Rock) {
+			_units = resource_manager.GetNRock(me);
+			_desired_cap = utility.AI_TargetUnitMultipler * utility.EXTRA_Rock_PerRockery;
+		} else if (_actor_type == ActorType.Scissors) {
+			_units = resource_manager.GetNScissor(me);
+			_desired_cap = utility.AI_TargetUnitMultipler * utility.EXTRA_Scissors_PerSmelter;
+		}
+		
+		//Subtract our minimum units
+		_units -= utility.AI_MinUnits;
+		
+		//Get how close we are to desired population level
+		float _fraction_of_desired = _units / _desired_cap;
+		//Chance of attack is fraction of desired / 2
+		return _fraction_of_desired / 2f;
 	}
 	
 	void Refund(Building _b) {
@@ -480,28 +631,24 @@ public class AI implements Runnable {
 		if (rockery_countdown > 0) --rockery_countdown;
 		if (smelter_countdown > 0) --smelter_countdown;
 		
-		//try an attack
-		CheckIfAttack();
-		
-		//move attractors towards their destinations with their payloads
-		DoAttractorMoving();
-		
-		//check if need to defend
-		CheckIfDefence();
-		
 		//Do we need all our attack and defence attractors any more?
 		//refund/move if not
-		CheckAttractors();
+		CheckOffenceAttractors();
+//		CheckDefenceAttractors();
+
+		//check if need to defend
+//		CheckIfDefence();
+		
+		//try an attack
+		CheckIfAttack();
+		//move attractors towards their destinations with their payloads
+		DoAttractorMoving();
 
 		//see if we can build new building, collect moar nomz.
 		TryBuildResourceGathere();
 
 	}
-	
-	public void Tock() {
 
-	}
-	
 	void TryBuildResourceGathere() {
 		final Vector<BuildingType> toPlace = new Vector<BuildingType>();
 		if (resource_manager.CanAfford(BuildingType.Woodshop, me) == true

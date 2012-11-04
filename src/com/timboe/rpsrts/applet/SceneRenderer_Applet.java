@@ -59,6 +59,9 @@ public class SceneRenderer_Applet {
 	public Point CurMouse;
 	public Point2D MouseTF;
 	
+	HighScore highScore;
+	Thread highScoreThread;
+	
     Font myFont = new Font(Font.MONOSPACED, Font.BOLD, 12);
     Font myGridFont = new Font(Font.MONOSPACED, Font.BOLD, 20);
     Font myBigFont = new Font(Font.MONOSPACED, Font.BOLD, 100);
@@ -70,6 +73,8 @@ public class SceneRenderer_Applet {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
+		highScore = new HighScore();
+		highScoreThread = new Thread(highScore);
 		System.out.println("--- Scene renderer spawned (depends on Util,World,Bitmap,Sprite,Trans,Resource): "+this);
 	}
 	
@@ -157,7 +162,11 @@ public class SceneRenderer_Applet {
 		if (utility.gameMode == GameMode.gameOverWon) {
 			g2.setTransform(theTransforms.af_none);
 			g2.drawImage(theBitmaps.WIN,0,0,null);
-			clicked = drawButton(g2, 195, 500, 605, "I CAN DO BETTER!", 60);
+			if (utility.playerName == "") {
+				clicked = drawButton(g2, 195, 500, 605, "SUBMIT MY SCORE!", 60);
+			} else {
+				clicked = drawButton(g2, 195, 500, 605, "RETURN TO TITLE SCREEN", 0);
+			}
 		} else {
 			g2.setTransform(theTransforms.af_none);
 			g2.drawImage(theBitmaps.LOOSE,0,0,null);
@@ -166,11 +175,7 @@ public class SceneRenderer_Applet {
 		if (clicked == true) {
 			if (utility.playerName != null) {
 				//Do high score!
-				try {
-					utility._RPSRTS.SubmitHighScore();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				highScoreThread.run();
 			}
 			utility._RPSRTS.genNewWorld();
 			utility.doWorldGen = false;
@@ -190,6 +195,8 @@ public class SceneRenderer_Applet {
 			cursor = "|";
 		}
 		drawButton(g2, 500, 50, 480, "YOUR NAME:"+utility.playerName+cursor, 20);
+		g2.setFont(myFont);
+		drawStatBox(g2, "By entering a name below, you agree to upload and display of your", " score along with statistics from your game.", "", "", 480, 8);
 
 	}
 	
@@ -303,6 +310,10 @@ public class SceneRenderer_Applet {
 	private void drawStatBox(Graphics2D _g2, String _s1, String _s2, String _s3, String _s4) {
 		int _x = (int)CurMouse.getX() - con_start_x/2 - x_add*3;
 		int _y = (int)CurMouse.getY() + x_add/2;
+		drawStatBox(_g2, _s1, _s2, _s3, _s4, _x, _y);
+	}
+	
+	private void drawStatBox(Graphics2D _g2, String _s1, String _s2, String _s3, String _s4, int _x, int _y) {
 		final int _os = 15;
 		final int box_w = 500;
 		int box_h = 70;

@@ -856,7 +856,7 @@ public class SpriteManager {
 					}
 					if (toHire != null) {
 						toHire.SetJob(ActorJob.Guard, _b);
-						System.out.println("NEW JOB "+toHire.GetOwner()+" "+toHire.GetType()+" is going to GUARD "+_b.GetType());
+						//System.out.println("NEW JOB "+toHire.GetOwner()+" "+toHire.GetType()+" is going to GUARD "+_b.GetType());
 					}
 				}
 			}

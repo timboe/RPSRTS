@@ -77,6 +77,12 @@ public class ResourceManager {
 	private int ENEMY_ROCK;
 	private int ENEMY_PAPER;
 	
+	//
+	
+	private int STAT_TreesChopped;
+	private int STAT_ProjectilesFired;
+	
+	
 	
 	
 	public int GetGlobalWood() {

@@ -1,3 +1,3 @@
 package com.timboe.rpsrts.enumerators;
 
-public enum PathfindStatus {NotRun, Passed, Failed}
+public enum PathfindStatus {NotRun, Running, Passed, Failed}

@@ -15,13 +15,34 @@ public class Pathfinder implements Runnable {
 	private final PathfinderGrid thePathfinderGrid = PathfinderGrid.GetPathfinderGrid();
 	
 	private Vector<WorldPoint> result = null; //TODO make me something better
-	private final Sprite fromSprite;
-	private final Sprite toSprite;
+	private final WorldPoint fromLoc;
+	private final WorldPoint toLoc;
+	private final int r_from;
+	private final int r_to;
 	private Boolean killMe = false;
 	
     public Pathfinder(Sprite _from, Sprite _to) {
-    	fromSprite = _from;
-    	toSprite = _to;
+    	if (_to != null) {
+    		toLoc = _to.GetLoc();
+        	r_to = _to.GetR();
+    	} else {
+    		toLoc = null;
+        	r_to = 0;
+    	}
+    	if (_from != null) {
+        	fromLoc = _from.GetLoc();
+        	r_from = _from.GetR();
+    	} else {
+        	fromLoc = null;
+        	r_from = 0;
+    	}
+    }
+    
+    public Pathfinder(WorldPoint _from, WorldPoint _to, int _r) {
+    	fromLoc = _from;
+    	toLoc = _to;
+    	r_from = _r;
+    	r_to = _r;
     }
 
     public Vector<WorldPoint> GetResult() {
@@ -37,7 +58,7 @@ public class Pathfinder implements Runnable {
     	if (killMe == true) return;
 //System.out.println("GOING FROM ("+fromSprite.GetX()+","+fromSprite.GetY()+") TO ("+toSprite.GetX()+","+toSprite.GetY()+")!");
 
-    	if (fromSprite == null || toSprite == null) {
+    	if (fromLoc == null || toLoc == null) {
     		Kill();
     		return;
     	}
@@ -45,9 +66,9 @@ public class Pathfinder implements Runnable {
     	final HashMap<WorldPoint, PTWeight> _closed_set = new HashMap<WorldPoint, PTWeight>();
     	final HashMap<WorldPoint, PTWeight> _open_set = new HashMap<WorldPoint, PTWeight>();
     	
-		final float DistToDest = utility.Seperation(fromSprite.GetLoc(), toSprite.GetLoc());
+		final float DistToDest = utility.Seperation(fromLoc, toLoc);
 		//get nearest accessible
-		WeightedPoint closed_set_starter_node = theSpriteManager.ClipToGrid(fromSprite.GetLoc());
+		WeightedPoint closed_set_starter_node = theSpriteManager.ClipToGrid(fromLoc);
 		
 		//couldn't find a start node
 		if (closed_set_starter_node == null) {
@@ -96,7 +117,7 @@ public class Pathfinder implements Runnable {
 			
 			//Is this the soloution?
 			if ( (++loop > utility.pathfinding_max_depth)
-					|| utility.Seperation(A_loc, toSprite.GetLoc()) < (utility.tiles_size + fromSprite.GetR() + toSprite.GetR())) {
+					|| utility.Seperation(A_loc, toLoc) < (utility.tiles_size + r_from + r_to)) {
 					//|| (Math.abs(A.GetX() - _to.GetX()) <= pathfinding_accuracy && Math.abs(A.GetY() - _to.GetY()) <= pathfinding_accuracy) ) {
 				soloution = A;
 				break;
@@ -138,7 +159,7 @@ public class Pathfinder implements Runnable {
 				}
 
 				if (tentative_is_better) {
-					final float DistBtoGoal = utility.Seperation( toSprite.GetLoc(), B_loc);
+					final float DistBtoGoal = utility.Seperation( toLoc, B_loc);
 					B.g_score = tentative_g_score;
 					B.h_score = DistBtoGoal;
 					B.f_score = tentative_g_score + DistBtoGoal;
@@ -165,7 +186,7 @@ public class Pathfinder implements Runnable {
 			}
 //System.out.println("INFO Took "+loop+" alg loops: PATH FINDING MINIMISED, WE CAN GET TO ("+soloution.X+","+soloution.Y+") in "+result.size()+" steps! ");
 		} else {
-			System.out.println("FATAL Took "+loop+" alg loops : PATH FINDING EPIC FAIL!");
+//System.out.println("FATAL Took "+loop+" alg loops : PATH FINDING EPIC FAIL!");
 			result = null;
 		}
 		_closed_set.clear();

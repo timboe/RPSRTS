@@ -21,7 +21,7 @@ public class Utility {
 	//Global variables
 	public RPSRTS _RPSRTS;
 	public boolean dbg = false; //debug flag
-	public boolean noPlayers = true; //AI takes over both teams
+	public boolean noPlayers = false; //AI takes over both teams
 	public float rotateAngle = 0f; //copied here as ROTATE stored in Transform(awt) or Matrix(andorid) classes
 	public boolean doWorldGen = false; //proceed with building world
 	public GameMode gameMode = GameMode.titleScreen; //what state is game currently in
@@ -164,7 +164,8 @@ public class Utility {
 	public final int AI_BadBuilding_Before_Sell = 3; //building_no_resource_penalty seconds per tick
 	public final int AI_NewUnitsWhenXClosetoCap = 2;
 	public final int AI_BuildCooldown = 40;//tocks (applies per building type)
-	public final int AI_TargetUnitMultipler = 3;
+	public final int AI_TargetUnitMultipler = 3; //How many fully-populated buildings worth of units is ideal?
+	public final int AI_MinUnits = 3; //Minimum units before UnitGen is always kept TRUE
 	
 	//COSTS
 	public final int StartingResources = 500;

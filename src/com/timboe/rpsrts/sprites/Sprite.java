@@ -53,9 +53,9 @@ public class Sprite implements Comparable<Sprite> {
 	public boolean Attack(int _damage) {
 		health -= _damage;
 		if (GetOwner() == ObjectOwner.Player) {
-			resource_manager.ScorePoints(ObjectOwner.Enemy, _damage);
+			resource_manager.ScorePoints(ObjectOwner.Enemy, _damage/2);
 		} else if (GetOwner() == ObjectOwner.Enemy) {
-			resource_manager.ScorePoints(ObjectOwner.Enemy, _damage);
+			resource_manager.ScorePoints(ObjectOwner.Player, _damage/2);
 		}
 		flashTicks = 12;
 		if (health <= 0) {
@@ -131,7 +131,12 @@ public class Sprite implements Comparable<Sprite> {
 	}
 
 	public float GetZOrder() {
-		return (float) ( -1f * (x_prec * Math.sin(utility.rotateAngle) + (y_prec * Math.cos(utility.rotateAngle))) );
+		//Projectiles look better if always rendered on top, therefore give them an offset;
+		int offset = 0;
+		if (GetIsProjectile() == true) {
+			offset += utility.world_size;
+		}
+		return (float) ( -1f * (x_prec * Math.sin(utility.rotateAngle) + (y_prec * Math.cos(utility.rotateAngle)) + offset) );
 
 	}
 	

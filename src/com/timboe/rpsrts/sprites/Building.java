@@ -124,7 +124,7 @@ public class Building extends Sprite {
 		if (toFetch == null ) {
 			no_local_resource_penalty += utility.building_no_resource_penalty;
 			no_local_resource_counter++;
-			System.out.println("BUILDING NOT TAKING ANY MORE WORKERS FOR "+no_local_resource_penalty+" SEC");
+			System.out.println(this+" NOT TAKING NO WORKERS FOR "+no_local_resource_penalty+"s (NO LOCAL RESOURCE, STRIKE "+no_local_resource_counter+")");
 		}
 		return toFetch;
 	}
@@ -188,6 +188,8 @@ public class Building extends Sprite {
 		GridDeRegister();
 		x = new_x;
 		y = new_y;
+		x_prec = x + utility.rnd() - .5f;
+		y_prec = y + utility.rnd() - .5f;
 		GridRegister();
 		if (GetOwner() == ObjectOwner.Player) {
 			move_hover = true;

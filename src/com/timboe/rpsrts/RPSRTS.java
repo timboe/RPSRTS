@@ -15,13 +15,6 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.util.Locale;
 
 import com.timboe.rpsrts.applet.GameWorld_Applet;
@@ -31,7 +24,6 @@ import com.timboe.rpsrts.applet.SpriteManager_Applet;
 import com.timboe.rpsrts.applet.TransformStore;
 import com.timboe.rpsrts.enumerators.GameMode;
 import com.timboe.rpsrts.enumerators.ObjectOwner;
-import com.timboe.rpsrts.enumerators.Pwd;
 import com.timboe.rpsrts.enumerators.ResourceType;
 import com.timboe.rpsrts.managers.ResourceManager;
 import com.timboe.rpsrts.managers.Utility;
@@ -95,31 +87,6 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		utility.SetTicksPerRender(utility.game_ticks_per_render);
 		utility._TICK = 0;
 	}
-	
-	public void SubmitHighScore() throws IOException {
-		//Create Post String
-		//Thanks to http://robbamforth.wordpress.com/2009/04/27/java-how-to-post-to-a-htmlphp-post-form/
-		String data = URLEncoder.encode("pwd",    "UTF-8") + "=" + URLEncoder.encode(Pwd.GetPass(), "UTF-8");
-		data += "&" + URLEncoder.encode("name",    "UTF-8") + "=" + URLEncoder.encode(utility.playerName, "UTF-8");
-		data += "&" + URLEncoder.encode("score",   "UTF-8") + "=" + URLEncoder.encode(Integer.toString(resource_manager.GetScore(ObjectOwner.Player)), "UTF-8");
-		data += "&" + URLEncoder.encode("wintime", "UTF-8") + "=" + URLEncoder.encode(Long.toString(utility.game_time_count/1000l), "UTF-8");
-		                
-		         
-		// Send Data To Page
-		URL url = new URL("http://tim-martin.co.uk/rpsrts_score.php");
-		URLConnection conn = url.openConnection();
-		conn.setDoOutput(true);
-		OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-		wr.write(data);
-		wr.flush();
-		   
-		// Get The Response
-		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-		String line;
-		while ((line = rd.readLine()) != null) {
-		        System.out.println(line);
-		}
-	}
 
 	@Override
 	public void init() {
@@ -163,7 +130,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			} else if (utility.playerName.length() < 3) {
 				if (e.getKeyChar() >= '!' && e.getKeyChar() <= '~') { //assuming ASCII
 					utility.playerName += e.getKeyChar();
-					utility.playerName.toUpperCase(Locale.ENGLISH);
+					utility.playerName = utility.playerName.toUpperCase(Locale.ENGLISH);
 				}
 			}
 		}
@@ -188,6 +155,8 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			resource_manager.AddResources(ResourceType.Cactus, 100, ObjectOwner.Player);
 			resource_manager.AddResources(ResourceType.Rockpile, 100, ObjectOwner.Player);
 			resource_manager.AddResources(ResourceType.Mine, 100, ObjectOwner.Player);
+		} else if (e.getKeyChar() == 'p') {
+			utility.gamePaused = !utility.gamePaused;
 		}
 		
 	}
@@ -327,9 +296,8 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 					e.printStackTrace();
 				}
 			}
-			utility._TIME_OF_NEXT_TICK = System.currentTimeMillis()
-					+ Math.round(1000f / utility.GetDesiredTPS());
-			
+			utility._TIME_OF_NEXT_TICK = System.currentTimeMillis() + Math.round(1000f / utility.GetDesiredTPS());
+						
 			++utility._TICK;
 			if (utility.gamePaused == false && utility.gameMode != GameMode.titleScreen) {
 				theSpriteManger.Tick();
