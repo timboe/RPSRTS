@@ -398,7 +398,7 @@ public class SceneRenderer_Applet {
 			utility.doWorldGen = false;
 			utility.gamePaused = false;
 		}
-		g2.setFont(myFont);
+		g2.setFont(myFont); 
 	}
 	
 	private boolean drawButton(Graphics2D g2, int _x, int _y, int _w, String _s, int _txt_x_offset) {
