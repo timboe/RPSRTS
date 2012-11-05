@@ -9,7 +9,7 @@ public class Projectile extends Sprite {
 	int strength;
 	
 	protected Projectile(int _ID, Actor _source, int _r, Sprite _target) {
-		super(_ID, _source.GetX(), _source.GetY(), _r);
+		super(_ID, _source.GetX() - _r, _source.GetY() - _r, _r);
 		speed = utility.projectile_speed;
 		target = _target;
 		source = _source;
@@ -17,7 +17,10 @@ public class Projectile extends Sprite {
 		if (_source.GetIfPreferedTarget(_target) == true) {
 			multiplier = 2;
 		}
-
+		if (_source.GetType() == ActorType.Lizard) {
+			animSteps = 3;
+			x -= r;
+		}
 	}
 	
 	@Override

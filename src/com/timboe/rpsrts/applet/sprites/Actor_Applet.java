@@ -11,6 +11,7 @@ import com.timboe.rpsrts.applet.managers.TransformStore;
 import com.timboe.rpsrts.enumerators.ActorType;
 import com.timboe.rpsrts.enumerators.ObjectOwner;
 import com.timboe.rpsrts.sprites.Actor;
+import com.timboe.rpsrts.sprites.Building;
 import com.timboe.rpsrts.world.WorldPoint;
 
 public class Actor_Applet extends Actor {
@@ -57,7 +58,18 @@ public class Actor_Applet extends Actor {
 			} else {
 				spriteGraphic = theBitmaps.scissor_enemy;
 			}
-
+		} else if (type == ActorType.Spock) {
+			if (_oo == ObjectOwner.Player) {
+				spriteGraphic = theBitmaps.spock_player;
+			} else {
+				spriteGraphic = theBitmaps.spock_enemy;
+			}	
+		} else if (type == ActorType.Lizard) {
+			if (_oo == ObjectOwner.Player) {
+				spriteGraphic = theBitmaps.lizard_player;
+			} else {
+				spriteGraphic = theBitmaps.lizard_enemy;
+			}	
 		}
 	}
 	
@@ -67,7 +79,7 @@ public class Actor_Applet extends Actor {
 		final int _x = (int)transform.getX();
 		final int _y = (int)transform.getY();
 
-		if (true) { //DBG
+		if (utility.dbg == true) { //DBG
 			_g2.setColor(Color.red);
 			_g2.setTransform(theTransforms.af);
 			_g2.fillOval(x - r, y - r, 2*r, 2*r);
@@ -78,14 +90,13 @@ public class Actor_Applet extends Actor {
 		_g2.setTransform(theTransforms.af_translate_zoom);
 		
 		int health_offset = 5;
-		
 		if (GetType() == ActorType.Spock) {
-			_g2.setColor(Color.yellow);
-			_g2.fillOval(_x - r, _y - (5*r), r * 2, r * 5);
-			health_offset = 13;
+			_g2.drawImage(spriteGraphic[animStep % animSteps], _x - r + 1, _y - (4*r) - 3, null);
+			health_offset = 14;
 		} else if (GetType() == ActorType.Lizard) {
 			_g2.setColor(Color.green);
 			_g2.fillOval(_x - (2*r), _y - r, r * 4, r * 2);
+			_g2.drawImage(spriteGraphic[animStep % animSteps], _x - (2*r) - 2, _y - r - 3, null);
 		} else {
 			_g2.drawImage(spriteGraphic[animStep % animSteps], _x - r, _y - r - 3, null);
 		}
@@ -157,12 +168,17 @@ public class Actor_Applet extends Actor {
 				_g2.setColor(Color.magenta);
 				_g2.drawLine(x, y, boss.GetX(), boss.GetY());
 			}
-		}			
-		
-		if (true) { //DBG
+			for (Building _b : previous_bad_employers) {
+				_g2.setColor(Color.cyan);
+				_g2.drawLine(x, y, _b.GetX(), _b.GetY());
+			}
 			_g2.setColor(Color.blue);
 			_g2.setTransform(theTransforms.af);
 			_g2.fillOval(x - 1, y - 1, 2, 2);
+		}			
+		
+		if (true) { //DBG
+
 		}
 	}
 }

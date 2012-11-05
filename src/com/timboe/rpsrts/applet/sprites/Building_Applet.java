@@ -2,7 +2,6 @@ package com.timboe.rpsrts.applet.sprites;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
@@ -79,10 +78,9 @@ public class Building_Applet extends Building {
 			++animStep;
 		}
 
-		Point2D transform = null;
-		transform = theTransforms.af_shear_rotate.transform(new Point(x, y), transform);
-		final int _x = (int)Math.round(transform.getX());
-		final int _y = (int)Math.round(transform.getY());
+		Point2D transform = theTransforms.getTransformedPoint(x, y);
+		final int _x = (int)(transform.getX());
+		final int _y = (int)(transform.getY());
 
 		//Do delete hover
 		if (delete_hover) {
@@ -126,12 +124,11 @@ public class Building_Applet extends Building {
 			_g2.setTransform(theTransforms.af_translate_zoom);
 			_g2.setColor(Color.red);
 			_g2.drawString(Integer.toString(GetEmployees()), _x - r, _y - r - 10);
-		}
-		if (true) { //DBG
 			_g2.setColor(Color.red);
 			_g2.setTransform(theTransforms.af);
 			_g2.fillOval(x - r, y - r, 2*r, 2*r);
 		}
+
 		if (underConstruction == true) {
 			int conStep = 0;
 			final float healthFrac = (float)health/(float)maxHealth;
@@ -155,7 +152,7 @@ public class Building_Applet extends Building {
 			_g2.drawImage(spriteGraphic[animStep % animSteps], _x - r, _y - r - 5 - y_offset, null);
 		}
 		
-		if (true) { //DBG
+		if (utility.dbg == true) { //DBG
 			_g2.setColor(Color.blue);
 			_g2.setTransform(theTransforms.af);
 			_g2.fillOval(x - 1, y - 1, 2, 2);

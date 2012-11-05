@@ -73,7 +73,7 @@ public class GameWorld {
  	public int GenerateWorld() {
 		final float timeNow = (System.nanoTime() / 1000000000f);
 		float time_to_wait = utility.wg_seconds_to_wait;
-		if (utility.dbg == true) {
+		if (utility.dbg == true || utility.fastForward == true) {
 			time_to_wait = 0f;
 		}
 		if (utility.doWorldGen == false) return 1; //Stop until player clicks GO
@@ -84,6 +84,10 @@ public class GameWorld {
 			wg_time_of_last_operation = (System.nanoTime() / 1000000000f);
 			wg_state = 1;
 			System.out.println("STATE: reset " + wg_state + " RND_C:" + utility.rnd_count);
+		}
+		
+		if (utility.gamePaused == true) {
+			return wg_state;
 		}
 
 		if (wg_state == 1) {

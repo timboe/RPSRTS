@@ -72,6 +72,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 				resource_manager.ScorePoints(ObjectOwner.Enemy, bonus);
 			}
 			utility.SetTicksPerRender(utility.slowmo_ticks_per_render); 
+			utility.fastForward = false;
 			utility.loose_time = System.currentTimeMillis() / 1000l;
 		}
 	}
@@ -85,7 +86,6 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		theSpriteManger.Reset();
 		theWorld.Reset();
 		theSceneRenderer.background_buffered = null;
-		utility.SetTicksPerRender(utility.game_ticks_per_render);
 		utility._TICK = 0;
 	}
 
@@ -212,9 +212,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		theSceneRenderer.CurMouse = e.getPoint();
-		if (utility.gameMode == GameMode.titleScreen) return;
 		theSceneRenderer.mouseMove();
-
 	}
 
 	@Override
@@ -258,13 +256,13 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	    theTransforms.SetAA(g2,true);
 		theTransforms.updateTransforms();
 		theSceneRenderer.doInverseMouseTransform();
+    	if (utility.mouseClick == true) theSceneRenderer.mouseClick();
 
 		theSceneRenderer.sceneBlackout(g2);
 	    if (utility.gameMode == GameMode.titleScreen) {
 	    	theSceneRenderer.sceneTitle(g2);
 	    } else if (utility.gameMode == GameMode.gameOn){
 	    	theSceneRenderer.sceneGame(g2);
-	    	if (utility.mouseClick == true) theSceneRenderer.mouseClick();
 		    doWinLoose();
 	    } else if (utility.gameMode == GameMode.gameOverLost || utility.gameMode == GameMode.gameOverWon) {
 	    	theSceneRenderer.sceneGameOver(g2);
@@ -291,8 +289,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			if (utility._TIME_OF_NEXT_TICK > System.currentTimeMillis()) {
 				// too soon to repaint, wait...
 				try {
-					Thread.sleep(Math.abs(utility._TIME_OF_NEXT_TICK
-							- System.currentTimeMillis()));
+					Thread.sleep(Math.abs(utility._TIME_OF_NEXT_TICK - System.currentTimeMillis()));
 				} catch (final InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -306,14 +303,14 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			}
 
 			if (utility._TICK % utility.do_fps_every_x_ticks == 0) {
-				utility.FPS = Math.round((1. / (System.currentTimeMillis() - utility._TIME_OF_LAST_TICK)* 1000. * utility.do_fps_every_x_ticks) / utility.GetTicksPerRender());
-				utility._TIME_OF_LAST_TICK = System.currentTimeMillis();
+				utility.FPS = Math.round((1. / (System.currentTimeMillis() - utility._TIME_OF_LAST_TICK)* 1000.) / utility.GetTicksPerRender());
 			}
 			
 			if (utility._TICK % utility.GetTicksPerRender() == 0) {
 				repaint();
 			}
 			
+			utility._TIME_OF_LAST_TICK = System.currentTimeMillis();
 			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		}
 	}

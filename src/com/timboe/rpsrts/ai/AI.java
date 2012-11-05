@@ -117,7 +117,9 @@ public class AI implements Runnable {
 				toAttack = theSpriteManager.GetBase(enemy); //Go all out?
 			}
 			WorldPoint new_destination_location = null;
-			new_destination_location = theSpriteManager.FindGoodSpot(toAttack.GetLoc(), utility.attractorRadius, 2 * utility.wander_radius, false);
+			if(toAttack != null) {
+				new_destination_location = theSpriteManager.FindGoodSpot(toAttack.GetLoc(), utility.attractorRadius, 2 * utility.wander_radius, false);
+			}
 			
 			if (new_destination_location == null) {
 				//bah! refund then please

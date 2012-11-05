@@ -45,8 +45,8 @@ public class SpriteManager_App extends SpriteManager {
 		return (Building) new Building_App(++GlobalSpriteCounter, (int)_p.getX(), (int)_p.getY(), _r, _bt, _oo);
 	}
 	@Override
-	protected Projectile PlatformSpecific_PlaceProjectile(Actor _source, Sprite _target) {
-		return (Projectile) new Projectile_App(++GlobalSpriteCounter, _source, utility.projectileRadius, _target);
+	protected Projectile PlatformSpecific_PlaceProjectile(Actor _source, Sprite _target, int _r) {
+		return (Projectile) new Projectile_App(++GlobalSpriteCounter, _source, _r, _target);
 	}
 	@Override
 	protected Resource PlatformSpecific_PlaceResource(WorldPoint _p, ResourceType _rt) {

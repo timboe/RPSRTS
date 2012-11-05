@@ -45,16 +45,19 @@ public class Bitmaps_Applet extends Bitmaps {
 		return singleton;
 	}
 	public BufferedImage off[];
-	
 	public BufferedImage on[];
+	public BufferedImage sound[];
+	public BufferedImage quality[];
+	public BufferedImage pause[];
+	public BufferedImage ff[];
 	public BufferedImage WIN;
-	
 	public BufferedImage LOOSE;
+	
 	public BufferedImage tree[];
 	public BufferedImage cactus[];
 	public BufferedImage mine[];
-	
 	public BufferedImage stone[];
+	
 	public BufferedImage base_player[];
 	public BufferedImage base_enemy[];
 	public BufferedImage construction_player[];
@@ -64,31 +67,35 @@ public class Bitmaps_Applet extends Bitmaps {
 	public BufferedImage woodshop_player[];
 	public BufferedImage woodshop_enemy[];
 	public BufferedImage rockery_player[];
-	
 	public BufferedImage rockery_enemy[];
 	public BufferedImage attractor_scissors_player[];
 	public BufferedImage attractor_paper_player[];
 	public BufferedImage attractor_rock_player[];
 	public BufferedImage attractor_scissors_enemy[];
 	public BufferedImage attractor_paper_enemy[];
-	
 	public BufferedImage attractor_rock_enemy[];
+	
 	public BufferedImage scissor_player[];
 	public BufferedImage scissor_enemy[];
 	public BufferedImage paper_player[];
 	public BufferedImage paper_enemy[];
 	public BufferedImage rock_player[];
-	
 	public BufferedImage rock_enemy[];
+	public BufferedImage spock_player[];
+	public BufferedImage spock_enemy[];
+	public BufferedImage lizard_player[];
+	public BufferedImage lizard_enemy[];	
+	
 	public BufferedImage proj_scissor_player[];
 	public BufferedImage proj_scissor_enemy[];
 	public BufferedImage proj_paper_player[];
 	public BufferedImage proj_paper_enemy[];
 	public BufferedImage proj_rock_player[];
-
 	public BufferedImage proj_rock_enemy[];
+	public BufferedImage proj_lizard_enemy[];
+	public BufferedImage proj_lizard_player[];
 
-	public BufferedImage X[];
+	public BufferedImage X[]; //Switched out later
 	
 	private Bitmaps_Applet() {
 		super();
@@ -122,9 +129,19 @@ public class Bitmaps_Applet extends Bitmaps {
         
         on = new BufferedImage[4];
         off = new BufferedImage[4];
+    	sound = new BufferedImage[2];
+    	quality = new BufferedImage[2];
+    	pause = new BufferedImage[2];
+    	ff = new BufferedImage[2];
         for (int i = 0; i < 4; ++i) {
         	on[i] = clip(resource_on_off, 0, 0, 12, 6);
         	off[i] = clip(resource_on_off, 0, 6, 12, 6);
+        	if (i >= 2) continue;
+        	int j = (i+1) * 12;
+        	quality[i] = clip(resource_on_off, 0, j, 12, 12);
+        	sound[i] = clip(resource_on_off, 12, j, 12, 12);
+        	pause[i] = clip(resource_on_off, 24, j, 12, 12);
+        	ff[i] = clip(resource_on_off, 36, j, 12, 12);
         }
         
 
@@ -167,6 +184,10 @@ public class Bitmaps_Applet extends Bitmaps {
 		paper_enemy = new BufferedImage[4];
 		rock_player = new BufferedImage[4];
 		rock_enemy = new BufferedImage[4];
+		spock_player = new BufferedImage[4];
+		spock_enemy = new BufferedImage[4];
+		lizard_player = new BufferedImage[4];
+		lizard_enemy = new BufferedImage[4];
 		for (int i=0; i<4; ++i) {
 			int j = 0;
 			scissor_player[i] = clip(resource_actors, i*6, j, 6, 6);
@@ -180,6 +201,14 @@ public class Bitmaps_Applet extends Bitmaps {
 			rock_player[i] = clip(resource_actors, i*6, j, 6, 6);
 			j += 6;
 			rock_enemy[i] = clip(resource_actors, i*6, j, 6, 6);
+			j += 6;
+			spock_player[i] = clip(resource_actors, i*5, j, 5, 15);
+			j += 15;
+			spock_enemy[i] = clip(resource_actors, i*5, j, 5, 15);
+			j += 15;
+			lizard_player[i] = clip(resource_actors, i*15, j, 15, 6);
+			j += 6;
+			lizard_enemy[i] = clip(resource_actors, i*15, j, 15, 6);
 		}
 		
 		proj_scissor_player = new BufferedImage[4];
@@ -188,6 +217,8 @@ public class Bitmaps_Applet extends Bitmaps {
 		proj_paper_enemy = new BufferedImage[4];
 		proj_rock_player = new BufferedImage[4];
 		proj_rock_enemy = new BufferedImage[4];
+		proj_lizard_player = new BufferedImage[3];
+		proj_lizard_enemy = new BufferedImage[3];
 		for (int i=0; i<4; ++i) {
 			int j = 0;
 			proj_scissor_player[i] = clip(resource_projectile, i*3, j, 3, 3);
@@ -201,6 +232,12 @@ public class Bitmaps_Applet extends Bitmaps {
 			proj_rock_player[i] = clip(resource_projectile, i*3, j, 3, 3);
 			j += 3;
 			proj_rock_enemy[i] = clip(resource_projectile, i*3, j, 3, 3);
+			j += 3;
+			//
+			if (i >= 3) continue;
+			proj_lizard_player[i] = clip(resource_projectile, i*4, j, 4, 4);
+			j += 4;
+			proj_lizard_enemy[i] = clip(resource_projectile, i*4, j, 4, 4);
 		}
 
 		attractor_paper_enemy = new BufferedImage[4];

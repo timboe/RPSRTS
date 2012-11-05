@@ -55,8 +55,8 @@ public class SpriteManager_Applet extends SpriteManager {
 		return (Building) new Building_Applet(++GlobalSpriteCounter, (int)_p.getX(), (int)_p.getY(), _r, _bt, _oo);
 	}
 	@Override
-	protected Projectile PlatformSpecific_PlaceProjectile(Actor _source, Sprite _target) {
-		return (Projectile) new Projectile_Applet(++GlobalSpriteCounter, _source, utility.projectileRadius, _target);
+	protected Projectile PlatformSpecific_PlaceProjectile(Actor _source, Sprite _target, int _r) {
+		return (Projectile) new Projectile_Applet(++GlobalSpriteCounter, _source, _r, _target);
 	}
 	@Override
 	protected Resource PlatformSpecific_PlaceResource(WorldPoint _p, ResourceType _rt) {
@@ -140,8 +140,21 @@ public class SpriteManager_Applet extends SpriteManager {
 				_g2.drawImage(_graphic[FrameCount/2 % animSteps], __x - _r, __y - _r - _y_offset, null);
 			}
 		} else { //Drawing top bar
+			int f=0;
+			if (_graphic == theBitmaps.sound) {
+				if (utility.soundOn == false) f = 1;
+			} else if (_graphic == theBitmaps.quality) {
+				if (utility.highQuality == false) f = 1;
+			} else if (_graphic == theBitmaps.pause) {
+				if (utility.gamePaused == true) f = 1;
+			} else if (_graphic == theBitmaps.ff) {
+				if (utility.fastForward == true) f = 1;
+			} else {
+				f = FrameCount/2 % animSteps;
+			}
+				
 			if (_graphic != null) {
-				_g2.drawImage(_graphic[FrameCount/2 % animSteps], _x - _r, _y - _r - _y_offset, null);
+				_g2.drawImage(_graphic[f], _x - _r, _y - _r - _y_offset, null);
 			}
 		}
 	}
@@ -204,8 +217,8 @@ public class SpriteManager_Applet extends SpriteManager {
 				&& ( (doDistanceCheck == true && closeToExisting == true) || doDistanceCheck == false) ) {
 			//PLACE BUILDING and location is A'OK
 			if (_place_remove == true) {
-				PlaceBuilding(new WorldPoint(_mouse_x,_mouse_y), _bt, ObjectOwner.Player);
-//				PlaceSpecialSpawn(_mouse_x, _mouse_y, ActorType.Spock, ObjectOwner.Player); //TODO TEMP!
+//				PlaceBuilding(new WorldPoint(_mouse_x,_mouse_y), _bt, ObjectOwner.Player);
+				PlaceSpecialSpawn(_mouse_x, _mouse_y, ActorType.Lizard, ObjectOwner.Player, null, null); //TODO TEMP!
 				return true;
 			}
 

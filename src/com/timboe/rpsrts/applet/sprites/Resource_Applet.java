@@ -2,7 +2,6 @@ package com.timboe.rpsrts.applet.sprites;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
@@ -23,18 +22,17 @@ public class Resource_Applet extends Resource {
 	
 	public void Render(Graphics2D _g2, int _tick_count) {
 
-		Point2D transformed_island = null;
+		Point2D transformed_island = theTransforms.getTransformedPoint(x, y);
 		//apply  coordinate transform to convert to island coordinates
-		transformed_island = theTransforms.af_shear_rotate.transform(new Point(x,y), transformed_island);
-		final int _x = (int)Math.round(transformed_island.getX());
-		final int _y = (int)Math.round(transformed_island.getY());
+		final int _x = (int)(transformed_island.getX());
+		final int _y = (int)(transformed_island.getY());
 
 		int anim = stuff / 5;
 		if (anim > 5) {
 			anim = 5;
 		}
 
-		if (not_reachable_penalty > 0 || true) {
+		if (not_reachable_penalty > 0 && utility.dbg == true) {
 			_g2.setColor(Color.red);
 			_g2.setTransform(theTransforms.af);
 			_g2.fillOval(x - r, y - r, 2*r, 2*r);
@@ -54,17 +52,13 @@ public class Resource_Applet extends Resource {
 			_g2.drawImage(theBitmaps.stone[toDraw], _x - r, _y - r - 3, null);
 		}
 		
-		if (not_reachable_penalty > 0 || true) {
+		if (utility.dbg == true) {
 			_g2.setColor(Color.blue);
 			_g2.setTransform(theTransforms.af);
 			_g2.fillOval(x - 1, y - 1, 2, 2);
-		}
-
-		if (utility.dbg == true) {
 			_g2.setColor(Color.white);
 			_g2.setTransform(theTransforms.af_translate_zoom);
-			_g2.drawString(Integer.toString(stuff), _x - r, _y - r); //usually - stuff XXX
+			_g2.drawString(Integer.toString(stuff), _x - r, _y - r);
 		}
 	}
-
 }

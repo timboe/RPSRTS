@@ -25,28 +25,28 @@ public class Actor extends Sprite {
 	protected int attack_range;
 	protected int poisoned = 0;
 	
-	float RPS;
+	protected float RPS;
 	
-	ArrayList<ResourceType> iCollect = new ArrayList<ResourceType>(); //things this actor collects
-	ResourceType carrying; //resource type in hands
+	protected ArrayList<ResourceType> iCollect = new ArrayList<ResourceType>(); //things this actor collects
+	protected ResourceType carrying; //resource type in hands
 	protected int carryAmount; //amount in `hands'
 	protected int strength; //amount actor can carry / attack
 
-	boolean tick;
-	boolean tock;
+	protected boolean tick;
+	protected boolean tock;
 	
 	protected ArrayList<WorldPoint> waypoint_list_sync = null;  //pahfinding list ---may need thread protection---
 	protected Sprite destination; //final pathfind destination
 	protected WorldPoint waypoint;  //current pathfind destination
-	Thread pathfinding_thread = null;
-	Pathfinder pathfinder = null;
-	PathfindStatus navagate_status;
-	int direction = 0;
+	protected Thread pathfinding_thread = null;
+	protected Pathfinder pathfinder = null;
+	protected PathfindStatus navagate_status;
+	protected int direction = 0;
 
-	int stuck;
-	int stuck_wander_ticks;
+	protected int stuck;
+	protected int stuck_wander_ticks;
 	protected WorldPoint wander;
-	int tocks_since_quit;
+	protected int tocks_since_quit;
 
 	protected Actor(int _ID, int _x, int _y, int _r, ActorType _at, ObjectOwner _oo) {
 		super(_ID, _x, _y, _r);
@@ -300,9 +300,6 @@ public class Actor extends Sprite {
 			if (carryAmount >= strength) {
 				//System.out.println("INFO Gatherer has its fill, returning to gather target");
 				behaviour = ActorBehaviour.ReturningFromTarget;
-			}
-			if (((Resource) target).GetRemaining() == 0) {
-				target.Kill();
 			}
 		} else if (tick == true && behaviour == ActorBehaviour.ReturningFromTarget) {
 			if (destination == null) {

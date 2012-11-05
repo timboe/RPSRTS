@@ -21,7 +21,10 @@ public class Utility {
 	//Global variables
 	public RPSRTS _RPSRTS;
 	public boolean dbg = false; //debug flag
-	public boolean noPlayers = false; //AI takes over both teams
+	public boolean noPlayers = true; //AI takes over both teams
+	public boolean soundOn = true;
+	public boolean highQuality = true;
+	public boolean fastForward = false;
 	public float rotateAngle = 0f; //copied here as ROTATE stored in Transform(awt) or Matrix(andorid) classes
 	public boolean doWorldGen = false; //proceed with building world
 	public GameMode gameMode = GameMode.titleScreen; //what state is game currently in
@@ -59,9 +62,10 @@ public class Utility {
 	public final int do_fps_every_x_ticks = 6; // refresh FPS after X frames
 	public final int game_ticks_per_render = 2;
 	public final int slowmo_ticks_per_render = 1;
+	public final int fast_forward_speed = 10;
 	
 	//world manager settings
-	public final float wg_seconds_to_wait = 1f; //Time to wait between steps
+	public final float wg_seconds_to_wait = 0.5f; //Time to wait between steps
 	public final int wg_DegInCircle = 360;
 	public final float island_scale = 0.75f; //Size of initial circular island w.r.t. world
 	public final float wg_CrinkleScale = 30; //Multiplier to Gaussian edge smear

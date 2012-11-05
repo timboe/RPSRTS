@@ -6,6 +6,7 @@ import java.util.Vector;
 
 import com.timboe.rpsrts.enumerators.ActorType;
 import com.timboe.rpsrts.enumerators.BuildingType;
+import com.timboe.rpsrts.enumerators.GameStatistics;
 import com.timboe.rpsrts.enumerators.ObjectOwner;
 import com.timboe.rpsrts.enumerators.ResourceType;
 import com.timboe.rpsrts.world.WeightedPoint;
@@ -176,6 +177,10 @@ public class Building extends Sprite {
 			else theSpriteManager.PlaceSpooge(x, y, GetOwner(), utility.spooges_totem_death, utility.spooges_scale_totem_death);
 		}
 		dead = true;
+		//TODO explode code
+		if (false) {
+			resource_manager.AddStatistic(GameStatistics.BuildingsExploded);
+		}
 		GridDeRegister();
 	}
 	

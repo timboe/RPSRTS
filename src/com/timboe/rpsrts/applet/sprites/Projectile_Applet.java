@@ -26,10 +26,12 @@ public class Projectile_Applet extends Projectile {
 			if (_source.GetType() == ActorType.Paper) spriteGraphic = theBitmaps.proj_paper_player;
 			else if (_source.GetType() == ActorType.Rock) spriteGraphic = theBitmaps.proj_rock_player;
 			else if (_source.GetType() == ActorType.Scissors) spriteGraphic = theBitmaps.proj_scissor_player;
+			else if (_source.GetType() == ActorType.Lizard) spriteGraphic = theBitmaps.proj_lizard_player;
 		} else if (_source.GetOwner() == ObjectOwner.Enemy) {
 			if (_source.GetType() == ActorType.Paper) spriteGraphic = theBitmaps.proj_paper_enemy;
 			else if (_source.GetType() == ActorType.Rock) spriteGraphic = theBitmaps.proj_rock_enemy;
 			else if (_source.GetType() == ActorType.Scissors) spriteGraphic = theBitmaps.proj_scissor_enemy;
+			else if (_source.GetType() == ActorType.Lizard) spriteGraphic = theBitmaps.proj_lizard_enemy;
 		}
 	}
 	
@@ -40,11 +42,9 @@ public class Projectile_Applet extends Projectile {
 			++animStep;
 		}
 		
-
-				
 		_g2.setTransform(theTransforms.af_translate_zoom);
 		if (source.GetType() == ActorType.Spock) {
-			if (animStep % animSteps == 0) {
+			if (animStep % animSteps == 0 || animStep % animSteps == 2) {
 				_g2.setColor(Color.white);
 			} else if (source.GetOwner() == ObjectOwner.Player) {
 				_g2.setColor(Color.red);
@@ -55,13 +55,7 @@ public class Projectile_Applet extends Projectile {
 			final int _x1 = (int) transform.getX();
 			final int _y1 = (int) transform.getY(); 
 			transform = theTransforms.getTransformedPoint(source.GetX(), source.GetY());
-			_g2.drawLine((int)transform.getX(), (int) (transform.getY() - source.GetR() * 1.5), _x1, _y1);
-		} else if (source.GetType() == ActorType.Lizard) {
-			Point2D transform = theTransforms.getTransformedPoint(x, y);
-			final int _x = (int) transform.getX();
-			final int _y = (int) transform.getY();
-			_g2.setColor(Color.cyan);
-			_g2.drawOval(_x - 2, _y - 2, 4, 4);
+			_g2.drawLine((int)(transform.getX() - 2), (int) (transform.getY() - 7), _x1, _y1);
 		} else {
 			Point2D transform = theTransforms.getTransformedPoint(x, y);
 			final int _x = (int) transform.getX();

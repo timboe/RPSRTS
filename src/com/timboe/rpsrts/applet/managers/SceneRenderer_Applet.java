@@ -9,6 +9,7 @@ import java.awt.Rectangle;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+
 import java.io.IOException;
 import java.util.HashSet;
 
@@ -83,7 +84,13 @@ public class SceneRenderer_Applet {
 	
 	private void contentCreation(Graphics2D _g2) {
     	theTransforms.SetAA(_g2, false);
-    	theTransforms.modifyRotate(0.001f);
+    	if (utility.gamePaused == false) {
+    		if (utility.fastForward == true) {
+    			theTransforms.modifyRotate(0.01f);
+    		} else {
+    			theTransforms.modifyRotate(0.001f);
+    		}
+    	}
     	if (theWorld.GetWorldGenerated() == false) {
 	    	final int status = theWorld.GenerateWorld();
 	    	if (status == 1) { //Object made, circle island, plane grid
@@ -165,10 +172,10 @@ public class SceneRenderer_Applet {
 		if (utility.gameMode == GameMode.gameOverWon) {
 			g2.setTransform(theTransforms.af_none);
 			g2.drawImage(theBitmaps.WIN,0,0,null);
-			if (utility.playerName == "") {
+			if (utility.playerName != "") {
 				clicked = drawButton(g2, 195, 500, 605, "SUBMIT MY SCORE!", 60);
 			} else {
-				clicked = drawButton(g2, 195, 500, 605, "RETURN TO TITLE SCREEN", 0);
+				clicked = drawButton(g2, 195, 500, 605, "BACK TO TITLE SCREEN", 0);
 			}
 		} else {
 			g2.setTransform(theTransforms.af_none);
@@ -199,7 +206,7 @@ public class SceneRenderer_Applet {
 		}
 		drawButton(g2, 500, 50, 480, "YOUR NAME:"+utility.playerName+cursor, 20);
 		g2.setFont(myFont);
-		drawStatBox(g2, "By entering a name below, you agree to upload and display of your", " score along with statistics from your game.", "", "", 480, 8);
+		drawStatBox(g2, "By entering a name below, you agree to upload and display of your", " score along with statistics from your game.", "", "", 480, 8, 500, 18);
 
 	}
 	
@@ -313,16 +320,16 @@ public class SceneRenderer_Applet {
 	private void drawStatBox(Graphics2D _g2, String _s1, String _s2, String _s3, String _s4) {
 		int _x = (int)CurMouse.getX() - con_start_x/2 - x_add*3;
 		int _y = (int)CurMouse.getY() + x_add/2;
-		drawStatBox(_g2, _s1, _s2, _s3, _s4, _x, _y);
+		drawStatBox(_g2, _s1, _s2, _s3, _s4, _x, _y, 500, 15);
 	}
 	
-	private void drawStatBox(Graphics2D _g2, String _s1, String _s2, String _s3, String _s4, int _x, int _y) {
-		final int _os = 15;
-		final int box_w = 500;
+	private void drawStatBox(Graphics2D _g2, String _s1, String _s2, String _s3, String _s4, int _x, int _y, int box_w, int _os) {
 		int box_h = 70;
-		if (_s3 == "") {
+		if (_s2 == "") {
+			box_h /= 4;
+		} else if (_s3 == "") {
 			box_h /= 2;
-		}
+		} 
 		_g2.setColor(backing_brown);
 		_g2.fillRect(_x, _y, box_w, box_h);
 		_g2.setColor(Color.white);
@@ -378,6 +385,20 @@ public class SceneRenderer_Applet {
 			cursor = "|";
 		}
 		clicked = drawButton(g2, 175, 400, 650, "ISLAND SEED:"+utility.rndSeedTxt+cursor, 20);
+	}
+	
+	private void drawPausedWindow(Graphics2D g2) {
+		boolean clicked = drawButton(g2, 350, 200, 300, "RESUME", 70);
+		if (clicked == true) {
+			utility.gamePaused = false;
+		}
+		clicked = drawButton(g2, 350, 300, 300, "QUIT", 100);
+		if (clicked == true) {
+			utility._RPSRTS.genNewWorld();
+			utility.doWorldGen = false;
+			utility.gamePaused = false;
+		}
+		g2.setFont(myFont);
 	}
 	
 	private boolean drawButton(Graphics2D g2, int _x, int _y, int _w, String _s, int _txt_x_offset) {
@@ -505,7 +526,6 @@ public class SceneRenderer_Applet {
 			theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.off, true);
 		}
 		
-		
 		if (buildingStatBox != 0) {
 			_g2.setTransform(theTransforms.af_none);
 	    	if(buildingStatBox == 1) {
@@ -580,6 +600,53 @@ public class SceneRenderer_Applet {
 		_g2.setFont(myFont);
 	}
     
+    private void drawBottomBar(Graphics2D _g2) {
+    	_g2.setTransform(theTransforms.af_none);
+		_g2.translate(utility.window_X - 130, utility.window_Y - 30);
+		_g2.scale(3, 3);
+		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.sound, true);
+		_g2.translate(12, 0);
+		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.quality, true);
+		_g2.translate(12, 0);
+		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.pause, true);
+		_g2.translate(12, 0);
+		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.ff, true);
+		_g2.setTransform(theTransforms.af_none);
+		_g2.setFont(myFont);
+		int _x = 0;
+		int _y = 0;
+		if (CurMouse != null) {
+			_x=(int)CurMouse.getX();
+			_y=(int)CurMouse.getY() - 40;
+		}
+		if (buildingStatBox == 100) {
+			if (utility.soundOn) {
+				drawStatBox(_g2, "Click to mute.", "", "", "", _x - 65, _y, 135, 13);
+			} else {
+				drawStatBox(_g2, "Click to un-mute.", "", "", "", _x - 65, _y, 135, 13);
+			}
+		} else if (buildingStatBox == 101) {
+			if (utility.highQuality == true) {
+				drawStatBox(_g2, "Click to decrease quality.", "", "", "", _x - 110, _y, 200, 13);
+			} else {
+				drawStatBox(_g2, "Click to increase quality.", "", "", "", _x - 110, _y, 200, 13);
+			}
+		} else if (buildingStatBox == 102) {
+			if (utility.gamePaused == false) {
+				drawStatBox(_g2, "Click to pause.", "", "", "", _x - 90, _y, 145, 13);
+			} else {
+				drawStatBox(_g2, "Click to un-pause.", "", "", "", _x - 90, _y, 145, 13);
+			}		
+		} else if (buildingStatBox == 103) {
+			if (utility.fastForward == false) {
+				drawStatBox(_g2, "Click to fast-forward.", "", "", "", _x - 210, _y, 230, 13);
+			} else {
+				drawStatBox(_g2, "Click to play at normal speed.", "", "", "", _x - 210, _y, 230, 13);
+			}		
+		}
+
+    }
+    
     public void mouseClick() {
 	    if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (0 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (0 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 			if (buildingToPlace == BuildingType.Woodshop) buildingToPlace = null;
@@ -608,8 +675,23 @@ public class SceneRenderer_Applet {
 			resource_manager.SetGeneratingRock(ObjectOwner.Player, !resource_manager.GetGeneratingRock(ObjectOwner.Player) );
 		} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (9 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (9 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 			resource_manager.SetGeneratingScissors(ObjectOwner.Player, !resource_manager.GetGeneratingScissors(ObjectOwner.Player) );
+		} else if (CurMouse.getX() > (utility.window_X - 164 + (0*3*12)) && CurMouse.getX() < (utility.window_X - 164 + (1*12*3)) && CurMouse.getY() > (utility.window_Y - 64) && CurMouse.getY() <  (utility.window_Y - 64 + (12*3)) ) {
+			utility.soundOn = !utility.soundOn;
+		} else if (CurMouse.getX() > (utility.window_X - 164 + (1*3*12)) && CurMouse.getX() < (utility.window_X - 164 + (2*12*3)) && CurMouse.getY() > (utility.window_Y - 64) && CurMouse.getY() <  (utility.window_Y - 64 + (12*3)) ) {
+			utility.highQuality = !utility.highQuality;
+			theTransforms.setAA(utility.highQuality);
+		} else if (CurMouse.getX() > (utility.window_X - 164 + (2*3*12)) && CurMouse.getX() < (utility.window_X - 164 + (3*12*3)) && CurMouse.getY() > (utility.window_Y - 64) && CurMouse.getY() <  (utility.window_Y - 64 + (12*3)) ) {
+			utility.gamePaused = !utility.gamePaused;
+		} else if (CurMouse.getX() > (utility.window_X - 164 + (3*3*12)) && CurMouse.getX() < (utility.window_X - 164 + (4*12*3)) && CurMouse.getY() > (utility.window_Y - 64) && CurMouse.getY() <  (utility.window_Y - 64 + (12*3)) ) {
+			utility.fastForward = !utility.fastForward;
+			if (utility.fastForward == true) {
+				utility.SetTicksPerRender(utility.GetTicksPerRender() * utility.fast_forward_speed);
+			} else {
+				utility.SetTicksPerRender(utility.game_ticks_per_render);
+			}
 		} else {
 			utility.mouseClick = true;
+
 		}
 	}
 	
@@ -634,6 +716,14 @@ public class SceneRenderer_Applet {
 			buildingStatBox = 9;
 		} else if (CurMouse.getX() > (con_start_x + (9 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (9 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 			buildingStatBox = 10;
+		} else if (CurMouse.getX() > (utility.window_X - 164 + (0*3*12)) && CurMouse.getX() < (utility.window_X - 164 + (1*12*3)) && CurMouse.getY() > (utility.window_Y - 64) && CurMouse.getY() <  (utility.window_Y - 64 + (12*3)) ) {
+			buildingStatBox = 100;
+		} else if (CurMouse.getX() > (utility.window_X - 164 + (1*3*12)) && CurMouse.getX() < (utility.window_X - 164 + (2*12*3)) && CurMouse.getY() > (utility.window_Y - 64) && CurMouse.getY() <  (utility.window_Y - 64 + (12*3)) ) {
+			buildingStatBox = 101;
+		} else if (CurMouse.getX() > (utility.window_X - 164 + (2*3*12)) && CurMouse.getX() < (utility.window_X - 164 + (3*12*3)) && CurMouse.getY() > (utility.window_Y - 64) && CurMouse.getY() <  (utility.window_Y - 64 + (12*3)) ) {
+			buildingStatBox = 102;
+		} else if (CurMouse.getX() > (utility.window_X - 164 + (3*3*12)) && CurMouse.getX() < (utility.window_X - 164 + (4*12*3)) && CurMouse.getY() > (utility.window_Y - 64) && CurMouse.getY() <  (utility.window_Y - 64 + (12*3)) ) {
+			buildingStatBox = 103;
 		} else {
 			buildingStatBox = 0;
 		}
@@ -664,6 +754,10 @@ public class SceneRenderer_Applet {
 	    	}
         }
 	    drawTopBar(g2);
+    	drawBottomBar(g2);
+    	if (utility.gamePaused == true) {
+    		drawPausedWindow(g2);
+    	}
 	}
 	
 	public void sceneGameOver(Graphics2D g2) {
@@ -673,6 +767,7 @@ public class SceneRenderer_Applet {
 	    if ( (System.currentTimeMillis() / 1000l) - utility.loose_time > 3) {
 	    	drawEndScreen(g2);
 	    }
+    	drawBottomBar(g2);
 	}
 	
 	public void sceneTitle(Graphics2D g2) {
@@ -683,5 +778,6 @@ public class SceneRenderer_Applet {
     	} else if (theSpriteManger.GetWorldSeeded() == true) {
     		drawStartPlayingOption(g2);
     	}
+    	drawBottomBar(g2);
 	}
 }

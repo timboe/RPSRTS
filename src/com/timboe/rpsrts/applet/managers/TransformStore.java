@@ -34,8 +34,7 @@ public class TransformStore {
 	private float TRANSLATE_X = 0f;
 	private float TRANSLATE_Y = 0f;
 	public float TOP_ROTATE; //keep this here 
-	private final float YSHEAR_MIN = 0.15f;
-	
+	private final float YSHEAR_MIN = 0.05f;
 	private final float YSHEAR_MAX = 1f;//0.85f;
 	private final float TRANSLATE_X_MAX = 0.0165f;
 	private final float TRANSLATE_Y_MAX = 0.01f;
@@ -189,5 +188,9 @@ public class TransformStore {
 		if (ZOOM <= 0.3f) {
 			ZOOM = 0.3f;
 		}
+	}
+
+	public void setAA(boolean highQuality) {
+		disable_aa = !highQuality;
 	}
 }

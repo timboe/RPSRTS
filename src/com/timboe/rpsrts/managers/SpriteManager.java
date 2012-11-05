@@ -12,6 +12,7 @@ import com.timboe.rpsrts.enumerators.ActorJob;
 import com.timboe.rpsrts.enumerators.ActorType;
 import com.timboe.rpsrts.enumerators.BiomeType;
 import com.timboe.rpsrts.enumerators.BuildingType;
+import com.timboe.rpsrts.enumerators.GameStatistics;
 import com.timboe.rpsrts.enumerators.ObjectOwner;
 import com.timboe.rpsrts.enumerators.ResourceType;
 import com.timboe.rpsrts.sprites.Actor;
@@ -445,6 +446,7 @@ public class SpriteManager {
 	public Actor PlaceActor(WorldPoint _p, ActorType _at, ObjectOwner _o) {
 		//NO rechecks that coordinates are safe - be warned!
 		final Actor newActor = PlatFormSpecific_PlaceActor(_p, _at, _o);
+		if (_at == ActorType.Rock) resource_manager.AddStatistic(GameStatistics.RocksAssembled);
 		synchronized (GetActorObjects()) {
 			GetActorObjects().add(newActor);
 		}
@@ -459,6 +461,7 @@ public class SpriteManager {
 				|| _bt == BuildingType.AttractorScissors) {
 			_r = utility.attractorRadius;
 		}
+		resource_manager.AddStatistic(GameStatistics.BuildingsConstructed);
 		resource_manager.Buy(_bt, _oo);
 		final Building newBuilding = PlatformSpecific_PlaceBuilding(_p, _r, _bt, _oo);
 		synchronized (GetBuildingOjects()) {
@@ -472,7 +475,12 @@ public class SpriteManager {
 	}
 	
 	public void PlaceProjectile(Actor _source, Sprite _target) {
-		final Projectile newProjectile = PlatformSpecific_PlaceProjectile(_source, _target);
+		int r = utility.projectileRadius;
+		if (_source.GetType() == ActorType.Lizard) {
+			++r;
+		}
+		final Projectile newProjectile = PlatformSpecific_PlaceProjectile(_source, _target, r);
+		resource_manager.AddStatistic(GameStatistics.ProjectilesFired);
 		synchronized (GetProjectileObjects()) {
 			GetProjectileObjects().add(newProjectile);
 		}
@@ -510,17 +518,22 @@ public class SpriteManager {
 	
 	public SpecialSpawn PlaceSpecialSpawn(int _x, int _y, ActorType _at, ObjectOwner _oo, ArrayList<Actor> _l1, ArrayList<Actor> _l2) {
 		final SpecialSpawn newSS = PlatformSpecific_SpecialSpawn(_x, _y, utility.specialSpawnRadius, _at, _oo);
+		resource_manager.AddStatistic(GameStatistics.SpecialUnitsSpawned);
 		synchronized (GetSpecialSpawnObjects()) {
 			GetSpecialSpawnObjects().add(newSS);
 			newSS.addToMurderList(_l1);
 			newSS.addToMurderList(_l2);
 		}
-		for (Actor _a : _l1) {
-			markedForDeath.add(_a.GetID());
+		if (_l1 != null) {
+			for (Actor _a : _l1) {
+				markedForDeath.add(_a.GetID());
+			}
 		}
-		for (Actor _a : _l2) {
-			markedForDeath.add(_a.GetID());
-		}		
+		if (_l2 != null) {
+			for (Actor _a : _l2) {
+				markedForDeath.add(_a.GetID());
+			}	
+		}
 		return newSS;
 	}
 	
@@ -528,7 +541,7 @@ public class SpriteManager {
 	//These methods are overridden by Applet or Android sub-instances of SpriteManager
 	protected Actor PlatFormSpecific_PlaceActor(WorldPoint _p, ActorType _at, ObjectOwner _o) { return null; }
 	protected Building PlatformSpecific_PlaceBuilding(WorldPoint _p, int _r, BuildingType _bt, ObjectOwner _oo) { return null; }
-	protected Projectile PlatformSpecific_PlaceProjectile(Actor _source, Sprite _target) { return null; }
+	protected Projectile PlatformSpecific_PlaceProjectile(Actor _source, Sprite _target, int _r) { return null; }
 	protected Resource PlatformSpecific_PlaceResource(WorldPoint _p, ResourceType _rt) { return null; }
 	protected Spoogicles PlatformSpecific_PlaceSpooge(int _x, int _y, ObjectOwner _oo, int _n, float _scale) { return null; }
 	protected WaterfallSplash PlatformSpecific_PlaceWaterfallSplash(int _x, int _y, int _r) { return null; }
@@ -579,8 +592,12 @@ public class SpriteManager {
 		final WorldPoint enemy_starting = theWorld.GetIdeadStartingLocation(ObjectOwner.Enemy);
 		final float timeNow = (System.nanoTime() / 1000000000f);
 		float time_to_wait = utility.wg_seconds_to_wait;
-		if (utility.dbg == true) {
+		if (utility.dbg == true || utility.fastForward == true) {
 			time_to_wait = 0f;
+		}
+		
+		if (utility.gamePaused == true) {
+			return ws_step;
 		}
 
 		if (ws_step == 0 && (timeNow-ws_time_of_last_operation) > time_to_wait) {
@@ -845,6 +862,7 @@ public class SpriteManager {
 			for (Actor _a : GetActorObjects()) {
 				if (_a.GetOwner() == _target && utility.Seperation(location, _a.GetLoc()) < utility.actor_poison_range) {
 					_a.Poison();
+					resource_manager.AddStatistic(GameStatistics.UnitsPoisoned);
 				}
 			}
 		}
@@ -973,16 +991,16 @@ public class SpriteManager {
 								for (final Actor _a : GetActorObjects()) {
 									if (_a.GetOwner() != _b1.GetOwner()) continue; 
 									if (markedForDeath.contains(_a.GetID()) == true) continue;
-									if (utility.Seperation(_a.GetLoc(), _b2.GetLoc()) > utility.wander_radius * 2 
-												&& utility.Seperation(_a.GetLoc(), _b1.GetLoc()) > utility.wander_radius * 2) continue;
-									if (_a.GetType() == l1_type) {
+									if (utility.Seperation(_a.GetLoc(), _b2.GetLoc()) > utility.wander_radius 
+												&& utility.Seperation(_a.GetLoc(), _b1.GetLoc()) > utility.wander_radius) continue;
+									if (_a.GetType() == l1_type && l1.size() < min_l1) {
 										l1.add(_a);
-									} else if (_a.GetType() == l2_type) {
+									} else if (_a.GetType() == l2_type && l2.size() < min_l2) {
 										l2.add(_a);
 									}
 								}
 							}
-							if (l1.size() > min_l1 && l2.size() > min_l2) {
+							if (l1.size() == min_l1 && l2.size() == min_l2) {
 								//We're good for a new special!
 								final WorldPoint location = FindGoodSpot(
 										new WorldPoint((int) (_b1.GetX() + (_b2.GetX()-_b1.GetX())/2f), (int) (_b1.GetY() + (_b2.GetY()-_b1.GetY())/2f)),

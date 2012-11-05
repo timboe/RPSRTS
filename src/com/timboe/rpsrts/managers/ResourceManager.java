@@ -3,6 +3,7 @@ package com.timboe.rpsrts.managers;
 import com.timboe.rpsrts.enumerators.ActorType;
 import com.timboe.rpsrts.enumerators.BuildingType;
 import com.timboe.rpsrts.enumerators.GameMode;
+import com.timboe.rpsrts.enumerators.GameStatistics;
 import com.timboe.rpsrts.enumerators.ObjectOwner;
 import com.timboe.rpsrts.enumerators.ResourceType;
 import com.timboe.rpsrts.sprites.Building;
@@ -81,10 +82,44 @@ public class ResourceManager {
 	
 	private int STAT_TreesChopped;
 	private int STAT_ProjectilesFired;
+	private int STAT_SpecialUnitsSpawned;
+	private int STAT_ResourcesPlundered;
+	private int STAT_BuildingsConstructed;
+	private int STAT_UnitsPoisoned;
+	private int STAT_RocksAssembled;
+	private int STAT_TroopsSlaughtered;
+	private int STAT_BuildingsExploded;
+	//One more
 	
+	public void AddStatistic(GameStatistics _stat) {
+		switch (_stat) {
+		case BuildingsConstructed: ++STAT_BuildingsConstructed; return;
+		case ProjectilesFired: ++STAT_ProjectilesFired; return;
+		case ResourcesPlundered: ++STAT_ResourcesPlundered; return;
+		case RocksAssembled: ++STAT_RocksAssembled; return;
+		case SpecialUnitsSpawned: ++STAT_SpecialUnitsSpawned; return;
+		case BuildingsExploded: ++STAT_BuildingsExploded; return;
+		case TreesChopped: ++STAT_TreesChopped; return;
+		case TroopsSlaughtered: ++STAT_TroopsSlaughtered; return;
+		case UnitsPoisoned: ++STAT_UnitsPoisoned; return;
+		}
+	}
 	
-	
-	
+	public String GetStatistic(GameStatistics _stat) {
+		switch (_stat) {
+			case BuildingsConstructed: return Integer.toString(STAT_BuildingsConstructed);
+			case ProjectilesFired: return Integer.toString(STAT_ProjectilesFired);
+			case ResourcesPlundered: return Integer.toString(STAT_ResourcesPlundered);
+			case RocksAssembled: return Integer.toString(STAT_RocksAssembled);
+			case SpecialUnitsSpawned: return Integer.toString(STAT_SpecialUnitsSpawned);
+			case BuildingsExploded: return Integer.toString(STAT_BuildingsExploded);
+			case TreesChopped: return Integer.toString(STAT_TreesChopped);
+			case TroopsSlaughtered: return Integer.toString(STAT_TroopsSlaughtered);
+			case UnitsPoisoned: return Integer.toString(STAT_UnitsPoisoned);
+		}
+		return "0";
+	}
+		
 	public int GetGlobalWood() {
 		return GLOBAL_WOOD;
 	}
@@ -446,6 +481,16 @@ public class ResourceManager {
 		
 		PLAYER_SCORE = 0;
 		ENEMY_SCORE = 0;
+		
+		STAT_TreesChopped = 0;
+		STAT_ProjectilesFired = 0;
+		STAT_SpecialUnitsSpawned = 0;
+		STAT_ResourcesPlundered = 0;
+		STAT_BuildingsConstructed = 0;
+		STAT_UnitsPoisoned = 0;
+		STAT_RocksAssembled = 0;
+		STAT_TroopsSlaughtered = 0;
+		STAT_BuildingsExploded = 0;
 	}
 
 	public void TryToSpawnUnit(Building _b) {

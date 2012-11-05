@@ -1,5 +1,6 @@
 package com.timboe.rpsrts.sprites;
 
+import com.timboe.rpsrts.enumerators.GameStatistics;
 import com.timboe.rpsrts.enumerators.ObjectOwner;
 import com.timboe.rpsrts.managers.GameWorld;
 import com.timboe.rpsrts.managers.ResourceManager;
@@ -60,6 +61,9 @@ public class Sprite implements Comparable<Sprite> {
 		flashTicks = 12;
 		if (health <= 0) {
 			Kill();
+			if (GetIsActor() == true) {
+				resource_manager.AddStatistic(GameStatistics.TroopsSlaughtered);
+			}
 			return true;
 		}
 		return false;

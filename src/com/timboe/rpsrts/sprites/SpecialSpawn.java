@@ -34,8 +34,12 @@ public class SpecialSpawn extends Sprite {
 	}
 	
 	public void addToMurderList(ArrayList<Actor> _hsa) {
-		toKillOff.addAll(_hsa);
-		killEveryNTicks = (int) (nTicks / toKillOff.size()); 
+		if (_hsa != null) {
+			toKillOff.addAll(_hsa);
+		}
+		if (toKillOff.size() > 0) {
+			killEveryNTicks = (int) (nTicks / toKillOff.size()); 
+		}
 	}
 	
 	public ObjectOwner GetOwner() {

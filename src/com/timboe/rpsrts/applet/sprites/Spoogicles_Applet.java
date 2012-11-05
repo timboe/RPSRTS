@@ -23,8 +23,8 @@ public class Spoogicles_Applet extends Spoogicles {
 		}
 		
 		Point2D transform = theTransforms.getTransformedPoint(floorX,floorLevel);
-		final int _x = (int)Math.round(transform.getX());
-		final int _y = (int)Math.round(transform.getY());
+		final int _x = (int)(transform.getX());
+		final int _y = (int)(transform.getY());
 		
 		for (int s = 0; s < nSpooge; ++s) {
 			if (isDead.get(s).get()  == true) continue;

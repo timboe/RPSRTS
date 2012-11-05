@@ -20,11 +20,14 @@ public class SpecialSpawn_Applet extends SpecialSpawn {
 	public synchronized void Render(Graphics2D _g2, int _tick_count) {
 
 		Point2D transform = theTransforms.getTransformedPoint(x , y );
-		int _x_orig = (int)Math.round(transform.getX());
-		int _y_orig = (int)Math.round(transform.getY());
+		int _x_orig = (int)(transform.getX());
+		int _y_orig = (int)(transform.getY());
 		_g2.setTransform(theTransforms.af_translate_zoom);
-		_g2.setColor(Color.magenta);
-		_g2.fillRect((int) _x_orig-1, (int) _y_orig-1, 2, 2);
+	
+		if (utility.dbg == true) {
+			_g2.setColor(Color.magenta);
+			_g2.fillRect((int) _x_orig-1, (int) _y_orig-1, 2, 2);
+		}
 
 
 		for (int s = 0; s < nSpooge; ++s) {

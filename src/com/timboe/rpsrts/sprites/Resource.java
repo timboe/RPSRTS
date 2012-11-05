@@ -1,5 +1,6 @@
 package com.timboe.rpsrts.sprites;
 
+import com.timboe.rpsrts.enumerators.GameStatistics;
 import com.timboe.rpsrts.enumerators.ResourceType;
 import com.timboe.rpsrts.world.WeightedPoint;
 import com.timboe.rpsrts.world.WorldPoint;
@@ -84,6 +85,15 @@ public class Resource extends Sprite {
 			_requested = stuff;
 			stuff = 0;
 		}
+		for (int i = 0; i < _requested; ++i) {
+			resource_manager.AddStatistic(GameStatistics.ResourcesPlundered);
+		}
+		if (GetRemaining() == 0) {
+			if (GetType() == ResourceType.Tree) {
+				resource_manager.AddStatistic(GameStatistics.TreesChopped);
+			}
+			Kill();
+		}
 		//System.out.println("Resource: "+_requested+" given");
 		if (type == ResourceType.Mine) {
 			resource_manager.ModGlobalIron(-_requested);
@@ -109,11 +119,10 @@ public class Resource extends Sprite {
 		if (not_reachable_penalty > 0) {
 			--not_reachable_penalty;
 		}
-		if (utility.rnd() < utility.resource_chance_grow 
-				&& stuff < utility.resource_max_stuff ) {
+		if (utility.rnd() < utility.resource_chance_grow && stuff < utility.resource_max_stuff ) {
 			++stuff;
 		} else if (utility.rnd() < utility.resource_chance_spawn) {
-			WorldPoint spawn_loc = theSpriteManager.FindSpotForResource(this.GetLoc());// theSpriteManagerFindGoodSpot(loc, theSpriteManager.utility.resourceRadius, theSpriteManager.theWorld.GetTileSize(), true);
+			WorldPoint spawn_loc = theSpriteManager.FindSpotForResource(this.GetLoc());
 			if (spawn_loc != null) {
 				theSpriteManager.PlaceResource(spawn_loc, this.GetType(), true);
 			}
