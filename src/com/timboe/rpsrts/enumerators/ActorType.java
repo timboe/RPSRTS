@@ -1,3 +1,3 @@
 package com.timboe.rpsrts.enumerators;
 
-public enum ActorType {Rock,Paper,Scissors,Lizzard,Spock}
+public enum ActorType {Rock,Paper,Scissors,Lizard,Spock}

@@ -35,7 +35,7 @@ public class Spoogicles extends Sprite {
 		for (int s = 0; s < _spoogicles; ++s) {
 			x.add( new AtomicFloat( 0f ) );
 			y.add( new AtomicFloat( 0f ) );
-			spooge_x_vel.add( new AtomicFloat( (float) (utility.rndG(0f, 0.5f * scale) )) );
+			spooge_x_vel.add( new AtomicFloat( (float) (utility.rndG(0f, 2f * scale) )) );
 			spooge_y_vel.add( new AtomicFloat( (float) (-2.5 - Math.abs(utility.rndG(0f, 2f * scale))) ));
 			isDead.add(new AtomicBoolean(false));
 		}

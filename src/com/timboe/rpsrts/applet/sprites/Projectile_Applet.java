@@ -1,7 +1,7 @@
 package com.timboe.rpsrts.applet.sprites;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
@@ -40,13 +40,34 @@ public class Projectile_Applet extends Projectile {
 			++animStep;
 		}
 		
-		Point2D transform = null;
-		transform = theTransforms.af_shear_rotate.transform(new Point(x, y), transform);
-		final int _x = (int)Math.round(transform.getX());
-		final int _y = (int)Math.round(transform.getY());
+
 				
 		_g2.setTransform(theTransforms.af_translate_zoom);
-		_g2.drawImage(spriteGraphic[animStep % animSteps], _x - r, _y - r, null);
+		if (source.GetType() == ActorType.Spock) {
+			if (animStep % animSteps == 0) {
+				_g2.setColor(Color.white);
+			} else if (source.GetOwner() == ObjectOwner.Player) {
+				_g2.setColor(Color.red);
+			} else {
+				_g2.setColor(Color.blue);
+			}
+			Point2D transform = theTransforms.getTransformedPoint(target.GetX(), target.GetY());
+			final int _x1 = (int) transform.getX();
+			final int _y1 = (int) transform.getY(); 
+			transform = theTransforms.getTransformedPoint(source.GetX(), source.GetY());
+			_g2.drawLine((int)transform.getX(), (int) (transform.getY() - source.GetR() * 1.5), _x1, _y1);
+		} else if (source.GetType() == ActorType.Lizard) {
+			Point2D transform = theTransforms.getTransformedPoint(x, y);
+			final int _x = (int) transform.getX();
+			final int _y = (int) transform.getY();
+			_g2.setColor(Color.cyan);
+			_g2.drawOval(_x - 2, _y - 2, 4, 4);
+		} else {
+			Point2D transform = theTransforms.getTransformedPoint(x, y);
+			final int _x = (int) transform.getX();
+			final int _y = (int) transform.getY();
+			_g2.drawImage(spriteGraphic[animStep % animSteps], _x - r, _y - r, null);
+		}
 	}
 
 }

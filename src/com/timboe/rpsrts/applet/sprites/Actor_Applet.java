@@ -64,10 +64,9 @@ public class Actor_Applet extends Actor {
     public synchronized void Render(Graphics2D _g2, int _frame_count) {
 		if (dead == true) return;
 		Point2D transform = theTransforms.getTransformedPoint(x, y);
-		final int _x = (int)Math.round(transform.getX());
-		final int _y = (int)Math.round(transform.getY());
+		final int _x = (int)transform.getX();
+		final int _y = (int)transform.getY();
 
-		
 		if (true) { //DBG
 			_g2.setColor(Color.red);
 			_g2.setTransform(theTransforms.af);
@@ -77,26 +76,43 @@ public class Actor_Applet extends Actor {
 		if (flashTicks > 0) --flashTicks;
 		
 		_g2.setTransform(theTransforms.af_translate_zoom);
-		BufferedImage toDraw = spriteGraphic[animStep % animSteps];
-		_g2.drawImage(toDraw, _x - r, _y - r - 3, null);
-
+		
+		int health_offset = 5;
+		
+		if (GetType() == ActorType.Spock) {
+			_g2.setColor(Color.yellow);
+			_g2.fillOval(_x - r, _y - (5*r), r * 2, r * 5);
+			health_offset = 13;
+		} else if (GetType() == ActorType.Lizard) {
+			_g2.setColor(Color.green);
+			_g2.fillOval(_x - (2*r), _y - r, r * 4, r * 2);
+		} else {
+			_g2.drawImage(spriteGraphic[animStep % animSteps], _x - r, _y - r - 3, null);
+		}
+		
 		//Do carry capacity
 		if (carryAmount > 0) {
 			_g2.setColor(Color.black);
-			_g2.fillRect(_x - r, _y - r - 6, r * 2, 1);
+			_g2.fillRect(_x - r, _y - r - health_offset - 1, r * 2, 1);
 			_g2.setColor(Color.green);
-			_g2.fillRect(_x - r, _y - r - 6, (int) Math.round(r * 2 * ((float)carryAmount/(float)strength) ), 1);
+			_g2.fillRect(_x - r, _y - r - health_offset - 1, (int) Math.round(r * 2 * ((float)carryAmount/(float)strength) ), 1);
 		}
 
 		//Do health
 		_g2.setColor(Color.black);
-		_g2.fillRect(_x - r, _y - r - 5, r * 2, 1);
+		_g2.fillRect(_x - r, _y - r - health_offset, r * 2, 1);
 		if (owner == ObjectOwner.Player) {
 			_g2.setColor(Color.red);
 		} else {
 			_g2.setColor(Color.blue);
 		}
-		_g2.fillRect(_x - r, _y - r - 5, (int) Math.round(r * 2 * ((float)health/(float)maxHealth) ), 1);
+		_g2.fillRect(_x - r, _y - r - health_offset, (int) Math.round(r * 2 * ((float)health/(float)maxHealth) ), 1);
+		
+		//Do poison
+		if (poisoned > 0) {
+			_g2.setColor(Color.cyan);
+			_g2.fillOval(_x - r, _y - r, 2*r, 2);
+		}
 		
 		if (utility.dbg == true) {
 			_g2.setTransform(theTransforms.af);

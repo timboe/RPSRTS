@@ -18,6 +18,7 @@ import com.timboe.rpsrts.sprites.Actor;
 import com.timboe.rpsrts.sprites.Building;
 import com.timboe.rpsrts.sprites.Projectile;
 import com.timboe.rpsrts.sprites.Resource;
+import com.timboe.rpsrts.sprites.SpecialSpawn;
 import com.timboe.rpsrts.sprites.Spoogicles;
 import com.timboe.rpsrts.sprites.Sprite;
 import com.timboe.rpsrts.sprites.WaterfallSplash;
@@ -64,6 +65,8 @@ public class SpriteManager {
 	private final HashSet<Projectile> ProjectileObjects = new HashSet<Projectile>();
 	private final HashSet<Spoogicles> SpoogicleObjects = new HashSet<Spoogicles>();
 	private final HashSet<WaterfallSplash> WaterfallSplahsObjects = new HashSet<WaterfallSplash>();
+	private final HashSet<SpecialSpawn> SpecialSpawnObjects = new HashSet<SpecialSpawn>();
+
 	// Synchronised
 	private final Collection<Sprite> CollisionObjectsSync = Collections.synchronizedCollection(CollisionObjects);
 	private final Collection<Actor> ActorObjectsSync = Collections.synchronizedCollection(ActorObjects);
@@ -72,9 +75,11 @@ public class SpriteManager {
 	private final Collection<Projectile> ProjectileObjectsSync = Collections.synchronizedCollection(ProjectileObjects);
 	private final Collection<Spoogicles> SpoogicleObjectsSync = Collections.synchronizedCollection(SpoogicleObjects);
 	private final Collection<WaterfallSplash> WaterfallSplahsObjectsSync = Collections.synchronizedCollection(WaterfallSplahsObjects);
+	private final Collection<SpecialSpawn> SpecialSpawnObjectsSync = Collections.synchronizedCollection(SpecialSpawnObjects);
 
 	//
 	protected final HashSet<Resource> TempResourceHolder = new HashSet<Resource>();
+	protected final HashSet<Integer> markedForDeath = new HashSet<Integer>(); //used to not spawn many special units
 
 	protected SpriteManager() {
 	}
@@ -82,6 +87,10 @@ public class SpriteManager {
 	private void CheckActorCombat(){
 		synchronized (GetActorObjects()) {
 			for (final Actor _a : GetActorObjects()) {
+				//TODO check this, currently won't change target mid-fight
+				if (_a.GetAttackTarget() != null) {
+					continue;
+				}
 				Sprite chosen_target = null;
 				float min_distance = utility.minimiser_start;
 				for (final Sprite _target : ActorObjects) {
@@ -310,6 +319,15 @@ public class SpriteManager {
 			GetWaterfallSplashObjects().removeAll(toKill);
 		}
 		toKill.clear();
+		synchronized (GetSpecialSpawnObjects()) {
+			for (final SpecialSpawn _s : GetSpecialSpawnObjects()) {
+				if (_s.GetDead() == true) {
+					toKill.add(_s);
+				}
+			}
+			GetSpecialSpawnObjects().removeAll(toKill);
+		}
+		toKill.clear();
 	}
 
 	public Collection<Actor> GetActorObjects() {
@@ -372,6 +390,10 @@ public class SpriteManager {
 	public Collection<Spoogicles> GetSpoogiclesObjects() {
 		return SpoogicleObjectsSync;
 	}
+	
+	public Collection<SpecialSpawn> GetSpecialSpawnObjects() {
+		return SpecialSpawnObjectsSync;
+	}
 
 	public TreeSet<Sprite> GetSpritesZOrdered() {
 		TreeSet<Sprite> ZOrder = new TreeSet<Sprite>();
@@ -397,6 +419,11 @@ public class SpriteManager {
 		}
 		synchronized (GetSpoogiclesObjects()) {
 			for (final Sprite _s : GetSpoogiclesObjects()) {
+				ZOrder.add(_s);
+			}
+		}
+		synchronized (GetSpecialSpawnObjects()) {
+			for (final Sprite _s : GetSpecialSpawnObjects()) {
 				ZOrder.add(_s);
 			}
 		}
@@ -481,6 +508,23 @@ public class SpriteManager {
 		}
 	}
 	
+	public SpecialSpawn PlaceSpecialSpawn(int _x, int _y, ActorType _at, ObjectOwner _oo, ArrayList<Actor> _l1, ArrayList<Actor> _l2) {
+		final SpecialSpawn newSS = PlatformSpecific_SpecialSpawn(_x, _y, utility.specialSpawnRadius, _at, _oo);
+		synchronized (GetSpecialSpawnObjects()) {
+			GetSpecialSpawnObjects().add(newSS);
+			newSS.addToMurderList(_l1);
+			newSS.addToMurderList(_l2);
+		}
+		for (Actor _a : _l1) {
+			markedForDeath.add(_a.GetID());
+		}
+		for (Actor _a : _l2) {
+			markedForDeath.add(_a.GetID());
+		}		
+		return newSS;
+	}
+	
+
 	//These methods are overridden by Applet or Android sub-instances of SpriteManager
 	protected Actor PlatFormSpecific_PlaceActor(WorldPoint _p, ActorType _at, ObjectOwner _o) { return null; }
 	protected Building PlatformSpecific_PlaceBuilding(WorldPoint _p, int _r, BuildingType _bt, ObjectOwner _oo) { return null; }
@@ -488,7 +532,8 @@ public class SpriteManager {
 	protected Resource PlatformSpecific_PlaceResource(WorldPoint _p, ResourceType _rt) { return null; }
 	protected Spoogicles PlatformSpecific_PlaceSpooge(int _x, int _y, ObjectOwner _oo, int _n, float _scale) { return null; }
 	protected WaterfallSplash PlatformSpecific_PlaceWaterfallSplash(int _x, int _y, int _r) { return null; }
-
+	protected SpecialSpawn PlatformSpecific_SpecialSpawn(int _x, int _y, int _r, ActorType _at, ObjectOwner _oo) { return null; }
+	
 	public void Reset() {
 		ws_step = 0;
 		player_base = null;
@@ -511,6 +556,9 @@ public class SpriteManager {
 		}
 		synchronized (GetWaterfallSplashObjects()) {
 			GetWaterfallSplashObjects().clear();
+		}
+		synchronized (GetWaterfallSplashObjects()) {
+			GetSpecialSpawnObjects().clear();
 		}
 		//now _this_ singleton is fully spawned. Is safe to fetch the resourceManager (inter-depencence)
 		 if (resource_manager == null) {
@@ -730,6 +778,11 @@ public class SpriteManager {
 				_w.Tick(TickCount);
 			}
 		}
+		synchronized (GetSpecialSpawnObjects()) {
+			for (final SpecialSpawn _s : GetSpecialSpawnObjects()) {
+				_s.Tick(TickCount);
+			}
+		}
 		
 		//any resources added?
 		//now we're clear of the tick loop we can add these to the list
@@ -779,7 +832,25 @@ public class SpriteManager {
 		//FIGHT!
 		CheckActorCombat();
 
-		//
+		CheckBuildingEmployment();
+		
+		CheckSpecialSpawn();
+		if (AI_thread.isAlive() == false) AI_thread.run();
+		if (utility.noPlayers == true && AIHuman_thread.isAlive() == false) AIHuman_thread.run();
+		
+	}
+	
+	public void CheckPoison(WorldPoint location, ObjectOwner _target) {
+		synchronized (GetActorObjects()) {
+			for (Actor _a : GetActorObjects()) {
+				if (_a.GetOwner() == _target && utility.Seperation(location, _a.GetLoc()) < utility.actor_poison_range) {
+					_a.Poison();
+				}
+			}
+		}
+	}
+
+	private void CheckBuildingEmployment() {
 		synchronized (GetBuildingOjects()) {
 			for (final Building _b : GetBuildingOjects()) {
 				if (_b.GetDead() == true) {
@@ -861,9 +932,71 @@ public class SpriteManager {
 					}
 				}
 			}
+		}
+	}
 
-			if (AI_thread.isAlive() == false) AI_thread.run();
-			if (utility.noPlayers == true && AIHuman_thread.isAlive() == false) AIHuman_thread.run();
+	private void CheckSpecialSpawn() {
+		
+		//See if we can spawn a special unit type
+		//spock = paper+scissors, lizard = paper+rock
+		synchronized (GetBuildingOjects()) {
+			for (final Building _b1 : GetBuildingOjects()) {
+				if (_b1.GetType() == BuildingType.AttractorPaper) {
+					for (final Building _b2 : GetBuildingOjects()) {
+						if (_b2.GetID() == _b1.GetID())	continue;
+						for (int i=0; i<2; ++i) {
+							ArrayList<Actor> l1 = new ArrayList<Actor>();
+							ArrayList<Actor> l2 = new ArrayList<Actor>();
+							ActorType l1_type = ActorType.Paper;
+							ActorType l2_type = null;
+							BuildingType b2_type = null;
+							ActorType toSpawn = null;
+							int min_l1 = utility.EXTRA_Paper_PerWoodmill;
+							int min_l2 = 0;
+							if (i==0) {	//------------DO LIZARD------------
+								toSpawn = ActorType.Lizard;
+								l2_type = ActorType.Rock;
+								min_l2 = utility.EXTRA_Rock_PerRockery;
+								b2_type = BuildingType.AttractorRock;
+							} else if (i==1) { //------------DO SPOCK------------
+								toSpawn = ActorType.Spock;
+								l2_type = ActorType.Scissors;
+								min_l2 = utility.EXTRA_Scissors_PerSmelter;
+								b2_type = BuildingType.AttractorScissors;
+							}
+						
+							if (_b2.GetType() != b2_type) continue;
+							if (_b2.GetOwner() != _b1.GetOwner()) continue;
+							if (utility.Seperation(_b1.GetLoc(), _b2.GetLoc()) > utility.wander_radius * 2) continue;
+							//seperation criteria met, are there enough units around?
+							synchronized (GetActorObjects()) {
+								for (final Actor _a : GetActorObjects()) {
+									if (_a.GetOwner() != _b1.GetOwner()) continue; 
+									if (markedForDeath.contains(_a.GetID()) == true) continue;
+									if (utility.Seperation(_a.GetLoc(), _b2.GetLoc()) > utility.wander_radius * 2 
+												&& utility.Seperation(_a.GetLoc(), _b1.GetLoc()) > utility.wander_radius * 2) continue;
+									if (_a.GetType() == l1_type) {
+										l1.add(_a);
+									} else if (_a.GetType() == l2_type) {
+										l2.add(_a);
+									}
+								}
+							}
+							if (l1.size() > min_l1 && l2.size() > min_l2) {
+								//We're good for a new special!
+								final WorldPoint location = FindGoodSpot(
+										new WorldPoint((int) (_b1.GetX() + (_b2.GetX()-_b1.GetX())/2f), (int) (_b1.GetY() + (_b2.GetY()-_b1.GetY())/2f)),
+										utility.actorRadius * 2,
+										utility.wander_radius * 2,
+										false);
+								if (location != null) {
+									PlaceSpecialSpawn(location.getX(), location.getY(), toSpawn, _b1.GetOwner(), l1, l2);
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }

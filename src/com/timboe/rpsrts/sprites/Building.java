@@ -55,16 +55,20 @@ public class Building extends Sprite {
 			health = maxHealth;
 			y_offset = 14;
 			getiAttract().add(ActorType.Paper);
+			getiAttract().add(ActorType.Lizard);
+			getiAttract().add(ActorType.Spock);
 		} else if (type == BuildingType.AttractorRock) {
 			maxHealth *= 6;
 			health = maxHealth;
 			y_offset = 14;
 			getiAttract().add(ActorType.Rock);
+			getiAttract().add(ActorType.Lizard);
 		} else if (type == BuildingType.AttractorScissors) {
 			maxHealth *= 6;
 			health = maxHealth;
 			y_offset = 14;
 			getiAttract().add(ActorType.Scissors);
+			getiAttract().add(ActorType.Spock);
 		} else {
 			health = maxHealth / 4;
 			underConstruction = true;

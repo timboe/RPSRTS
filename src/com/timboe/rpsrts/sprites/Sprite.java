@@ -18,7 +18,7 @@ public class Sprite implements Comparable<Sprite> {
 	protected int y;
 	protected float x_prec;
 	protected float y_prec;
-	WorldPoint loc;
+	private WorldPoint loc;
 	protected int r;
 	
 	protected int flashTicks;
@@ -28,7 +28,7 @@ public class Sprite implements Comparable<Sprite> {
 	int even_odd;
 
 	float speed;
-	protected int health;
+	protected float health;
 	protected int maxHealth;
 	protected boolean dead = false;
 	
@@ -50,12 +50,12 @@ public class Sprite implements Comparable<Sprite> {
 		flashTicks = 0;
 	}
 
-	public boolean Attack(int _damage) {
+	public boolean Attack(float _damage) {
 		health -= _damage;
 		if (GetOwner() == ObjectOwner.Player) {
-			resource_manager.ScorePoints(ObjectOwner.Enemy, _damage/2);
+			resource_manager.ScorePoints(ObjectOwner.Enemy, (int) Math.ceil(_damage/2));
 		} else if (GetOwner() == ObjectOwner.Enemy) {
-			resource_manager.ScorePoints(ObjectOwner.Player, _damage/2);
+			resource_manager.ScorePoints(ObjectOwner.Player, (int) Math.ceil(_damage/2));
 		}
 		flashTicks = 12;
 		if (health <= 0) {
@@ -142,6 +142,10 @@ public class Sprite implements Comparable<Sprite> {
 	
 	public void Kill() {
 		dead = true;
+	}
+
+	public boolean GetIsSpecialSpawn() {
+		return false;
 	}
 
 

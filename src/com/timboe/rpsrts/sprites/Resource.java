@@ -113,7 +113,7 @@ public class Resource extends Sprite {
 				&& stuff < utility.resource_max_stuff ) {
 			++stuff;
 		} else if (utility.rnd() < utility.resource_chance_spawn) {
-			WorldPoint spawn_loc = theSpriteManager.FindSpotForResource(this.loc);// theSpriteManagerFindGoodSpot(loc, theSpriteManager.utility.resourceRadius, theSpriteManager.theWorld.GetTileSize(), true);
+			WorldPoint spawn_loc = theSpriteManager.FindSpotForResource(this.GetLoc());// theSpriteManagerFindGoodSpot(loc, theSpriteManager.utility.resourceRadius, theSpriteManager.theWorld.GetTileSize(), true);
 			if (spawn_loc != null) {
 				theSpriteManager.PlaceResource(spawn_loc, this.GetType(), true);
 			}

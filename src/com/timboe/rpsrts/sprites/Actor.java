@@ -23,7 +23,8 @@ public class Actor extends Sprite {
 	protected Sprite target; //building designated target
 	protected Sprite attack_target; //Who i'm wailing on
 	protected int attack_range;
-
+	protected int poisoned = 0;
+	
 	float RPS;
 	
 	ArrayList<ResourceType> iCollect = new ArrayList<ResourceType>(); //things this actor collects
@@ -59,6 +60,7 @@ public class Actor extends Sprite {
 		stuck = 0;
 		navagate_status = PathfindStatus.NotRun;
 		animSteps = 4;
+		RPS = 1f;
 
 		if (type == ActorType.Paper) {
 			RPS = 2f;
@@ -77,6 +79,13 @@ public class Actor extends Sprite {
 		ticks_per_tock *= RPS;
 		attack_range = utility.actor_attack_range;
 
+		
+		if (type == ActorType.Spock || type == ActorType.Lizard) {
+			//spock = paper+scissors, lizard = paper+rock
+			maxHealth = (int) (utility.actor_starting_health * utility.EXTRA_Scissors_PerSmelter * 2);
+			strength = (int) (utility.actor_strength * utility.EXTRA_Scissors_PerSmelter * 2);
+			ticks_per_tock *= 0.5;
+		}
 		
 		health = maxHealth;
 		animStep = utility.rndI(animSteps);
@@ -131,12 +140,22 @@ public class Actor extends Sprite {
 	public boolean GetIfPreferedTarget(Sprite to_compare) {
 		if (to_compare.GetIsActor() == true) {
 			if (type == ActorType.Paper && ((Actor) to_compare).GetType() == ActorType.Rock ) return true;
+			else if (type == ActorType.Paper && ((Actor) to_compare).GetType() == ActorType.Spock ) return true;
 			else if (type == ActorType.Rock && ((Actor) to_compare).GetType() == ActorType.Scissors ) return true;
+			else if (type == ActorType.Rock && ((Actor) to_compare).GetType() == ActorType.Lizard ) return true;
 			else if (type == ActorType.Scissors && ((Actor) to_compare).GetType() == ActorType.Paper ) return true;
+			else if (type == ActorType.Scissors && ((Actor) to_compare).GetType() == ActorType.Lizard ) return true;
+			else if (type == ActorType.Spock && ((Actor) to_compare).GetType() == ActorType.Rock ) return true;
+			else if (type == ActorType.Spock && ((Actor) to_compare).GetType() == ActorType.Scissors ) return true;
+			else if (type == ActorType.Lizard && ((Actor) to_compare).GetType() == ActorType.Spock ) return true;
+			else if (type == ActorType.Lizard && ((Actor) to_compare).GetType() == ActorType.Paper ) return true;
 		} else if (to_compare.GetIsBuilding() == true) {
 			if (type == ActorType.Paper && ((Building) to_compare).GetType() == BuildingType.Rockery ) return true;
 			else if (type == ActorType.Rock && ((Building) to_compare).GetType() == BuildingType.Smelter ) return true;
 			else if (type == ActorType.Scissors && ((Building) to_compare).GetType() == BuildingType.Woodshop ) return true;
+			else if (type == ActorType.Spock && ((Building) to_compare).GetType() == BuildingType.Smelter) return true;
+			else if (type == ActorType.Spock && ((Building) to_compare).GetType() == BuildingType.Rockery) return true;
+			else if (type == ActorType.Lizard && ((Building) to_compare).GetType() == BuildingType.Woodshop) return true;
 		}
 		return false;
 	}
@@ -175,17 +194,19 @@ public class Actor extends Sprite {
 		if (tick == true) {
 			if (wander != null
 					|| utility.Seperation(GetLoc(), attack_target.GetLoc()) > attack_range
-					|| utility.rnd() < (0.05f * RPS)) { //TODO tweak this range, currently paper wander 20% tick
+					|| utility.rnd() < (0.01f * RPS)) { //TODO tweak this range, down from 0.05 to 0.01
 				//if (wander == null) wander = theSpriteManager.FindGoodSpot(attack_target.GetLoc(), r, attack_range, false);
-				WanderAbout(attack_target, attack_range, attack_range/2);
+				WanderAbout(attack_target, attack_range/2, attack_range/4);
 			}
-		} else if (tock == true) {
+		}
+		if (tock == true) {
 			final float _sep = utility.Seperation(GetLoc(), attack_target.GetLoc());
 			if (_sep > 2 * attack_range) {
 				attack_target = null;
 				return;
-			} else if (_sep > attack_range)
+			} else if (_sep > attack_range) {
 				return;
+			}
 			//in range -- attack!
 			++animStep;
 			theSpriteManager.PlaceProjectile(this, attack_target);
@@ -377,11 +398,9 @@ public class Actor extends Sprite {
 				//Is there another waypoint?
 				boolean more = false;
 				if (waypoint_list_sync != null) {
-					synchronized (waypoint_list_sync) {
-						if (waypoint_list_sync.size() > 0) {
-							waypoint = waypoint_list_sync.remove( waypoint_list_sync.size() - 1 );
-							more = true;
-						}
+					if (waypoint_list_sync.size() > 0) {
+						waypoint = waypoint_list_sync.remove( waypoint_list_sync.size() - 1 );
+						more = true;
 					}
 				}
 				if (more == false) {
@@ -490,9 +509,7 @@ public class Actor extends Sprite {
 					destination = null;
 					waypoint = null;
 				} else {
-					synchronized (waypoint_list_sync) {
-						waypoint = waypoint_list_sync.get( waypoint_list_sync.size() - 1 );
-					}
+					waypoint = waypoint_list_sync.get( waypoint_list_sync.size() - 1 );
 					navagate_status = PathfindStatus.Passed;
 				}
 				pathfinder = null;
@@ -514,6 +531,10 @@ public class Actor extends Sprite {
 			Job_Gather();
 		}
 		////////////////////////////////////////////////////////////////////////////////////////////
+		if (poisoned > 0) {
+			--poisoned;
+			Attack(utility.actor_poison_rate);
+		}
 	}
 
 	public void Tock() {
@@ -573,6 +594,10 @@ public class Actor extends Sprite {
 
 	public Sprite GetAttackTarget() {
 		return attack_target;
+	}
+
+	public void Poison() {
+		poisoned += utility.actor_poison_ticks;
 	}
 }
 

@@ -1,7 +1,10 @@
 package com.timboe.rpsrts.sprites;
 
+import com.timboe.rpsrts.enumerators.ActorType;
+
 public class Projectile extends Sprite {
-	Sprite target;
+	protected Sprite target;
+	protected Actor source;
 	int multiplier = 1;
 	int strength;
 	
@@ -9,6 +12,7 @@ public class Projectile extends Sprite {
 		super(_ID, _source.GetX(), _source.GetY(), _r);
 		speed = utility.projectile_speed;
 		target = _target;
+		source = _source;
 		strength = _source.GetStrength();
 		if (_source.GetIfPreferedTarget(_target) == true) {
 			multiplier = 2;
@@ -22,9 +26,17 @@ public class Projectile extends Sprite {
 	}
 	
 	public void Tick(int _tick_count) {
+		if ((_tick_count + tick_offset) % ticks_per_tock == 0) Tock();
+
 		if (dead == true) return;
 		if (target == null || target.GetDead() == true) {
 			Kill();
+			return;
+		}
+		
+		if (source.GetType() == ActorType.Spock && target != null && target.GetDead() == false) {
+			target.Attack(((float)strength*(float)multiplier) / (float)utility.ticks_per_tock);
+			theSpriteManager.PlaceSpooge(target.GetX(), target.GetY(), target.GetOwner(), utility.spooges_hit, utility.spooges_scale_hit);
 			return;
 		}
 		
@@ -33,6 +45,9 @@ public class Projectile extends Sprite {
 			target.Attack(strength*multiplier);
 			theSpriteManager.PlaceSpooge(x, y, target.GetOwner(), utility.spooges_hit, utility.spooges_scale_hit);
 			Kill();
+			if (source.GetType() == ActorType.Lizard) {
+				theSpriteManager.CheckPoison(GetLoc(), target.GetOwner());
+			}
 			return;
 		}
 		
@@ -41,5 +56,11 @@ public class Projectile extends Sprite {
 		x = (int) Math.round(x_prec);
 		y = (int) Math.round(y_prec);
 	
+	}
+	
+	public void Tock() {
+		if (source.GetType() == ActorType.Spock) {
+			Kill();
+		}
 	}
 }

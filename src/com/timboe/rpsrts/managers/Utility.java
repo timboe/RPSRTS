@@ -86,11 +86,13 @@ public class Utility {
 	public final int attractorRadius = 4;
 	public final int actorRadius = 3;
 	public final int projectileRadius = 2;
+	public final int specialSpawnRadius = 10;
 	public final int resourceRadius = 3;
 	public final int resources_kept_away_from_base = 50; //clear area around main bases
 	public final int place_res_gaussian = 2;
 	public final float projectile_speed = 1f;
 	
+
 	//actor settings
 	public final int starting_actors = 2;
 	public final int amount_collect_per_tock = 1; //amount to take/give per tock
@@ -103,6 +105,9 @@ public class Utility {
 	public final float actor_strength = 4f;
 	public final float actor_starting_health = 50f;
 	public final int actor_attack_range = 30;
+	public final float actor_poison_rate = 0.1f;
+	public final int actor_poison_ticks = 60;
+	public final float actor_poison_range = 20;
 	
 	//biome settings
 	public final int biome_golbal_density_mod = 1;//tiles_size; //derived

@@ -12,6 +12,7 @@ import com.timboe.rpsrts.applet.sprites.Actor_Applet;
 import com.timboe.rpsrts.applet.sprites.Building_Applet;
 import com.timboe.rpsrts.applet.sprites.Projectile_Applet;
 import com.timboe.rpsrts.applet.sprites.Resource_Applet;
+import com.timboe.rpsrts.applet.sprites.SpecialSpawn_Applet;
 import com.timboe.rpsrts.applet.sprites.Spoogicles_Applet;
 import com.timboe.rpsrts.applet.sprites.WaterfallSplash_Applet;
 import com.timboe.rpsrts.enumerators.ActorType;
@@ -23,6 +24,7 @@ import com.timboe.rpsrts.sprites.Actor;
 import com.timboe.rpsrts.sprites.Building;
 import com.timboe.rpsrts.sprites.Projectile;
 import com.timboe.rpsrts.sprites.Resource;
+import com.timboe.rpsrts.sprites.SpecialSpawn;
 import com.timboe.rpsrts.sprites.Spoogicles;
 import com.timboe.rpsrts.sprites.Sprite;
 import com.timboe.rpsrts.sprites.WaterfallSplash;
@@ -68,6 +70,10 @@ public class SpriteManager_Applet extends SpriteManager {
 	protected WaterfallSplash PlatformSpecific_PlaceWaterfallSplash(int _x, int _y, int _r) {
 		return (WaterfallSplash) new WaterfallSplash_Applet(++GlobalSpriteCounter, _x, _y, _r);
 	}
+	@Override
+	protected SpecialSpawn PlatformSpecific_SpecialSpawn(int _x, int _y, int _r, ActorType _at, ObjectOwner _oo) {
+		return (SpecialSpawn) new SpecialSpawn_Applet(++GlobalSpriteCounter, _x, _y, _r, _at, _oo);
+	}
 	
 	public void Render(Graphics2D _g2) {
 		++FrameCount;
@@ -83,6 +89,8 @@ public class SpriteManager_Applet extends SpriteManager {
 				((Projectile_Applet) _Z).Render(_g2, FrameCount);
 			} else if (_Z.GetIsSpoogicle() == true) {
 				((Spoogicles_Applet) _Z).Render(_g2, FrameCount);
+			} else if (_Z.GetIsSpecialSpawn() == true) {
+				((SpecialSpawn_Applet) _Z).Render(_g2, FrameCount);
 			}
 		}
 		
@@ -197,6 +205,7 @@ public class SpriteManager_Applet extends SpriteManager {
 			//PLACE BUILDING and location is A'OK
 			if (_place_remove == true) {
 				PlaceBuilding(new WorldPoint(_mouse_x,_mouse_y), _bt, ObjectOwner.Player);
+//				PlaceSpecialSpawn(_mouse_x, _mouse_y, ActorType.Spock, ObjectOwner.Player); //TODO TEMP!
 				return true;
 			}
 

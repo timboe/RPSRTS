@@ -24,26 +24,15 @@ public class AI implements Runnable {
 	private final GameWorld theWorld = GameWorld.GetGameWorld();
 	protected final SpriteManager theSpriteManager = SpriteManager.GetSpriteManager();
 	private final ResourceManager resource_manager = ResourceManager.GetResourceManager();
-//	private final PathfinderGrid thePathfinderGrid = PathfinderGrid.GetPathfinderGrid();
 	
 	ArrayList<Thread> pathfinding_thread = new ArrayList<Thread>();
-	//Thread pathfinding_thread_paper;
-	//Thread pathfinding_thread_scisors;
-
 	ArrayList<Pathfinder> pathfinder = new ArrayList<Pathfinder>();
-	//Pathfinder pathfinder_paper;
-	//Pathfinder pathfinder_scissors;
-
 	ArrayList<PathfindStatus> navagate_status = new ArrayList<PathfindStatus>();// {PathfindStatus.NotRun,PathfindStatus.NotRun,PathfindStatus.NotRun};
-	//PathfindStatus navagate_status_paper = PathfindStatus.NotRun;
-	//PathfindStatus navagate_status_scissors = PathfindStatus.NotRun;
-
-	//bit more ugly TODO Change to List?
 	ArrayList<ArrayList<WorldPoint>> waypoint_list = new ArrayList<ArrayList<WorldPoint>>();
-	//protected Vector<WorldPoint>[] waypoint_list = new Vector<WorldPoint>[3]; 
-	//protected Vector<WorldPoint> waypoint_list_rock = null;
-	//protected Vector<WorldPoint> waypoint_list_scissors = null;
-	
+	ArrayList<WorldPoint> attack_dest = new ArrayList<WorldPoint>();
+	ArrayList<WorldPoint> attack_source = new ArrayList<WorldPoint>();
+	ArrayList<Building> attack_attractors = new ArrayList<Building>();
+	ArrayList<Building> defence_attractors = new ArrayList<Building>();
 	
 	int woodshop_countdown = 0;
 	int rockery_countdown = 0;
@@ -56,16 +45,6 @@ public class AI implements Runnable {
 	boolean attack_paper = false;
 	boolean attack_rock = false;
 	boolean attack_scissors = false;
-	
-	ArrayList<WorldPoint> attack_dest = new ArrayList<WorldPoint>();
-//	WorldPoint attack_rock_dest;
-//	WorldPoint attack_scissors_dest;
-	ArrayList<WorldPoint> attack_source = new ArrayList<WorldPoint>();
-//	WorldPoint attack_rock_source;
-//	WorldPoint attack_scissors_source;
-	
-	ArrayList<Building> attack_attractors = new ArrayList<Building>();
-	ArrayList<Building> defence_attractors = new ArrayList<Building>();
 	
 	private ObjectOwner me;
 	private ObjectOwner enemy;
