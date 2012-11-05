@@ -9,7 +9,6 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 
 import com.timboe.rpsrts.enumerators.ObjectOwner;
-import com.timboe.rpsrts.enumerators.Pwd;
 import com.timboe.rpsrts.managers.ResourceManager;
 import com.timboe.rpsrts.managers.Utility;
 
@@ -33,7 +32,7 @@ public class HighScore implements Runnable {
 	public void SubmitHighScore() throws IOException {
 		//Create Post String
 		//Thanks to http://robbamforth.wordpress.com/2009/04/27/java-how-to-post-to-a-htmlphp-post-form/
-		String data = URLEncoder.encode("pwd",    "UTF-8") + "=" + URLEncoder.encode(Pwd.GetPass(), "UTF-8");
+		String data = URLEncoder.encode("pwd",    "UTF-8") + "=" + URLEncoder.encode("", "UTF-8");
 		data += "&" + URLEncoder.encode("name",    "UTF-8") + "=" + URLEncoder.encode(utility.playerName, "UTF-8");
 		data += "&" + URLEncoder.encode("score",   "UTF-8") + "=" + URLEncoder.encode(Integer.toString(resource_manager.GetScore(ObjectOwner.Player)), "UTF-8");
 		data += "&" + URLEncoder.encode("wintime", "UTF-8") + "=" + URLEncoder.encode(Long.toString(utility.game_time_count/1000l), "UTF-8");
