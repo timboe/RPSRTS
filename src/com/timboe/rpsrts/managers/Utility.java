@@ -62,7 +62,7 @@ public class Utility {
 	public final int do_fps_every_x_ticks = 6; // refresh FPS after X frames
 	public final int game_ticks_per_render = 2;
 	public final int slowmo_ticks_per_render = 1;
-	public final int fast_forward_speed = 10;
+	public final int fast_forward_speed = 100;
 	
 	//world manager settings
 	public final float wg_seconds_to_wait = 0.5f; //Time to wait between steps

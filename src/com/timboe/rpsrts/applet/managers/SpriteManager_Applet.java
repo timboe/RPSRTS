@@ -227,7 +227,8 @@ public class SpriteManager_Applet extends SpriteManager {
 			if (_place_remove == true) {
 //				PlaceBuilding(new WorldPoint(_mouse_x,_mouse_y), _bt, ObjectOwner.Player);
 //				PlaceExplosion(_mouse_x, _mouse_y, ObjectOwner.Player); //TODO TEMP!
-				PlaceSpecialSpawn(_mouse_x, _mouse_y, ActorType.Spock, ObjectOwner.Player, null, null);
+				CheckBuildingExplode(new WorldPoint(_mouse_x,_mouse_y), ObjectOwner.Enemy);
+//				PlaceSpecialSpawn(_mouse_x, _mouse_y, ActorType.Spock, ObjectOwner.Player, null, null);
 				return true;
 			}
 

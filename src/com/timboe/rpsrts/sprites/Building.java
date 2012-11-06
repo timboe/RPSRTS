@@ -219,7 +219,10 @@ public class Building extends Sprite {
 		if ((_tick_count + tick_offset) % ticks_per_tock == 0) Tock();
 		if (shrapnel > 0) {
 			--shrapnel;
+			//posibility for chain reaction
+			SetPrimedToExplode(+1);
 			Attack(utility.building_Explode_damage * utility.building_Explode_vs_building_multiplier);
+			SetPrimedToExplode(-1);
 		}
 	}
 	
