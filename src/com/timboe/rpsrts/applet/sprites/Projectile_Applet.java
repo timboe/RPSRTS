@@ -55,7 +55,7 @@ public class Projectile_Applet extends Projectile {
 			final int _x1 = (int) transform.getX();
 			final int _y1 = (int) transform.getY(); 
 			transform = theTransforms.getTransformedPoint(source.GetX(), source.GetY());
-			_g2.drawLine((int)(transform.getX() - 2), (int) (transform.getY() - 7), _x1, _y1);
+			_g2.drawLine((int)(transform.getX() - 2), (int) (transform.getY() - 7), _x1, _y1 - target.GetR());
 		} else {
 			Point2D transform = theTransforms.getTransformedPoint(x, y);
 			final int _x = (int) transform.getX();

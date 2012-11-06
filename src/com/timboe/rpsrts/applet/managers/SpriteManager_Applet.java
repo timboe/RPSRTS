@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 
 import com.timboe.rpsrts.applet.sprites.Actor_Applet;
 import com.timboe.rpsrts.applet.sprites.Building_Applet;
+import com.timboe.rpsrts.applet.sprites.Explosion_Applet;
 import com.timboe.rpsrts.applet.sprites.Projectile_Applet;
 import com.timboe.rpsrts.applet.sprites.Resource_Applet;
 import com.timboe.rpsrts.applet.sprites.SpecialSpawn_Applet;
@@ -22,6 +23,7 @@ import com.timboe.rpsrts.enumerators.ResourceType;
 import com.timboe.rpsrts.managers.SpriteManager;
 import com.timboe.rpsrts.sprites.Actor;
 import com.timboe.rpsrts.sprites.Building;
+import com.timboe.rpsrts.sprites.Explosion;
 import com.timboe.rpsrts.sprites.Projectile;
 import com.timboe.rpsrts.sprites.Resource;
 import com.timboe.rpsrts.sprites.SpecialSpawn;
@@ -74,6 +76,10 @@ public class SpriteManager_Applet extends SpriteManager {
 	protected SpecialSpawn PlatformSpecific_SpecialSpawn(int _x, int _y, int _r, ActorType _at, ObjectOwner _oo) {
 		return (SpecialSpawn) new SpecialSpawn_Applet(++GlobalSpriteCounter, _x, _y, _r, _at, _oo);
 	}
+	@Override
+	protected Explosion PlatformSpecific_Explosion(int _x, int _y, ObjectOwner _oo) {
+		return (Explosion) new Explosion_Applet(++GlobalSpriteCounter, _x, _y, utility.building_Explode_radius, _oo) ;
+	}
 	
 	public void Render(Graphics2D _g2) {
 		++FrameCount;
@@ -91,6 +97,8 @@ public class SpriteManager_Applet extends SpriteManager {
 				((Spoogicles_Applet) _Z).Render(_g2, FrameCount);
 			} else if (_Z.GetIsSpecialSpawn() == true) {
 				((SpecialSpawn_Applet) _Z).Render(_g2, FrameCount);
+			} else if (_Z.GetIsExplosion()) {
+				((Explosion_Applet) _Z).Render(_g2, FrameCount);
 			}
 		}
 		
@@ -218,7 +226,8 @@ public class SpriteManager_Applet extends SpriteManager {
 			//PLACE BUILDING and location is A'OK
 			if (_place_remove == true) {
 //				PlaceBuilding(new WorldPoint(_mouse_x,_mouse_y), _bt, ObjectOwner.Player);
-				PlaceSpecialSpawn(_mouse_x, _mouse_y, ActorType.Lizard, ObjectOwner.Player, null, null); //TODO TEMP!
+//				PlaceExplosion(_mouse_x, _mouse_y, ObjectOwner.Player); //TODO TEMP!
+				PlaceSpecialSpawn(_mouse_x, _mouse_y, ActorType.Spock, ObjectOwner.Player, null, null);
 				return true;
 			}
 

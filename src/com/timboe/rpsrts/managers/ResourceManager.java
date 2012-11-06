@@ -482,6 +482,10 @@ public class ResourceManager {
 		PLAYER_SCORE = 0;
 		ENEMY_SCORE = 0;
 		
+		GLOBAL_WOOD = 0;
+		GLOBAL_STONE = 0;
+		GLOBAL_IRON = 0;
+		
 		STAT_TreesChopped = 0;
 		STAT_ProjectilesFired = 0;
 		STAT_SpecialUnitsSpawned = 0;

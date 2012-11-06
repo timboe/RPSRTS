@@ -6,7 +6,6 @@ import java.util.Vector;
 
 import com.timboe.rpsrts.enumerators.ActorType;
 import com.timboe.rpsrts.enumerators.BuildingType;
-import com.timboe.rpsrts.enumerators.GameStatistics;
 import com.timboe.rpsrts.enumerators.ObjectOwner;
 import com.timboe.rpsrts.enumerators.ResourceType;
 import com.timboe.rpsrts.world.WeightedPoint;
@@ -19,22 +18,19 @@ public class Building extends Sprite {
 	protected ObjectOwner owner;
 	protected boolean delete_hover = false;
 	protected boolean move_hover = false;
-	ArrayList<Actor> employees = new ArrayList<Actor>();
+	private ArrayList<Actor> employees = new ArrayList<Actor>();
 	protected boolean underConstruction;
 	protected int y_offset;
+	private int primedToExplode = 0;
+	protected int shrapnel = 0;
 	
-	int no_local_resource_penalty;
-	public int no_local_resource_counter;
-
-	int cost_wood;
-	int cost_rock;
-	int cost_iron;
+	private int no_local_resource_penalty;
+	private int no_local_resource_counter;
 
 	protected Building(int _ID, int _x, int _y, int _r, BuildingType _bt, ObjectOwner _oo) {
 		super(_ID, _x, _y, _r);
 		type = _bt;
 		owner = _oo;
-		//employees = 0;
 		animSteps = 4;
 		y_offset = 0;
 		underConstruction = false;
@@ -107,6 +103,11 @@ public class Building extends Sprite {
 		return getiAttract();
 	}
 	
+
+	public int GetNoLocalResourceCounter() {
+		return no_local_resource_counter;
+	}
+	
 	public Boolean GetBeingBuilt() {
 		return underConstruction;
 	}
@@ -177,9 +178,8 @@ public class Building extends Sprite {
 			else theSpriteManager.PlaceSpooge(x, y, GetOwner(), utility.spooges_totem_death, utility.spooges_scale_totem_death);
 		}
 		dead = true;
-		//TODO explode code
-		if (false) {
-			resource_manager.AddStatistic(GameStatistics.BuildingsExploded);
+		if (primedToExplode > 0) {
+			theSpriteManager.CheckBuildingExplode(GetLoc(), GetOwner());
 		}
 		GridDeRegister();
 	}
@@ -217,6 +217,10 @@ public class Building extends Sprite {
 	
 	public void Tick(int _tick_count) {
 		if ((_tick_count + tick_offset) % ticks_per_tock == 0) Tock();
+		if (shrapnel > 0) {
+			--shrapnel;
+			Attack(utility.building_Explode_damage * utility.building_Explode_vs_building_multiplier);
+		}
 	}
 	
 	public void Tock() {
@@ -260,6 +264,14 @@ public class Building extends Sprite {
 
 	public void setiAttract(HashSet<ActorType> iAttract) {
 		this.iAttract = iAttract;
+	}
+	
+	public void SetPrimedToExplode(int _pte) {
+		primedToExplode += _pte;
+	}
+	
+	public void Shrapnel() {
+		shrapnel += utility.building_Explode_ticks;
 	}
 
 }

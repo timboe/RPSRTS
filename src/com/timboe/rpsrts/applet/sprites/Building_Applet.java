@@ -83,7 +83,7 @@ public class Building_Applet extends Building {
 		final int _y = (int)(transform.getY());
 
 		//Do delete hover
-		if (delete_hover) {
+		if (delete_hover == true) {
 			_g2.setTransform(theTransforms.af);
 			_g2.setColor(Color.red);
 			GeneralPath X = (GeneralPath) theShapeStore.GetCross();
@@ -94,7 +94,8 @@ public class Building_Applet extends Building {
 		}
 		
 		//Do move symbol
-		if (move_hover == true || 
+		if ((move_hover == true && owner == ObjectOwner.Player)
+				|| 
 				(getiAttract().size() > 0
 				&& owner == ObjectOwner.Player
 				&& theSceneRenderer.MouseTF != null 

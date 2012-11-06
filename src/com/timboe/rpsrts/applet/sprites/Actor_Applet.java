@@ -94,8 +94,6 @@ public class Actor_Applet extends Actor {
 			_g2.drawImage(spriteGraphic[animStep % animSteps], _x - r + 1, _y - (4*r) - 3, null);
 			health_offset = 14;
 		} else if (GetType() == ActorType.Lizard) {
-			_g2.setColor(Color.green);
-			_g2.fillOval(_x - (2*r), _y - r, r * 4, r * 2);
 			_g2.drawImage(spriteGraphic[animStep % animSteps], _x - (2*r) - 2, _y - r - 3, null);
 		} else {
 			_g2.drawImage(spriteGraphic[animStep % animSteps], _x - r, _y - r - 3, null);
@@ -121,8 +119,11 @@ public class Actor_Applet extends Actor {
 		
 		//Do poison
 		if (poisoned > 0) {
-			_g2.setColor(Color.cyan);
-			_g2.fillOval(_x - r, _y - r, 2*r, 2);
+			if (GetOwner() == ObjectOwner.Player) {
+				_g2.drawImage(theBitmaps.proj_lizard_enemy[animStep % 3], _x - r, _y - r - health_offset - 4, null);
+			} else {
+				_g2.drawImage(theBitmaps.proj_lizard_player[animStep % 3], _x - r, _y - r - health_offset - 4, null);
+			}
 		}
 		
 		if (utility.dbg == true) {
@@ -150,8 +151,8 @@ public class Actor_Applet extends Actor {
 			} else {
 				_g2.setColor(Color.blue);
 			}
-			if (waypoint_list_sync != null) {
-				for (final WorldPoint p : waypoint_list_sync) {
+			if (waypoint_list != null) {
+				for (final WorldPoint p : waypoint_list) {
 					if (p == null) {
 						continue;
 					}

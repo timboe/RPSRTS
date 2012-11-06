@@ -152,5 +152,9 @@ public class Sprite implements Comparable<Sprite> {
 		return false;
 	}
 
+	public boolean GetIsExplosion() {
+		return false;
+	}
+
 
 }

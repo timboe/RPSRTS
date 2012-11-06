@@ -140,16 +140,12 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			utility.mouseClick = false;
 			theSceneRenderer.buildingToPlace = null;
 			theSceneRenderer.buildingToMove = null;
-		} else if (e.getKeyChar() == 'a') {
-			theTransforms.toggleAA();
+		} else if (e.getKeyChar() == 'q') {
+			theSceneRenderer.toggleQuality();
 		} else if (e.getKeyChar() == 'd') {
 			utility.dbg = !utility.dbg;
 		} else if (e.getKeyChar() == 's') {
-			if (utility.GetTicksPerRender() == utility.game_ticks_per_render) {
-				utility.SetTicksPerRender(utility.GetTicksPerRender() * 100);
-			} else {
-				utility.SetTicksPerRender(utility.game_ticks_per_render);
-			}
+			theSceneRenderer.toggleSound();
 		} else if (e.getKeyChar() == 'w') {
 			genNewWorld();
 		} else if (e.getKeyChar() == 'c') {
@@ -157,7 +153,9 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			resource_manager.AddResources(ResourceType.Rockpile, 100, ObjectOwner.Player);
 			resource_manager.AddResources(ResourceType.Mine, 100, ObjectOwner.Player);
 		} else if (e.getKeyChar() == 'p') {
-			utility.gamePaused = !utility.gamePaused;
+			theSceneRenderer.togglePause();
+		} else if (e.getKeyChar() == 'f') {
+			theSceneRenderer.toggleFF();
 		}
 		
 	}
@@ -304,6 +302,9 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 
 			if (utility._TICK % utility.do_fps_every_x_ticks == 0) {
 				utility.FPS = Math.round((1. / (System.currentTimeMillis() - utility._TIME_OF_LAST_TICK)* 1000.) / utility.GetTicksPerRender());
+				if (utility.FPS > 999) {
+					utility.FPS = 999;
+				}
 			}
 			
 			if (utility._TICK % utility.GetTicksPerRender() == 0) {

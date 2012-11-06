@@ -532,7 +532,7 @@ public class AI implements Runnable {
 				if (_b.GetOwner() == enemy) {
 					continue;
 				}
-				if (_b.no_local_resource_counter >= utility.AI_BadBuilding_Before_Sell) {
+				if (_b.GetNoLocalResourceCounter() >= utility.AI_BadBuilding_Before_Sell) {
 					Refund(_b);
 				}
 			}

@@ -173,9 +173,9 @@ public class SceneRenderer_Applet {
 			g2.setTransform(theTransforms.af_none);
 			g2.drawImage(theBitmaps.WIN,0,0,null);
 			if (utility.playerName != "") {
-				clicked = drawButton(g2, 195, 500, 605, "SUBMIT MY SCORE!", 60);
+				clicked = drawButton(g2, 185, 500, 610, "SUBMIT MY SCORE!", 60);
 			} else {
-				clicked = drawButton(g2, 195, 500, 605, "BACK TO TITLE SCREEN", 0);
+				clicked = drawButton(g2, 185, 500, 610, "BACK TO TITLE SCREEN", 0);
 			}
 		} else {
 			g2.setTransform(theTransforms.af_none);
@@ -183,7 +183,7 @@ public class SceneRenderer_Applet {
 			clicked = drawButton(g2, 195, 500, 605, "LET ME TRY AGAIN!", 60);
 		}
 		if (clicked == true) {
-			if (utility.playerName != null) {
+			if (utility.playerName != "") {
 				//Do high score!
 				highScoreThread.run();
 			}
@@ -651,47 +651,54 @@ public class SceneRenderer_Applet {
 	    if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (0 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (0 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 			if (buildingToPlace == BuildingType.Woodshop) buildingToPlace = null;
 			else buildingToPlace = BuildingType.Woodshop;
+			utility.mouseClick = false;
 		} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (1 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (1 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 			if (buildingToPlace == BuildingType.Rockery) buildingToPlace = null;
 			else buildingToPlace = BuildingType.Rockery;
+			utility.mouseClick = false;
 		} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (2 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (2 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 			if (buildingToPlace == BuildingType.Smelter) buildingToPlace = null;
 			else buildingToPlace = BuildingType.Smelter;
+			utility.mouseClick = false;
 		} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (3 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (3 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 			if (buildingToPlace == BuildingType.AttractorPaper) buildingToPlace = null;
 			else buildingToPlace = BuildingType.AttractorPaper;
+			utility.mouseClick = false;
 		} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (4 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (4 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 			if (buildingToPlace == BuildingType.AttractorRock) buildingToPlace = null;
 			else buildingToPlace = BuildingType.AttractorRock;
+			utility.mouseClick = false;
 		} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (5 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (5 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 			if (buildingToPlace == BuildingType.AttractorScissors) buildingToPlace = null;
 			else buildingToPlace = BuildingType.AttractorScissors;
+			utility.mouseClick = false;
 		} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (6 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (6 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 			if (buildingToPlace == BuildingType.X) buildingToPlace = null;
 			else buildingToPlace = BuildingType.X;
+			utility.mouseClick = false;
 		} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (7 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (7 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 			resource_manager.SetGeneratingPaper(ObjectOwner.Player, !resource_manager.GetGeneratingPaper(ObjectOwner.Player) );
+			utility.mouseClick = false;
 		} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (8 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (8 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 			resource_manager.SetGeneratingRock(ObjectOwner.Player, !resource_manager.GetGeneratingRock(ObjectOwner.Player) );
+			utility.mouseClick = false;
 		} else if (utility.gameMode == GameMode.gameOn && CurMouse.getX() > (con_start_x + (9 * x_add) - x_add/2) && CurMouse.getX() < (con_start_x + (9 * x_add) + x_add/2) && CurMouse.getY() > (y_height/2 - x_add/2) && CurMouse.getY() <  (y_height/2 + (x_add/2)) ) {
 			resource_manager.SetGeneratingScissors(ObjectOwner.Player, !resource_manager.GetGeneratingScissors(ObjectOwner.Player) );
+			utility.mouseClick = false;
 		} else if (CurMouse.getX() > (utility.window_X - 164 + (0*3*12)) && CurMouse.getX() < (utility.window_X - 164 + (1*12*3)) && CurMouse.getY() > (utility.window_Y - 64) && CurMouse.getY() <  (utility.window_Y - 64 + (12*3)) ) {
-			utility.soundOn = !utility.soundOn;
+			toggleSound();
+			utility.mouseClick = false;
 		} else if (CurMouse.getX() > (utility.window_X - 164 + (1*3*12)) && CurMouse.getX() < (utility.window_X - 164 + (2*12*3)) && CurMouse.getY() > (utility.window_Y - 64) && CurMouse.getY() <  (utility.window_Y - 64 + (12*3)) ) {
-			utility.highQuality = !utility.highQuality;
-			theTransforms.setAA(utility.highQuality);
+			toggleQuality();
+			utility.mouseClick = false;
 		} else if (CurMouse.getX() > (utility.window_X - 164 + (2*3*12)) && CurMouse.getX() < (utility.window_X - 164 + (3*12*3)) && CurMouse.getY() > (utility.window_Y - 64) && CurMouse.getY() <  (utility.window_Y - 64 + (12*3)) ) {
-			utility.gamePaused = !utility.gamePaused;
+			togglePause();
+			utility.mouseClick = false;
 		} else if (CurMouse.getX() > (utility.window_X - 164 + (3*3*12)) && CurMouse.getX() < (utility.window_X - 164 + (4*12*3)) && CurMouse.getY() > (utility.window_Y - 64) && CurMouse.getY() <  (utility.window_Y - 64 + (12*3)) ) {
-			utility.fastForward = !utility.fastForward;
-			if (utility.fastForward == true) {
-				utility.SetTicksPerRender(utility.GetTicksPerRender() * utility.fast_forward_speed);
-			} else {
-				utility.SetTicksPerRender(utility.game_ticks_per_render);
-			}
+			toggleFF();
+			utility.mouseClick = false;
 		} else {
 			utility.mouseClick = true;
-
 		}
 	}
 	
@@ -779,5 +786,27 @@ public class SceneRenderer_Applet {
     		drawStartPlayingOption(g2);
     	}
     	drawBottomBar(g2);
+	}
+	
+	public void togglePause() {	
+		utility.gamePaused = !utility.gamePaused;
+	}
+	
+	public void toggleQuality() {
+		utility.highQuality = !utility.highQuality;
+		theTransforms.setAA(utility.highQuality);
+	}
+	
+	public void toggleFF() {
+		utility.fastForward = !utility.fastForward;
+		if (utility.fastForward == true) {
+			utility.SetTicksPerRender(utility.GetTicksPerRender() * utility.fast_forward_speed);
+		} else {
+			utility.SetTicksPerRender(utility.game_ticks_per_render);
+		}	
+	}
+	
+	public void toggleSound() {
+		utility.soundOn = !utility.soundOn;
 	}
 }

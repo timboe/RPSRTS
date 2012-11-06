@@ -17,6 +17,7 @@ import com.timboe.rpsrts.enumerators.ObjectOwner;
 import com.timboe.rpsrts.enumerators.ResourceType;
 import com.timboe.rpsrts.sprites.Actor;
 import com.timboe.rpsrts.sprites.Building;
+import com.timboe.rpsrts.sprites.Explosion;
 import com.timboe.rpsrts.sprites.Projectile;
 import com.timboe.rpsrts.sprites.Resource;
 import com.timboe.rpsrts.sprites.SpecialSpawn;
@@ -67,6 +68,7 @@ public class SpriteManager {
 	private final HashSet<Spoogicles> SpoogicleObjects = new HashSet<Spoogicles>();
 	private final HashSet<WaterfallSplash> WaterfallSplahsObjects = new HashSet<WaterfallSplash>();
 	private final HashSet<SpecialSpawn> SpecialSpawnObjects = new HashSet<SpecialSpawn>();
+	private final HashSet<Explosion> ExplosionObjects = new HashSet<Explosion>();
 
 	// Synchronised
 	private final Collection<Sprite> CollisionObjectsSync = Collections.synchronizedCollection(CollisionObjects);
@@ -77,6 +79,7 @@ public class SpriteManager {
 	private final Collection<Spoogicles> SpoogicleObjectsSync = Collections.synchronizedCollection(SpoogicleObjects);
 	private final Collection<WaterfallSplash> WaterfallSplahsObjectsSync = Collections.synchronizedCollection(WaterfallSplahsObjects);
 	private final Collection<SpecialSpawn> SpecialSpawnObjectsSync = Collections.synchronizedCollection(SpecialSpawnObjects);
+	private final Collection<Explosion> ExplosionObjectsSync = Collections.synchronizedCollection(ExplosionObjects);
 
 	//
 	protected final HashSet<Resource> TempResourceHolder = new HashSet<Resource>();
@@ -88,8 +91,8 @@ public class SpriteManager {
 	private void CheckActorCombat(){
 		synchronized (GetActorObjects()) {
 			for (final Actor _a : GetActorObjects()) {
-				//TODO check this, currently won't change target mid-fight
-				if (_a.GetAttackTarget() != null) {
+				//TODO check this, currently won't change target mid-fight if targeting a person
+				if (_a.GetAttackTarget() != null && _a.GetAttackTarget().GetIsActor() == true) {
 					continue;
 				}
 				Sprite chosen_target = null;
@@ -155,13 +158,7 @@ public class SpriteManager {
 		}
 	}
 	
-	public boolean CheckSafe(boolean RESOURCEBUILD, boolean ACTOR,
-			int _x, int _y, float _r, int _ID1_to_ignore_collision_of, int _ID2_to_ignore_collision_of) { //TODO this is now double _r
-		//NO LONGER NEEDED - CANNOT JUMP TO INVALID NODE
-//		if (TILE == true && theWorld.CheckSafeToPlaceTile(_x, _y, (int)Math.round(_r)) == false) {
-//			//System.out.println("Tile is bad, place/move DENIED");
-//			return false;
-//		}
+	public boolean CheckSafe(boolean RESOURCEBUILD, boolean ACTOR, int _x, int _y, float _r, int _ID1_to_ignore_collision_of, int _ID2_to_ignore_collision_of) { 
 		WorldPoint _me = new WorldPoint(_x,_y);
 		WeightedPoint _loc = ClipToGrid( _me );
 		if (_loc == null) return false;
@@ -194,7 +191,6 @@ public class SpriteManager {
 				}
 			}
 		}
-		//System.out.println("Place/Move ALLOWED");
 		return true;
 	}
 
@@ -205,17 +201,14 @@ public class SpriteManager {
 		_snap_x = _snap_x - (_snap_x % theWorld.tiles_size) + (theWorld.tiles_size/2);
 		_snap_y = _snap_y - (_snap_y % theWorld.tiles_size) + (theWorld.tiles_size/2);
 		
-		//System.out.println("SNAP ("+_snap_x+","+_snap_y+")");
 		WeightedPoint snap = thePathfinderGrid.point_collection_map.get(new WorldPoint(_snap_x,_snap_y));
 		
 		if (snap != null) { 
-			//System.out.println("SNAPPED AT i ("+i+")");
 			return snap;
 		}
 		return null;
 	}
 
-	//TODO CHECK THAT CHANGING THIS TO INCLUDE ACTORS IN THE CHECK WAS A GOOD IDEA (has overhead)
 	public WorldPoint FindGoodSpot(WorldPoint location, int _r, int _search_size, boolean is_resource) {
 		//is_resource == true prevents function returning true in vicinity of home base
 		int loop = 0;
@@ -231,29 +224,12 @@ public class SpriteManager {
 						continue;
 					}
 				}
-				//System.out.println("PLACE OBJECT AT X:"+_x+" Y:"+_y);
 				return new WorldPoint(_x,_y);
-			} //else System.out.println("FAILED TO PLACED oBJECT AT X:"+_x+" Y:"+_y);
+			} 
 		}
 		return null;
 	}
 	
-//	public boolean CheckSafeIncludingActors(boolean DELETEME, int _x, int _y, float _r, int _ID_to_ignore_collision_of) {
-//		//final boolean normalSafe = CheckSafe(_x, _y, _r, _ID_to_ignore_collision_of, 0);
-//		if (normalSafe == false) return false;
-//		for (final Actor _a : ActorObjects) {
-//			if (_ID_to_ignore_collision_of == _a.GetID()) {
-//				continue;
-//			}
-//			final int _x_d = _a.GetX() - _x;
-//			final int _y_d = _a.GetY() - _y;
-//			final float sep = Math.sqrt( (_x_d * _x_d) + (_y_d * _y_d) );
-//			final float combRad = _r + _a.GetR();
-//			if (sep < combRad) return false;
-//		}
-//		return true;
-//	}
-
 	public WorldPoint FindSpotForResource(WorldPoint _loc) {
 		return FindGoodSpot(_loc, utility.resourceRadius, utility.tiles_size, true);
 	}
@@ -329,10 +305,23 @@ public class SpriteManager {
 			GetSpecialSpawnObjects().removeAll(toKill);
 		}
 		toKill.clear();
+		synchronized (GetExplosionObjects()) {
+			for (final Explosion _e : GetExplosionObjects()) {
+				if (_e.GetDead() == true) {
+					toKill.add(_e);
+				}
+			}
+			GetExplosionObjects().removeAll(toKill);
+		}
+		toKill.clear();
 	}
 
 	public Collection<Actor> GetActorObjects() {
 		return ActorObjectsSync;
+	}
+	
+	public Collection<Explosion> GetExplosionObjects() {
+		return ExplosionObjectsSync;
 	}
 
 	public Building GetBase(ObjectOwner _oo) {
@@ -348,7 +337,6 @@ public class SpriteManager {
 				if (utility.Seperation(_b.GetLoc(), _mouse) < utility.buildingRadius) return _b;
 			}
 		}
-
 		return null;
 	}
 	
@@ -370,7 +358,7 @@ public class SpriteManager {
 						&& _a.GetCollects().contains(_r.GetType()) //Client can gather
 						&& utility.Seperation(_r.GetLoc(), _b.GetLoc()) < _dist //Is nearer
 						&& _r.GetRemaining() > 0 //Is not depleted
-						&& (r == null || utility.rnd() < 1f)) { //50% random chance to change (if not first node found) //TODO change back to 50%
+						&& (r == null || utility.rnd() < 0.5f)) { //50% random chance to change (if not first node found)
 					_dist = utility.Seperation(_r.GetLoc(), _b.GetLoc());
 					r = _r;
 				}
@@ -426,6 +414,11 @@ public class SpriteManager {
 		synchronized (GetSpecialSpawnObjects()) {
 			for (final Sprite _s : GetSpecialSpawnObjects()) {
 				ZOrder.add(_s);
+			}
+		}
+		synchronized (GetExplosionObjects()) {
+			for (final Sprite _e : GetExplosionObjects()) {
+				ZOrder.add(_e);
 			}
 		}
 		return ZOrder;
@@ -496,7 +489,7 @@ public class SpriteManager {
 			synchronized (GetCollisionObjects()) {
 				GetCollisionObjects().add(newResource);
 			}
-		} else { //resource can't corrupt it's own list while it's ticking
+		} else { //resource can't be allowed to corrupt it's own list while it's ticking
 			GetTempResourceObjects().add(newResource);
 		}
 		return newResource;
@@ -537,7 +530,15 @@ public class SpriteManager {
 		return newSS;
 	}
 	
-
+	public Explosion PlaceExplosion(int _x, int _y, ObjectOwner _oo) {
+		resource_manager.AddStatistic(GameStatistics.BuildingsExploded);
+		final Explosion newE = PlatformSpecific_Explosion(_x, _y, _oo);
+		synchronized (GetSpecialSpawnObjects()) {
+			GetExplosionObjects().add(newE);
+		}
+		return newE;
+	}
+	
 	//These methods are overridden by Applet or Android sub-instances of SpriteManager
 	protected Actor PlatFormSpecific_PlaceActor(WorldPoint _p, ActorType _at, ObjectOwner _o) { return null; }
 	protected Building PlatformSpecific_PlaceBuilding(WorldPoint _p, int _r, BuildingType _bt, ObjectOwner _oo) { return null; }
@@ -546,6 +547,7 @@ public class SpriteManager {
 	protected Spoogicles PlatformSpecific_PlaceSpooge(int _x, int _y, ObjectOwner _oo, int _n, float _scale) { return null; }
 	protected WaterfallSplash PlatformSpecific_PlaceWaterfallSplash(int _x, int _y, int _r) { return null; }
 	protected SpecialSpawn PlatformSpecific_SpecialSpawn(int _x, int _y, int _r, ActorType _at, ObjectOwner _oo) { return null; }
+	protected Explosion PlatformSpecific_Explosion(int _x, int _y, ObjectOwner _oo) { return null; }
 	
 	public void Reset() {
 		ws_step = 0;
@@ -567,11 +569,17 @@ public class SpriteManager {
 		synchronized (GetProjectileObjects()) {
 			GetProjectileObjects().clear();
 		}
+		synchronized (GetSpoogiclesObjects()) {
+			GetSpoogiclesObjects().clear();
+		}
 		synchronized (GetWaterfallSplashObjects()) {
 			GetWaterfallSplashObjects().clear();
 		}
-		synchronized (GetWaterfallSplashObjects()) {
+		synchronized (GetSpecialSpawnObjects()) {
 			GetSpecialSpawnObjects().clear();
+		}
+		synchronized (GetExplosionObjects()) {
+			GetExplosionObjects().clear();
 		}
 		//now _this_ singleton is fully spawned. Is safe to fetch the resourceManager (inter-depencence)
 		 if (resource_manager == null) {
@@ -581,13 +589,12 @@ public class SpriteManager {
 		//Start the AI
 		theAI = new AI(ObjectOwner.Enemy); //AI playing as the bad guys (blue)
 		AI_thread = new Thread(theAI);
-		theHumanAI = new AI(ObjectOwner.Player);
+		theHumanAI = new AI(ObjectOwner.Player);  //AI playing as the player (red)
 		AIHuman_thread = new Thread(theHumanAI);
 
 	}
 	
 	public int SeedWorld() {
-		//System.out.println("ENTER SEED");
 		final WorldPoint player_starting = theWorld.GetIdeadStartingLocation(ObjectOwner.Player);
 		final WorldPoint enemy_starting = theWorld.GetIdeadStartingLocation(ObjectOwner.Enemy);
 		final float timeNow = (System.nanoTime() / 1000000000f);
@@ -608,8 +615,6 @@ public class SpriteManager {
 			//Setup the pathfinding grid 
 			System.out.println("CONSTRUCT GRID");
 			thePathfinderGrid.Init();
-			//thePathfinderGridThread = new Thread(thePathfinderGrid);
-			//thePathfinderGridThread.start();
 			System.out.println("DONE CONSTRUCT GRID");
 			
 			final WorldPoint player_location = FindGoodSpot(player_starting, utility.buildingRadius, utility.look_for_spot_radius, false);
@@ -632,7 +637,6 @@ public class SpriteManager {
 			pathfinder = new Pathfinder(player_base, enemy_base);
 			pathfinding_thread = new Thread(pathfinder);
 			pathfinding_thread.start();
-
 		}
 
 		if (ws_step == 1) {
@@ -640,7 +644,7 @@ public class SpriteManager {
 			else {
 				ArrayList<WorldPoint> waypoint_list = pathfinder.GetResult();
 				if (waypoint_list == null) {
-					System.out.println("---- !!!! ---- BASES NON NAVAGABLE");
+					System.out.println("---- !!!! ---- BASES NON-NAVAGABLE");
 					return -1; //FAILED
 				} else {
 					++ws_step;
@@ -677,34 +681,30 @@ public class SpriteManager {
 				}
 				float resDensity = _t.GetOwner().GetResourceDensity();
 				if (toPlant == ResourceType.Rockpile || toPlant == ResourceType.Mine) resDensity /= (float) utility.place_res_gaussian; //Trees only come in one
-				if (utility.rnd() < resDensity) { //TODO check reduction factor here
+				if (utility.rnd() < resDensity) {
 					final WorldPoint look_around = new WorldPoint(_t.GetX() + utility.rndI(utility.tiles_size), _t.GetY() + utility.rndI(utility.tiles_size));
-					WorldPoint ideal_resource_loation = FindSpotForResource(look_around);// FindGoodSpot(look_around, utility.resourceRadius, tile_size, true);
+					WorldPoint ideal_resource_loation = FindSpotForResource(look_around);
 					if (ideal_resource_loation != null) {
-						//Try placing resources around a gaussian centred on 5
-						//int toPlace = (int) (utility.place_res_gaussian + (utility.rnd.nextGaussian() * utility.place_res_gaussian));
+						//Try placing resources around a gaussian
 						int toPlace = (int) (utility.rndG(utility.place_res_gaussian, utility.place_res_gaussian));
 						if (utility.rnd() < 0.75f && (toPlant == ResourceType.Cactus || toPlant == ResourceType.Tree)) toPlace = 1; //Trees only come in one
 						for (int place = 0; place < toPlace; ++place) {
 							if (ideal_resource_loation != null) PlaceResource(ideal_resource_loation, toPlant, false);
-							//get new location nearby
-							ideal_resource_loation = FindGoodSpot(look_around, utility.resourceRadius, utility.tiles_size*5, true);
+							ideal_resource_loation = FindGoodSpot(look_around, utility.resourceRadius, utility.tiles_size*5, true); //get new location nearby
 						}
 					}
 				}
 			}
+			//Unify resources
+			float avRes = (resource_manager.GetGlobalWood()+resource_manager.GetGlobalIron()+resource_manager.GetGlobalStone())/3f;
+			float resMult = utility.resource_desired_global / avRes;
+			synchronized (GetResourceObjects()) {
+				for (Resource _r : GetResourceObjects()) {
+					int ToAdd = (int) (_r.GetRemaining() * (resMult - 1.));
+					_r.Add( ToAdd );
+				}				
+			}			
 			System.out.println("THERE IS IN THE WORLD: "+resource_manager.GetGlobalWood()+" WOOD, "+resource_manager.GetGlobalIron()+" IRON AND "+resource_manager.GetGlobalStone()+" STONE");
-//			float avRes = (resource_manager.GLOBAL_WOOD+resource_manager.GLOBAL_IRON+resource_manager.GLOBAL_STONE)/3.f;
-//			float resMult = utility.resource_desired_global / avRes;
-//			for (Resource _r : ResourceObjects) {
-//				int ToAdd = (int) (_r.GetRemaining() * (resMult - 1.));
-//				//System.out.println("current:"+_r.GetRemaining()+" toAdd:"+ToAdd );
-//				_r.Add( ToAdd ); //TODO broken fix me
-//			}
-//			System.out.println("AV Res:"+avRes+" multiplier:"+resMult);
-//			System.out.println("THERE IS IN THE WORLD: "+resource_manager.GLOBAL_WOOD+" WOOD, "+resource_manager.GLOBAL_IRON+" IRON AND "+resource_manager.GLOBAL_STONE+" STONE");
-//			avRes = (resource_manager.GLOBAL_WOOD+resource_manager.GLOBAL_IRON+resource_manager.GLOBAL_STONE)/3.f;
-//			System.out.println("AV Res:"+avRes+" avRes Target:"+utility.resource_desired_global);
 		}
 
 		if (ws_step == 3 && (timeNow-ws_time_of_last_operation) > time_to_wait) {
@@ -800,9 +800,13 @@ public class SpriteManager {
 				_s.Tick(TickCount);
 			}
 		}
+		synchronized (GetExplosionObjects()) {
+			for (final Explosion _e : GetExplosionObjects()) {
+				_e.Tick(TickCount);
+			}
+		}
 		
-		//any resources added?
-		//now we're clear of the tick loop we can add these to the list
+		//any resources added? now we're clear of the tick loop we can add these to the list
 		if (GetTempResourceObjects().size() > 0) {
 			synchronized (GetResourceObjects()) {
 				GetResourceObjects().addAll(TempResourceHolder);
@@ -825,36 +829,14 @@ public class SpriteManager {
 	public void Tock() { //or, the 'long tick'
 		Garbage();
 
-		//This is where we assign tasks, take care of house keeping.
-		//Does player have enough resources to make new buildings?
-//		if (PLAYER_WOOD < 50000 && PLAYER_STONE < 50000 && PLAYER_IRON < 50000) {
-//			//emergency! Find a unemployed person and send them collecting
-//			float distance = 999999;
-//			Actor a = null;
-//			for (final Actor _a : ActorObjects) {
-//				if (_a.GetLastEmployer() == player_base) {
-//					continue;
-//				}
-//				if (_a.GetJob() == ActorJob.Idle && utility.Seperation(_a.GetLoc(), player_base.GetLoc()) < distance) {
-//					distance = utility.Seperation(_a.GetLoc(), player_base.GetLoc());
-//					a = _a;
-//				}
-//			}
-//			if (a != null) {
-//				//System.out.println("NEW JOB "+a+" is going to emergency gather for "+player_base);
-//				a.SetJob(ActorJob.Gather, player_base);// Gather resources for the main base
-//			}
-//		}
-
-		//FIGHT!
-		CheckActorCombat();
+		CheckActorCombat(); //FIGHT!
 
 		CheckBuildingEmployment();
 		
 		CheckSpecialSpawn();
+		
 		if (AI_thread.isAlive() == false) AI_thread.run();
 		if (utility.noPlayers == true && AIHuman_thread.isAlive() == false) AIHuman_thread.run();
-		
 	}
 	
 	public void CheckPoison(WorldPoint location, ObjectOwner _target) {
@@ -863,6 +845,24 @@ public class SpriteManager {
 				if (_a.GetOwner() == _target && utility.Seperation(location, _a.GetLoc()) < utility.actor_poison_range) {
 					_a.Poison();
 					resource_manager.AddStatistic(GameStatistics.UnitsPoisoned);
+				}
+			}
+		}
+	}
+	
+	public void CheckBuildingExplode(WorldPoint location, ObjectOwner _oo) {
+		PlaceExplosion(location.getX(), location.getY(), _oo);
+		synchronized (GetActorObjects()) {
+			for (Actor _a : GetActorObjects()) {
+				if (_a.GetOwner() == _oo && utility.Seperation(location, _a.GetLoc()) < utility.building_Explode_radius) {
+					_a.Shrapnel();
+				}
+			}
+		}
+		synchronized (GetBuildingOjects()) {
+			for (Building _b : GetBuildingOjects()) {
+				if (_b.GetOwner() == _oo && utility.Seperation(location, _b.GetLoc()) < utility.building_Explode_radius) {
+					_b.Shrapnel();
 				}
 			}
 		}
@@ -881,11 +881,11 @@ public class SpriteManager {
 					continue;
 				}
 
-				//TODO collectors should build if not enough builders
-				
 				//building could do with new employee
 				float min_sep = utility.minimiser_start;
 				Actor toHire = null;
+				float min_sep_employed = utility.minimiser_start;
+				Actor toHireEmployed = null;
 				//If is a collector building type
 				if (_b.GetCollects().size() > 0) { //GATHER TYPE
 					if (_b.GetEmployees() >= utility.building_gatherers_per_site) {
@@ -899,15 +899,17 @@ public class SpriteManager {
 							if (_a.GetLastEmployer().contains(_b) == true) {
 								continue; //Check was not recent employee
 							}
-							if (_a.GetJob() != ActorJob.Idle) {
-								continue; //Check has no job
-							}
 							if (_a.GetCollects().containsAll( _b.GetCollects() ) == false){
 								continue; //Actor collects correct res
 							}
-							if (utility.Seperation(_a.GetLoc(), _b.GetLoc()) < min_sep ) { //Is closest?
+							//Below here - we can take them. 
+							float sep = utility.Seperation(_a.GetLoc(), _b.GetLoc());
+							if (sep < min_sep && _a.GetJob() == ActorJob.Idle) { //Ideally get closest unemployed.
 								min_sep = utility.Seperation(_a.GetLoc(), _b.GetLoc());
 								toHire = _a;
+							} else if (sep < min_sep_employed && _a.GetJob() != ActorJob.Builder) {//find backup builder
+								min_sep_employed = sep;
+								toHireEmployed = _a;
 							}
 						}
 					}
@@ -919,6 +921,9 @@ public class SpriteManager {
 							//System.out.println("NEW JOB "+toHire.GetOwner()+" "+toHire.GetType()+" is going to GATHER for "+_b.GetType());
 							toHire.SetJob(ActorJob.Gather, _b);
 						}
+					} else if (toHireEmployed != null && _b.GetBeingBuilt() == true) {
+						toHireEmployed.SetJob(ActorJob.Builder, _b);
+						System.out.println("NEW JOB "+toHireEmployed.GetOwner()+" "+toHireEmployed.GetType()+" is going to --EHMERGEHNCY-- BUILD for "+_b.GetType());
 					}
 				} else { //ATTRACTOR TYPE
 					if (_b.GetEmployees() >= resource_manager.GetActorsPerAttractor(_b.GetOwner(), _b.GetType())) {
@@ -991,8 +996,8 @@ public class SpriteManager {
 								for (final Actor _a : GetActorObjects()) {
 									if (_a.GetOwner() != _b1.GetOwner()) continue; 
 									if (markedForDeath.contains(_a.GetID()) == true) continue;
-									if (utility.Seperation(_a.GetLoc(), _b2.GetLoc()) > utility.wander_radius 
-												&& utility.Seperation(_a.GetLoc(), _b1.GetLoc()) > utility.wander_radius) continue;
+									if (utility.Seperation(_a.GetLoc(), _b2.GetLoc()) > utility.wander_radius * 1.5f
+												&& utility.Seperation(_a.GetLoc(), _b1.GetLoc()) > utility.wander_radius * 1.5f) continue;
 									if (_a.GetType() == l1_type && l1.size() < min_l1) {
 										l1.add(_a);
 									} else if (_a.GetType() == l2_type && l2.size() < min_l2) {

@@ -20,8 +20,8 @@ public class Utility {
 	public boolean worldGenLock = false;
 	//Global variables
 	public RPSRTS _RPSRTS;
-	public boolean dbg = false; //debug flag
-	public boolean noPlayers = true; //AI takes over both teams
+	public boolean dbg = true; //debug flag
+	public boolean noPlayers = false; //AI takes over both teams
 	public boolean soundOn = true;
 	public boolean highQuality = true;
 	public boolean fastForward = false;
@@ -93,10 +93,9 @@ public class Utility {
 	public final int specialSpawnRadius = 10;
 	public final int resourceRadius = 3;
 	public final int resources_kept_away_from_base = 50; //clear area around main bases
-	public final int place_res_gaussian = 2;
+	public final int place_res_gaussian = 4; //clustering of mines and rockpiles 
 	public final float projectile_speed = 1f;
 	
-
 	//actor settings
 	public final int starting_actors = 2;
 	public final int amount_collect_per_tock = 1; //amount to take/give per tock
@@ -109,12 +108,12 @@ public class Utility {
 	public final float actor_strength = 4f;
 	public final float actor_starting_health = 50f;
 	public final int actor_attack_range = 30;
-	public final float actor_poison_rate = 0.1f;
-	public final int actor_poison_ticks = 60;
+	public final float actor_poison_rate = 0.15f;
+	public final int actor_poison_ticks = 120;
 	public final float actor_poison_range = 20;
 	
 	//biome settings
-	public final int biome_golbal_density_mod = 1;//tiles_size; //derived
+	public final int biome_golbal_density_mod = tiles_size/2;//tiles_size; //derived
 	public final float biome_colour_range = 10; //smear of colours in biome
 	public final int biome_desert_min_density = 2 + biome_golbal_density_mod;
 	public final int biome_desert_rnd_density = 2 + biome_golbal_density_mod;
@@ -127,7 +126,7 @@ public class Utility {
 	public final int not_reachable_penelty_tocks = 20; //if an actor fails to pathfind to this as a target, how long to quarantine for. This floats with every fail.
 	public final int resource_rnd = 20;
 	public final int resource_min = 10;
-	public final int resource_desired_global = 4000;
+	public final int resource_desired_global = 8000; //normalise starting resource amount to this number
 	public final int resource_mines_less_factor = 5; //* how much less for mines (as they cluster)
 	public final float resource_chance_grow = 0.005f;
 	public final float resource_chance_spawn = 0.0005f; //careful with this one! can fill board up with trees n' junk
@@ -140,10 +139,10 @@ public class Utility {
 	public final int spooges_building_death = 200;// 200;
 	public final int spooges_totem_death = 0; //30
 	public final int spooges_base_death = 1000;
-	public final float spooges_scale_actor_death = 0.1f;
-	public final float spooges_scale_hit = 0.05f;
-	public final float spooges_scale_building_death = 0.3f;
-	public final float spooges_scale_totem_death = 0.2f;
+	public final float spooges_scale_actor_death = 0.2f;
+	public final float spooges_scale_hit = 0.2f;
+	public final float spooges_scale_building_death = 0.4f;
+	public final float spooges_scale_totem_death = 0.3f;
 	public final float spooges_scale_base_death = 0.5f;
 	
 	//score settings
@@ -168,6 +167,10 @@ public class Utility {
 	public final int building_no_resource_penalty = 50;//s
 	public final int building_Place_degrees = 32; //can-be-placed markers
 	public final int building_Place_degrees_show = 16; //can-be-placed markers
+	public final int building_Explode_radius = 50;
+	public final int building_Explode_ticks = 30;
+	public final float building_Explode_damage = 0.5f; //damage per tick
+	public final float building_Explode_vs_building_multiplier = 10f; //above times this for buildings
 	
 	//AI
 	public final int AI_BadBuilding_Before_Sell = 3; //building_no_resource_penalty seconds per tick
@@ -243,12 +246,10 @@ public class Utility {
 
 	public float Seperation(Number x1, Number x2, Number y1, Number y2) {
 		return (float) Math.hypot(x1.floatValue()-x2.floatValue(), y1.floatValue()-y2.floatValue());
-		//return (float) Math.sqrt( (x1.floatValue()-x2.floatValue())*(x1.floatValue()-x2.floatValue()) + (y1.floatValue()-y2.floatValue())*(y1.floatValue()-y2.floatValue()) );
 	}
 
 	public float Seperation(WorldPoint a, WorldPoint b) {
 		return (float) Math.hypot(a.getX()-b.getX(), a.getY()-b.getY());
-		//return (float) Math.sqrt( (a.getX()-b.getX())*(a.getX()-b.getX()) + (a.getY()-b.getY())*(a.getY()-b.getY()) );
 	}
 	
 	public void SetTicksPerRender(int _tps) {

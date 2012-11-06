@@ -20,6 +20,8 @@ public class Projectile extends Sprite {
 		if (_source.GetType() == ActorType.Lizard) {
 			animSteps = 3;
 			x -= r;
+		} else if (_source.GetType() == ActorType.Spock && _target.GetIsBuilding() == true) {
+			((Building) _target).SetPrimedToExplode(+1);
 		}
 	}
 	
@@ -63,6 +65,9 @@ public class Projectile extends Sprite {
 	
 	public void Tock() {
 		if (source.GetType() == ActorType.Spock) {
+			if (target.GetIsBuilding() == true) {
+				((Building) target).SetPrimedToExplode(-1);
+			}
 			Kill();
 		}
 	}
