@@ -25,9 +25,9 @@ public class Actor extends Sprite {
 	protected int attack_range;
 	protected int poisoned = 0;
 	protected int shrapnel = 0;
-	
+
 	protected float RPS;
-	
+
 	protected ArrayList<ResourceType> iCollect = new ArrayList<ResourceType>(); //things this actor collects
 	protected ResourceType carrying; //resource type in hands
 	protected int carryAmount; //amount in `hands'
@@ -35,8 +35,8 @@ public class Actor extends Sprite {
 
 	protected boolean tick;
 	protected boolean tock;
-	
-	protected ArrayList<WorldPoint> waypoint_list = null;  //pahfinding list 
+
+	protected ArrayList<WorldPoint> waypoint_list = null;  //pahfinding list
 	protected Sprite destination; //final pathfind destination
 	protected WorldPoint waypoint;  //current pathfind destination
 	protected Thread pathfinding_thread = null;
@@ -50,8 +50,8 @@ public class Actor extends Sprite {
 	protected int tocks_since_quit;
 
 	protected int renavTEMP = 0;
-	
-	protected Actor(int _ID, int _x, int _y, int _r, ActorType _at, ObjectOwner _oo) {
+
+	protected Actor(final int _ID, final int _x, final int _y, final int _r, final ActorType _at, final ObjectOwner _oo) {
 		super(_ID, _x, _y, _r);
 		owner = _oo;
 		type = _at;
@@ -82,20 +82,20 @@ public class Actor extends Sprite {
 		ticks_per_tock *= RPS;
 		attack_range = utility.actor_attack_range;
 
-		
+
 		if (type == ActorType.Spock || type == ActorType.Lizard) {
 			//spock = paper+scissors, lizard = paper+rock
 			maxHealth = (int) (utility.actor_starting_health * utility.EXTRA_Scissors_PerSmelter * 2);
 			strength = (int) (utility.actor_strength * utility.EXTRA_Scissors_PerSmelter * 2);
 			ticks_per_tock *= 0.5;
 		}
-		
+
 		health = maxHealth;
 		animStep = utility.rndI(animSteps);
 	}
-	
-	private boolean AttemptMove(float _suggest_new_x, float _suggest_new_y, boolean force) {
-		if ((int) Math.round(_suggest_new_x) == x && (int) Math.round(_suggest_new_y) == y) { //if sub pixel
+
+	private boolean AttemptMove(final float _suggest_new_x, final float _suggest_new_y, final boolean force) {
+		if (Math.round(_suggest_new_x) == x && Math.round(_suggest_new_y) == y) { //if sub pixel
 			x_prec = _suggest_new_x;
 			y_prec = _suggest_new_y;
 			return true; //allowed
@@ -106,11 +106,11 @@ public class Actor extends Sprite {
 			_ID = destination.GetID();
 		}
 		//Building&Resouce=YES Actor=NO
-		if (force == true || theSpriteManager.CheckSafe(true,false,(int) Math.round(_suggest_new_x), (int) Math.round(_suggest_new_y), 1, _ID, 0) == true) { //TODO Check the effect of reducing the radius of the collision check here
+		if (force == true || theSpriteManager.CheckSafe(true,false,Math.round(_suggest_new_x), Math.round(_suggest_new_y), 1, _ID, 0) == true) { //TODO Check the effect of reducing the radius of the collision check here
 			x_prec = _suggest_new_x;
 			y_prec = _suggest_new_y;
-			x = (int) Math.round(x_prec);
-			y = (int) Math.round(y_prec);
+			x = Math.round(x_prec);
+			y = Math.round(y_prec);
 			//System.out.println("ALLOWED - NEW COORDINATES ("+x+","+y+") for ID:"+ID);
 			++animStep;
 			return true;
@@ -121,7 +121,7 @@ public class Actor extends Sprite {
 	private void ClearDestination() {
 		destination = null;
 		waypoint = null;
-		waypoint_list = null; 
+		waypoint_list = null;
 		if (pathfinder != null) {
 			pathfinder.Kill();
 		}
@@ -130,11 +130,15 @@ public class Actor extends Sprite {
 		navagate_status = PathfindStatus.NotRun;
 	}
 
+	public synchronized Sprite GetAttackTarget() {
+		return attack_target;
+	}
+
 	public ArrayList<ResourceType> GetCollects(){
 		return iCollect;
 	}
 
-	public boolean GetIfPreferedTarget(Sprite to_compare) {
+	public boolean GetIfPreferedTarget(final Sprite to_compare) {
 		if (to_compare.GetIsActor() == true) {
 			if (type == ActorType.Paper && ((Actor) to_compare).GetType() == ActorType.Rock ) return true;
 			else if (type == ActorType.Paper && ((Actor) to_compare).GetType() == ActorType.Spock ) return true;
@@ -178,7 +182,7 @@ public class Actor extends Sprite {
 	public int GetStrength() {
 		return strength;
 	}
-	
+
 	public ActorType GetType() {
 		return type;
 	}
@@ -209,7 +213,7 @@ public class Actor extends Sprite {
 			theSpriteManager.PlaceProjectile(this, attack_target);
 		}
 	}
-	
+
 	private void Job_Build() {
 		if (boss == null || boss.GetBeingBuilt() == false) { /* SAFETY CHECK */
 			//System.out.println("FATAL Boss is dead or building is constructed");
@@ -234,7 +238,7 @@ public class Actor extends Sprite {
 			++animStep;
 		}
 	}
-	
+
 	private void Job_Gather() {
 		if (boss == null) { /* SAFETY CHECK */
 			//System.out.println("FATAL Boss is dead, quit gathering job");
@@ -325,7 +329,7 @@ public class Actor extends Sprite {
 			}
 		}
 	}
-	
+
 	private void Job_Guard() {
 		if (tick == true && behaviour == ActorBehaviour.DoingNothing) { //Get a new assignment - come to build
 			if (navagate_status == PathfindStatus.NotRun) {
@@ -354,20 +358,20 @@ public class Actor extends Sprite {
 			WanderAbout(boss, utility.wander_radius, utility.wander_pull_to_target);
 		}
 	}
-	
+
 	public synchronized void Job_Guard_Renavagate() {
 		behaviour = ActorBehaviour.DoingNothing;
 		navagate_status = PathfindStatus.NotRun;
 		++renavTEMP;
 	}
-	
+
 	private void Job_Idle() {
 		if (tick == true) {
 			WanderAbout(theSpriteManager.GetBase(owner), utility.wander_radius, utility.wander_pull_to_target);
 		}
 		//TODO Add code here to try and drop off resources
 	}
-	
+
 	private void Job_Stuck() {
 		if (tick == true) {
 			--stuck_wander_ticks;
@@ -377,7 +381,7 @@ public class Actor extends Sprite {
 			}
 		}
 	}
-	
+
 	@Override
 	public synchronized void Kill() {
 		if (dead == true) return;
@@ -390,8 +394,8 @@ public class Actor extends Sprite {
 	private boolean Move() { //Goal in mind pathfinding
 		if (waypoint != null) { //Have at least one destination in list
 			//System.out.println("moveLoop FIRST WAYPOINT WP("+waypoint.getX()+","+waypoint.getY()+") POS ("+x_prec+","+y_prec+")");
-			final float _hypotenuse = utility.Seperation(x_prec, waypoint.getX(), y_prec, waypoint.getY()); //  
-			float radiusToAchieve = 1f; //If pathfinding to pathfind node
+			final float _hypotenuse = utility.Seperation(x_prec, waypoint.getX(), y_prec, waypoint.getY()); //
+			final float radiusToAchieve = 1f; //If pathfinding to pathfind node
 			if (_hypotenuse <= radiusToAchieve) { //At waypoint?
 				//Is there another waypoint?
 				if (waypoint_list != null && waypoint_list.size() > 0) {
@@ -434,7 +438,12 @@ public class Actor extends Sprite {
 		return false;
 	}
 
-	public synchronized void QuitJob(boolean resign) {
+
+	public synchronized void Poison() {
+		poisoned += utility.actor_poison_ticks;
+	}
+
+	public synchronized void QuitJob(final boolean resign) {
 		ClearDestination();
 		if (resign == false) {
 			tocks_since_quit = utility.tocks_before_retake_job_from_boss;
@@ -448,8 +457,7 @@ public class Actor extends Sprite {
 		SetJob(ActorJob.Idle, null);
 	}
 
-
-	public synchronized void SetDestination(Sprite _d) {
+	public synchronized void SetDestination(final Sprite _d) {
 		wander = null;
 		navagate_status = PathfindStatus.NotRun;
 		pathfinder = new Pathfinder(this, _d);
@@ -458,12 +466,12 @@ public class Actor extends Sprite {
 		destination = _d;
 	}
 
-	public synchronized void SetDestinationInitial(Sprite _d) {
+	public synchronized void SetDestinationInitial(final Sprite _d) {
 		stuck = 0;
 		SetDestination(_d);
 	}
 
-	public synchronized void SetJob(ActorJob _j, Building _boss) {
+	public synchronized void SetJob(final ActorJob _j, final Building _boss) {
 		//if (job == ActorJob.Guard) System.out.println("@@@@@@@@@@@@@@@@@@@ Assigning a new job to current guard Job:"+_j+" Boss:"+_boss);
 		job = _j;
 		boss = _boss;
@@ -474,12 +482,16 @@ public class Actor extends Sprite {
 		behaviour = ActorBehaviour.DoingNothing;
 	}
 
-	public synchronized void SetNemesis(Sprite _nemesis) {
+	public synchronized void SetNemesis(final Sprite _nemesis) {
 		attack_target = _nemesis;
 		wander = null;
 	}
 
-	public synchronized void Tick(int _tick_count) {
+	public synchronized void Shrapnel() {
+		shrapnel += utility.building_Explode_ticks;
+	}
+
+	public synchronized void Tick(final int _tick_count) {
 		if ((_tick_count + tick_offset) % ticks_per_tock == 0) Tock();
 		tick = true;
 		tock = false;
@@ -528,7 +540,7 @@ public class Actor extends Sprite {
 			--shrapnel;
 			Attack(utility.building_Explode_damage);
 		}
-		
+
 	}
 
 	private void Tock() {
@@ -550,17 +562,17 @@ public class Actor extends Sprite {
 		}
 		/////////////////////////////////////////////////////////////////////////////////
 		UnStick();
-		
+
 		if (attack_target == null && health < maxHealth) ++health;
 	}
 
 	private void UnStick() {
 		//If i have been left somewhere which should not be occupiable
-		if (waypoint == null && theSpriteManager.CheckSafe(true,false,(int) Math.round(x_prec), (int) Math.round(y_prec), 1, 0, 0) == false) { //My current pixel is BAD
-			int max_search = 50;
+		if (waypoint == null && theSpriteManager.CheckSafe(true,false,Math.round(x_prec), Math.round(y_prec), 1, 0, 0) == false) { //My current pixel is BAD
+			final int max_search = 50;
 			for (int search_area = 1; search_area <= max_search; search_area += 2) {
 				//Try and unstick me!
-				WorldPoint jumpTo = theSpriteManager.FindGoodSpot( GetLoc(), r, search_area, false);
+				final WorldPoint jumpTo = theSpriteManager.FindGoodSpot( GetLoc(), r, search_area, false);
 				if (jumpTo != null) {
 					if (AttemptMove(jumpTo.getX(), jumpTo.getY(), false) == true) {
 						//System.out.println(GetOwner()+" "+GetType()+" has been unstuck at search radius "+search_area+".");
@@ -572,7 +584,7 @@ public class Actor extends Sprite {
 		}
 	}
 
-	private void WanderAbout (Sprite _target, int _wander_radius, int _pull) { //target optional - random walk towards target
+	private void WanderAbout (final Sprite _target, final int _wander_radius, final int _pull) { //target optional - random walk towards target
 		if (wander == null) {
 			int pull_x = (int) (x_prec - _wander_radius + utility.rndI(_wander_radius*2));
 			int pull_y = (int) (y_prec - _wander_radius + utility.rndI(_wander_radius*2));
@@ -603,18 +615,6 @@ public class Actor extends Sprite {
 		if (allowed == false) {
 			wander = null;
 		}
-	}
-
-	public synchronized Sprite GetAttackTarget() {
-		return attack_target;
-	}
-
-	public synchronized void Poison() {
-		poisoned += utility.actor_poison_ticks;
-	}
-	
-	public synchronized void Shrapnel() {
-		shrapnel += utility.building_Explode_ticks;
 	}
 }
 

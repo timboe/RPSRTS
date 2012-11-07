@@ -7,8 +7,8 @@ public class Projectile extends Sprite {
 	protected Actor source;
 	int multiplier = 1;
 	int strength;
-	
-	protected Projectile(int _ID, Actor _source, int _r, Sprite _target) {
+
+	protected Projectile(final int _ID, final Actor _source, final int _r, final Sprite _target) {
 		super(_ID, _source.GetX() - _r, _source.GetY() - _r, _r);
 		speed = utility.projectile_speed;
 		target = _target;
@@ -24,13 +24,13 @@ public class Projectile extends Sprite {
 			((Building) _target).SetPrimedToExplode(+1);
 		}
 	}
-	
+
 	@Override
 	public boolean GetIsProjectile() {
 		return true;
 	}
-	
-	public void Tick(int _tick_count) {
+
+	public void Tick(final int _tick_count) {
 		if ((_tick_count + tick_offset) % ticks_per_tock == 0) Tock();
 
 		if (dead == true) return;
@@ -38,16 +38,16 @@ public class Projectile extends Sprite {
 			Kill();
 			return;
 		}
-		
+
 		if (source.GetType() == ActorType.Spock && target != null && target.GetDead() == false) {
-			target.Attack(((float)strength*(float)multiplier) / (float)utility.ticks_per_tock);
+			target.Attack(((float)strength*(float)multiplier) / utility.ticks_per_tock);
 			if (_tick_count % 2 == 0) {
 				theSpriteManager.PlaceSpooge(target.GetX(), target.GetY(), target.GetOwner(), utility.spooges_hit, utility.spooges_scale_hit);
 			}
 			return;
 		}
-		
-		float _hypotenuse = utility.Seperation(GetLoc(), target.GetLoc());
+
+		final float _hypotenuse = utility.Seperation(GetLoc(), target.GetLoc());
 		if (_hypotenuse < r) {
 			target.Attack(strength*multiplier);
 			theSpriteManager.PlaceSpooge(x, y, target.GetOwner(), utility.spooges_hit, utility.spooges_scale_hit);
@@ -57,14 +57,14 @@ public class Projectile extends Sprite {
 			}
 			return;
 		}
-		
+
 		x_prec -= (((x_prec - target.GetX()) / _hypotenuse) * speed);
 		y_prec -= (((y_prec - target.GetY()) / _hypotenuse) * speed);
-		x = (int) Math.round(x_prec);
-		y = (int) Math.round(y_prec);
-	
+		x = Math.round(x_prec);
+		y = Math.round(y_prec);
+
 	}
-	
+
 	public void Tock() {
 		if (source.GetType() == ActorType.Spock) {
 			if (target.GetIsBuilding() == true) {

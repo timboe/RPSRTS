@@ -14,24 +14,24 @@ public class ResourceManager {
 	public static ResourceManager GetResourceManager() {
 		return singleton;
 	}
-	
+
 	private final Utility utility = Utility.GetUtility();
 	private final SpriteManager theSpriteManager = SpriteManager.GetSpriteManager();
 
 	private int PLAYER_SCORE = 0;
 	private int ENEMY_SCORE = 0;
-	
+
 	//
 	private boolean GEN_PAPER_PLAYER = true;
 	private boolean GEN_ROCK_PLAYER = true;
 	private boolean GEN_SCISSORS_PLAYER= true;
-	
+
 	private boolean GEN_PAPER_ENEMY = true;
 	private boolean GEN_ROCK_ENEMY = true;
 	private boolean GEN_SCISSORS_ENEMY= true;
-	
+
 	//
-	
+
 	private int GLOBAL_WOOD = 0;
 	private int GLOBAL_STONE = 0;
 	private int GLOBAL_IRON = 0;
@@ -43,16 +43,16 @@ public class ResourceManager {
 	private int ENEMY_WOOD = 0;
 	private int ENEMY_STONE = 0;
 	private int ENEMY_IRON = 0;
-	
+
 	//
-	
+
 	private int N_PLAYER_WOODSHOPS = 0;
 	private int N_PLAYER_PAPER_ATTRACTORS = 0;
 	private int N_PLAYER_SMELTERS = 0;
 	private int N_PLAYER_SCISSOR_ATTRACTORS = 0;
 	private int N_PLAYER_ROCKERY = 0;
 	private int N_PLAYER_ROCK_ATTRACTORS = 0;
-	
+
 	private int N_ENEMY_WOODSHOPS = 0;
 	private int N_ENEMY_PAPER_ATTRACTORS = 0;
 	private int N_ENEMY_SMELTERS = 0;
@@ -77,9 +77,9 @@ public class ResourceManager {
 	private int ENEMY_SCISSORS;
 	private int ENEMY_ROCK;
 	private int ENEMY_PAPER;
-	
+
 	//
-	
+
 	private int STAT_TreesChopped;
 	private int STAT_ProjectilesFired;
 	private int STAT_SpecialUnitsSpawned;
@@ -90,148 +90,17 @@ public class ResourceManager {
 	private int STAT_TroopsSlaughtered;
 	private int STAT_BuildingsExploded;
 	//One more
-	
-	public void AddStatistic(GameStatistics _stat) {
-		switch (_stat) {
-		case BuildingsConstructed: ++STAT_BuildingsConstructed; return;
-		case ProjectilesFired: ++STAT_ProjectilesFired; return;
-		case ResourcesPlundered: ++STAT_ResourcesPlundered; return;
-		case RocksAssembled: ++STAT_RocksAssembled; return;
-		case SpecialUnitsSpawned: ++STAT_SpecialUnitsSpawned; return;
-		case BuildingsExploded: ++STAT_BuildingsExploded; return;
-		case TreesChopped: ++STAT_TreesChopped; return;
-		case TroopsSlaughtered: ++STAT_TroopsSlaughtered; return;
-		case UnitsPoisoned: ++STAT_UnitsPoisoned; return;
-		}
-	}
-	
-	public String GetStatistic(GameStatistics _stat) {
-		switch (_stat) {
-			case BuildingsConstructed: return Integer.toString(STAT_BuildingsConstructed);
-			case ProjectilesFired: return Integer.toString(STAT_ProjectilesFired);
-			case ResourcesPlundered: return Integer.toString(STAT_ResourcesPlundered);
-			case RocksAssembled: return Integer.toString(STAT_RocksAssembled);
-			case SpecialUnitsSpawned: return Integer.toString(STAT_SpecialUnitsSpawned);
-			case BuildingsExploded: return Integer.toString(STAT_BuildingsExploded);
-			case TreesChopped: return Integer.toString(STAT_TreesChopped);
-			case TroopsSlaughtered: return Integer.toString(STAT_TroopsSlaughtered);
-			case UnitsPoisoned: return Integer.toString(STAT_UnitsPoisoned);
-		}
-		return "0";
-	}
-		
-	public int GetGlobalWood() {
-		return GLOBAL_WOOD;
-	}
-	
-	public void ModGlobalWood(int _mod) {
-		GLOBAL_WOOD += _mod;
-	}
-	
-	public int GetGlobalIron() {
-		return GLOBAL_IRON;
-	}
-	
-	public void ModGlobalIron(int _mod) {
-		GLOBAL_IRON += _mod;
-	}
-	
-	public int GetGlobalStone() {
-		return GLOBAL_STONE;
-	}
-	
-	public void ModGlobalStone(int _mod) {
-		GLOBAL_STONE += _mod;
-	}
-	
-	public boolean GetGeneratingPaper(ObjectOwner _oo) {
-		if (_oo == ObjectOwner.Enemy) return GEN_PAPER_ENEMY;
-		else return GEN_PAPER_PLAYER;
-	}
-	
-	public void SetGeneratingPaper(ObjectOwner _oo, boolean _set) {
-		if (_oo == ObjectOwner.Enemy) GEN_PAPER_ENEMY = _set;
-		else GEN_PAPER_PLAYER = _set;
-	}
-	
-	public boolean GetGeneratingRock(ObjectOwner _oo) {
-		if (_oo == ObjectOwner.Enemy) return GEN_ROCK_ENEMY;
-		else return GEN_ROCK_PLAYER;
-	}
-	
-	public void SetGeneratingRock(ObjectOwner _oo, boolean _set) {
-		if (_oo == ObjectOwner.Enemy) GEN_ROCK_ENEMY = _set;
-		else GEN_ROCK_PLAYER = _set;
-	}
-	
-	public boolean GetGeneratingScissors(ObjectOwner _oo) {
-		if (_oo == ObjectOwner.Enemy) return GEN_SCISSORS_ENEMY;
-		else return GEN_SCISSORS_PLAYER;
-	}
-	
-	public void SetGeneratingScissors(ObjectOwner _oo, boolean _set) {
-		if (_oo == ObjectOwner.Enemy) GEN_SCISSORS_ENEMY = _set;
-		else GEN_SCISSORS_PLAYER = _set;
-	}
 
-
-
-	
-	public int GetNWood(ObjectOwner _oo) {
-		if (_oo == ObjectOwner.Enemy) return ENEMY_WOOD;
-		else return PLAYER_WOOD;
-	}
-	
-	public int GetNStone(ObjectOwner _oo) {
-		if (_oo == ObjectOwner.Enemy) return ENEMY_STONE;
-		else return PLAYER_STONE;
-	}
-	
-	public int GetNIron(ObjectOwner _oo) {
-		if (_oo == ObjectOwner.Enemy) return ENEMY_IRON;
-		else return PLAYER_IRON;
-	}
-	
-	public int GetNPaper(ObjectOwner _oo) {
-		if (_oo == ObjectOwner.Enemy) return ENEMY_PAPER;
-		else return PLAYER_PAPER;
-	}
-	
-	public int GetNRock(ObjectOwner _oo) {
-		if (_oo == ObjectOwner.Enemy) return ENEMY_ROCK;
-		else return PLAYER_ROCK;
-	}
-	
-	public int GetNScissor(ObjectOwner _oo) {
-		if (_oo == ObjectOwner.Enemy) return ENEMY_SCISSORS;
-		else return PLAYER_SCISSORS;
-	}
-	
-	public int GetMaxPaper(ObjectOwner _oo) {
-		if (_oo == ObjectOwner.Enemy) return ENEMY_MAX_PAPER;
-		else return PLAYER_MAX_PAPER;
-	}
-	
-	public int GetMaxRock(ObjectOwner _oo) {
-		if (_oo == ObjectOwner.Enemy) return ENEMY_MAX_ROCK;
-		else return PLAYER_MAX_ROCK;
-	}
-	
-	public int GetMaxScissor(ObjectOwner _oo) {
-		if (_oo == ObjectOwner.Enemy) return ENEMY_MAX_SCISSORS;
-		else return PLAYER_MAX_SCISSORS;
-	}
-	
 	private ResourceManager() {
 		Reset();
 		System.out.println("--- Resource Manager spawned (depends on Util,Sprite) : "+this);
 	}
-	
-	public void AddBuildingToTally(ObjectOwner _oo, BuildingType _bt) {
+
+	public void AddBuildingToTally(final ObjectOwner _oo, final BuildingType _bt) {
 		AddRmBuildingToTally(_oo, _bt, +1);
 	}
-	
-	public void AddResources(ResourceType _rt, int _amount, ObjectOwner _oo) {
+
+	public void AddResources(final ResourceType _rt, final int _amount, final ObjectOwner _oo) {
 		if (_oo == ObjectOwner.Player) {
 			if (_rt == ResourceType.Mine) {
 				PLAYER_IRON += _amount;
@@ -256,8 +125,8 @@ public class ResourceManager {
 			}
 		}
 	}
-	
-	private void AddRmBuildingToTally(ObjectOwner _oo, BuildingType _bt, int _amount) {
+
+	private void AddRmBuildingToTally(final ObjectOwner _oo, final BuildingType _bt, final int _amount) {
 		if (_oo == ObjectOwner.Player) {
 			if (_bt == BuildingType.AttractorPaper) N_PLAYER_PAPER_ATTRACTORS += _amount;
 			else if (_bt  == BuildingType.AttractorRock) N_PLAYER_ROCK_ATTRACTORS += _amount;
@@ -275,19 +144,21 @@ public class ResourceManager {
 		}
 	}
 
-	public boolean CanAfford(BuildingType _bt, ObjectOwner _oo) {
-		return AffordBuyRefund(_bt, _oo, false, false);
+	public void AddStatistic(final GameStatistics _stat) {
+		switch (_stat) {
+		case BuildingsConstructed: ++STAT_BuildingsConstructed; return;
+		case ProjectilesFired: ++STAT_ProjectilesFired; return;
+		case ResourcesPlundered: ++STAT_ResourcesPlundered; return;
+		case RocksAssembled: ++STAT_RocksAssembled; return;
+		case SpecialUnitsSpawned: ++STAT_SpecialUnitsSpawned; return;
+		case BuildingsExploded: ++STAT_BuildingsExploded; return;
+		case TreesChopped: ++STAT_TreesChopped; return;
+		case TroopsSlaughtered: ++STAT_TroopsSlaughtered; return;
+		case UnitsPoisoned: ++STAT_UnitsPoisoned; return;
+		}
 	}
-	
-	public void Buy(BuildingType _bt, ObjectOwner _oo) {
-		AffordBuyRefund(_bt, _oo, true, false);
-	}
-	
-	public void Refund(BuildingType _bt, ObjectOwner _oo) {
-		AffordBuyRefund(_bt, _oo, false, true);
-	}
-	
-	private boolean AffordBuyRefund(BuildingType _bt, ObjectOwner _oo, boolean doPurchase, boolean doRefund) {
+
+	private boolean AffordBuyRefund(final BuildingType _bt, final ObjectOwner _oo, final boolean doPurchase, final boolean doRefund) {
 		int cost_wood = 0;
 		int cost_iron = 0;
 		int cost_stone = 0;
@@ -349,8 +220,16 @@ public class ResourceManager {
 		}
 		return true;
 	}
-	
-	public void DecreaseMaxUnits(BuildingType _bt, ObjectOwner _oo) {
+
+	public void Buy(final BuildingType _bt, final ObjectOwner _oo) {
+		AffordBuyRefund(_bt, _oo, true, false);
+	}
+
+	public boolean CanAfford(final BuildingType _bt, final ObjectOwner _oo) {
+		return AffordBuyRefund(_bt, _oo, false, false);
+	}
+
+	public void DecreaseMaxUnits(final BuildingType _bt, final ObjectOwner _oo) {
 		if (_oo == ObjectOwner.Player) {
 			if (_bt == BuildingType.Woodshop) {
 				PLAYER_MAX_PAPER -= utility.EXTRA_Paper_PerWoodmill;
@@ -369,8 +248,8 @@ public class ResourceManager {
 			}
 		}
 	}
-	
-	public int GetActorsPerAttractor(ObjectOwner _oo, BuildingType _bt) {
+
+	public int GetActorsPerAttractor(final ObjectOwner _oo, final BuildingType _bt) {
 		int amount_per_attractor = 0;
 		if (_oo == ObjectOwner.Player) {
 			if (_bt == BuildingType.AttractorPaper) {
@@ -380,7 +259,7 @@ public class ResourceManager {
 			} else if (_bt == BuildingType.AttractorRock) {
 				amount_per_attractor = PLAYER_ROCK;
 				amount_per_attractor -= (N_PLAYER_SMELTERS * utility.building_gatherers_per_site);
-				if (N_PLAYER_ROCK_ATTRACTORS > 0) amount_per_attractor /= N_PLAYER_ROCK_ATTRACTORS;			
+				if (N_PLAYER_ROCK_ATTRACTORS > 0) amount_per_attractor /= N_PLAYER_ROCK_ATTRACTORS;
 			} else if (_bt == BuildingType.AttractorScissors) {
 				amount_per_attractor = PLAYER_SCISSORS;
 				amount_per_attractor -= (N_PLAYER_WOODSHOPS * utility.building_gatherers_per_site);
@@ -394,14 +273,89 @@ public class ResourceManager {
 			} else if (_bt == BuildingType.AttractorRock) {
 				amount_per_attractor = ENEMY_ROCK;
 				amount_per_attractor -= (N_ENEMY_ROCKERY * utility.building_gatherers_per_site);
-				if (N_ENEMY_ROCK_ATTRACTORS > 0) amount_per_attractor /= N_ENEMY_ROCK_ATTRACTORS;			
+				if (N_ENEMY_ROCK_ATTRACTORS > 0) amount_per_attractor /= N_ENEMY_ROCK_ATTRACTORS;
 			} else if (_bt == BuildingType.AttractorScissors) {
 				amount_per_attractor = ENEMY_SCISSORS;
 				amount_per_attractor -= (N_ENEMY_SMELTERS * utility.building_gatherers_per_site);
-				if (N_ENEMY_SCISSOR_ATTRACTORS > 0) amount_per_attractor /= N_ENEMY_SCISSOR_ATTRACTORS;			
-			}			
+				if (N_ENEMY_SCISSOR_ATTRACTORS > 0) amount_per_attractor /= N_ENEMY_SCISSOR_ATTRACTORS;
+			}
 		}
 		return amount_per_attractor;
+	}
+
+	public boolean GetGeneratingPaper(final ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return GEN_PAPER_ENEMY;
+		else return GEN_PAPER_PLAYER;
+	}
+
+	public boolean GetGeneratingRock(final ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return GEN_ROCK_ENEMY;
+		else return GEN_ROCK_PLAYER;
+	}
+
+	public boolean GetGeneratingScissors(final ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return GEN_SCISSORS_ENEMY;
+		else return GEN_SCISSORS_PLAYER;
+	}
+
+	public int GetGlobalIron() {
+		return GLOBAL_IRON;
+	}
+
+
+
+
+	public int GetGlobalStone() {
+		return GLOBAL_STONE;
+	}
+
+	public int GetGlobalWood() {
+		return GLOBAL_WOOD;
+	}
+
+	public int GetMaxPaper(final ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return ENEMY_MAX_PAPER;
+		else return PLAYER_MAX_PAPER;
+	}
+
+	public int GetMaxRock(final ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return ENEMY_MAX_ROCK;
+		else return PLAYER_MAX_ROCK;
+	}
+
+	public int GetMaxScissor(final ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return ENEMY_MAX_SCISSORS;
+		else return PLAYER_MAX_SCISSORS;
+	}
+
+	public int GetNIron(final ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return ENEMY_IRON;
+		else return PLAYER_IRON;
+	}
+
+	public int GetNPaper(final ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return ENEMY_PAPER;
+		else return PLAYER_PAPER;
+	}
+
+	public int GetNRock(final ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return ENEMY_ROCK;
+		else return PLAYER_ROCK;
+	}
+
+	public int GetNScissor(final ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return ENEMY_SCISSORS;
+		else return PLAYER_SCISSORS;
+	}
+
+	public int GetNStone(final ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return ENEMY_STONE;
+		else return PLAYER_STONE;
+	}
+
+	public int GetNWood(final ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Enemy) return ENEMY_WOOD;
+		else return PLAYER_WOOD;
 	}
 
 	public String GetResourceText() {
@@ -415,6 +369,29 @@ public class ResourceManager {
 //				+" | EIRON:"+Integer.toString(ENEMY_IRON);
 //	}
 
+	public int GetScore(final ObjectOwner _oo) {
+		if (_oo == ObjectOwner.Player) {
+			return PLAYER_SCORE;
+		} else {
+			return ENEMY_SCORE;
+		}
+	}
+
+	public String GetStatistic(final GameStatistics _stat) {
+		switch (_stat) {
+			case BuildingsConstructed: return Integer.toString(STAT_BuildingsConstructed);
+			case ProjectilesFired: return Integer.toString(STAT_ProjectilesFired);
+			case ResourcesPlundered: return Integer.toString(STAT_ResourcesPlundered);
+			case RocksAssembled: return Integer.toString(STAT_RocksAssembled);
+			case SpecialUnitsSpawned: return Integer.toString(STAT_SpecialUnitsSpawned);
+			case BuildingsExploded: return Integer.toString(STAT_BuildingsExploded);
+			case TreesChopped: return Integer.toString(STAT_TreesChopped);
+			case TroopsSlaughtered: return Integer.toString(STAT_TroopsSlaughtered);
+			case UnitsPoisoned: return Integer.toString(STAT_UnitsPoisoned);
+		}
+		return "0";
+	}
+
 	public String GetUnitText() {
 		return "PAPER:"+Integer.toString(PLAYER_PAPER)+"/"+Integer.toString(PLAYER_MAX_PAPER)
 				+" | ROCK:"+Integer.toString(PLAYER_ROCK)+"/"+Integer.toString(PLAYER_MAX_ROCK)
@@ -425,16 +402,8 @@ public class ResourceManager {
 //				+" | EROCK:"+Integer.toString(ENEMY_ROCK)+"/"+Integer.toString(ENEMY_MAX_ROCK)
 //				+" | ESCISSORS:"+Integer.toString(ENEMY_SCISSORS)+"/"+Integer.toString(ENEMY_MAX_SCISSORS);
 //	}
-	
-	public int GetScore(ObjectOwner _oo) {
-		if (_oo == ObjectOwner.Player) {
-			return PLAYER_SCORE;
-		} else {
-			return ENEMY_SCORE;
-		}
-	}
 
-	public void IncreaseMaxUnits(BuildingType _bt, ObjectOwner _oo) {
+	public void IncreaseMaxUnits(final BuildingType _bt, final ObjectOwner _oo) {
 		if (_oo == ObjectOwner.Player) {
 			if (_bt == BuildingType.Woodshop) {
 				PLAYER_MAX_PAPER += utility.EXTRA_Paper_PerWoodmill;
@@ -454,7 +423,23 @@ public class ResourceManager {
 		}
 	}
 
-	public void RemoveBuildingFromTally(ObjectOwner _oo, BuildingType _bt) {
+	public void ModGlobalIron(final int _mod) {
+		GLOBAL_IRON += _mod;
+	}
+
+	public void ModGlobalStone(final int _mod) {
+		GLOBAL_STONE += _mod;
+	}
+
+	public void ModGlobalWood(final int _mod) {
+		GLOBAL_WOOD += _mod;
+	}
+
+	public void Refund(final BuildingType _bt, final ObjectOwner _oo) {
+		AffordBuyRefund(_bt, _oo, false, true);
+	}
+
+	public void RemoveBuildingFromTally(final ObjectOwner _oo, final BuildingType _bt) {
 		AddRmBuildingToTally(_oo, _bt, -1);
 	}
 
@@ -478,14 +463,14 @@ public class ResourceManager {
 		ENEMY_SCISSORS = utility.starting_actors;
 		ENEMY_ROCK = utility.starting_actors;
 		ENEMY_PAPER = utility.starting_actors;
-		
+
 		PLAYER_SCORE = 0;
 		ENEMY_SCORE = 0;
-		
+
 		GLOBAL_WOOD = 0;
 		GLOBAL_STONE = 0;
 		GLOBAL_IRON = 0;
-		
+
 		STAT_TreesChopped = 0;
 		STAT_ProjectilesFired = 0;
 		STAT_SpecialUnitsSpawned = 0;
@@ -497,40 +482,66 @@ public class ResourceManager {
 		STAT_BuildingsExploded = 0;
 	}
 
-	public void TryToSpawnUnit(Building _b) {
+	public void ScorePoints(final ObjectOwner _oo, final int _points) {
+		if (utility.gameMode != GameMode.gameOn) {
+			return; //No scoring points when the game has ended!
+		}
+		if (_oo == ObjectOwner.Player) {
+			PLAYER_SCORE += _points;
+		} else {
+			ENEMY_SCORE += _points;
+		}
+	}
+
+	public void SetGeneratingPaper(final ObjectOwner _oo, final boolean _set) {
+		if (_oo == ObjectOwner.Enemy) GEN_PAPER_ENEMY = _set;
+		else GEN_PAPER_PLAYER = _set;
+	}
+
+	public void SetGeneratingRock(final ObjectOwner _oo, final boolean _set) {
+		if (_oo == ObjectOwner.Enemy) GEN_ROCK_ENEMY = _set;
+		else GEN_ROCK_PLAYER = _set;
+	}
+
+	public void SetGeneratingScissors(final ObjectOwner _oo, final boolean _set) {
+		if (_oo == ObjectOwner.Enemy) GEN_SCISSORS_ENEMY = _set;
+		else GEN_SCISSORS_PLAYER = _set;
+	}
+
+	public void TryToSpawnUnit(final Building _b) {
 		final ObjectOwner owner = _b.GetOwner();
 		final BuildingType type = _b.GetType();
 		ActorType toPlace = null;
 		if (owner == ObjectOwner.Player) {
-			if (type == BuildingType.Woodshop 
-					&& PLAYER_PAPER < PLAYER_MAX_PAPER 
+			if (type == BuildingType.Woodshop
+					&& PLAYER_PAPER < PLAYER_MAX_PAPER
 					&& PLAYER_WOOD >= utility.COST_Paper_Wood
 					&& GEN_PAPER_PLAYER == true) {
 				toPlace = ActorType.Paper;
-			} else if (type == BuildingType.Smelter 
-					&& PLAYER_SCISSORS < PLAYER_MAX_SCISSORS 
+			} else if (type == BuildingType.Smelter
+					&& PLAYER_SCISSORS < PLAYER_MAX_SCISSORS
 					&& PLAYER_IRON >= utility.COST_Scissors_Iron
 					&& GEN_SCISSORS_PLAYER == true) {
 				toPlace = ActorType.Scissors;
-			} else if (type == BuildingType.Rockery 
-					&& PLAYER_ROCK < PLAYER_MAX_ROCK 
+			} else if (type == BuildingType.Rockery
+					&& PLAYER_ROCK < PLAYER_MAX_ROCK
 					&& PLAYER_STONE >= utility.COST_Rock_Stone
 					&& GEN_ROCK_PLAYER == true) {
 				toPlace = ActorType.Rock;
 			}
 		} else if (owner == ObjectOwner.Enemy) {
-			if (type == BuildingType.Woodshop 
-					&& ENEMY_PAPER < ENEMY_MAX_PAPER 
+			if (type == BuildingType.Woodshop
+					&& ENEMY_PAPER < ENEMY_MAX_PAPER
 					&& ENEMY_WOOD >= utility.COST_Paper_Wood
 					&& GEN_PAPER_ENEMY == true) {
 				toPlace = ActorType.Paper;
-			} else if (type == BuildingType.Smelter 
-					&& ENEMY_SCISSORS < ENEMY_MAX_SCISSORS 
+			} else if (type == BuildingType.Smelter
+					&& ENEMY_SCISSORS < ENEMY_MAX_SCISSORS
 					&& ENEMY_IRON >= utility.COST_Scissors_Iron
 					&& GEN_SCISSORS_ENEMY == true) {
 				toPlace = ActorType.Scissors;
 			} else if (type == BuildingType.Rockery
-					&& ENEMY_ROCK < ENEMY_MAX_ROCK 
+					&& ENEMY_ROCK < ENEMY_MAX_ROCK
 					&& ENEMY_STONE >= utility.COST_Rock_Stone
 					&& GEN_ROCK_ENEMY == true) {
 				toPlace = ActorType.Rock;
@@ -573,19 +584,8 @@ public class ResourceManager {
 			}
 		}
 	}
-	
-	public void ScorePoints(ObjectOwner _oo, int _points) {
-		if (utility.gameMode != GameMode.gameOn) {
-			return; //No scoring points when the game has ended!
-		}
-		if (_oo == ObjectOwner.Player) {
-			PLAYER_SCORE += _points;
-		} else {
-			ENEMY_SCORE += _points;
-		}
-	}
 
-	public void UnitDeath(ActorType _at, ObjectOwner _oo) {
+	public void UnitDeath(final ActorType _at, final ObjectOwner _oo) {
 		if (_oo == ObjectOwner.Player) {
 			if (_at == ActorType.Paper) {
 				--PLAYER_PAPER;

@@ -12,10 +12,10 @@ import javax.imageio.ImageIO;
 import com.timboe.rpsrts.managers.Bitmaps;
 
 public class Bitmaps_Applet extends Bitmaps {
-	
+
 	private static Bitmaps_Applet singleton = new Bitmaps_Applet();
-	
-	public static BufferedImage clip(BufferedImage src, int x, int y, int w, int h) { //Stolen from notch
+
+	public static BufferedImage clip(final BufferedImage src, final int x, final int y, final int w, final int h) { //Stolen from notch
         final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         BufferedImage newImage = null;
 
@@ -40,7 +40,7 @@ public class Bitmaps_Applet extends Bitmaps {
 
         return newImage;
     }
-	
+
 	public static Bitmaps_Applet GetBitmaps_Applet() {
 		return singleton;
 	}
@@ -52,12 +52,12 @@ public class Bitmaps_Applet extends Bitmaps {
 	public BufferedImage ff[];
 	public BufferedImage WIN;
 	public BufferedImage LOOSE;
-	
+
 	public BufferedImage tree[];
 	public BufferedImage cactus[];
 	public BufferedImage mine[];
 	public BufferedImage stone[];
-	
+
 	public BufferedImage base_player[];
 	public BufferedImage base_enemy[];
 	public BufferedImage construction_player[];
@@ -74,7 +74,7 @@ public class Bitmaps_Applet extends Bitmaps {
 	public BufferedImage attractor_scissors_enemy[];
 	public BufferedImage attractor_paper_enemy[];
 	public BufferedImage attractor_rock_enemy[];
-	
+
 	public BufferedImage scissor_player[];
 	public BufferedImage scissor_enemy[];
 	public BufferedImage paper_player[];
@@ -84,8 +84,8 @@ public class Bitmaps_Applet extends Bitmaps {
 	public BufferedImage spock_player[];
 	public BufferedImage spock_enemy[];
 	public BufferedImage lizard_player[];
-	public BufferedImage lizard_enemy[];	
-	
+	public BufferedImage lizard_enemy[];
+
 	public BufferedImage proj_scissor_player[];
 	public BufferedImage proj_scissor_enemy[];
 	public BufferedImage proj_paper_player[];
@@ -96,10 +96,10 @@ public class Bitmaps_Applet extends Bitmaps {
 	public BufferedImage proj_lizard_player[];
 
 	public BufferedImage X[]; //Switched out later
-	
+
 	private Bitmaps_Applet() {
 		super();
-		
+
 		BufferedImage resource_sheet = null;
         BufferedImage resource_actors = null;
         BufferedImage resource_attractor = null;
@@ -108,7 +108,7 @@ public class Bitmaps_Applet extends Bitmaps {
         BufferedImage resource_projectile = null;
         BufferedImage resource_mine = null;
         BufferedImage resource_stone = null;
-		
+
 		try {
 			resource_sheet = ImageIO.read(Bitmaps.class.getResource("/resource/resource_sheet.gif"));
 	        resource_actors = ImageIO.read(Bitmaps.class.getResource("/resource/resource_actors.gif"));
@@ -118,15 +118,15 @@ public class Bitmaps_Applet extends Bitmaps {
 	        resource_projectile = ImageIO.read(Bitmaps.class.getResource("/resource/resource_projectile.gif"));
 	        resource_mine = ImageIO.read( this.getClass().getResource("/resource/mine.gif") );
 	        resource_stone =  ImageIO.read( this.getClass().getResource("/resource/stone.gif") );
-	        
+
 	        WIN = ImageIO.read( this.getClass().getResource("/resource/youreawinner.png") );
 	        LOOSE = ImageIO.read( this.getClass().getResource("/resource/yourealooser.png") );
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
-        
+
         X = new BufferedImage[1];
-        
+
         on = new BufferedImage[4];
         off = new BufferedImage[4];
     	sound = new BufferedImage[2];
@@ -137,13 +137,13 @@ public class Bitmaps_Applet extends Bitmaps {
         	on[i] = clip(resource_on_off, 0, 0, 12, 6);
         	off[i] = clip(resource_on_off, 0, 6, 12, 6);
         	if (i >= 2) continue;
-        	int j = (i+1) * 12;
+        	final int j = (i+1) * 12;
         	quality[i] = clip(resource_on_off, 0, j, 12, 12);
         	sound[i] = clip(resource_on_off, 12, j, 12, 12);
         	pause[i] = clip(resource_on_off, 24, j, 12, 12);
         	ff[i] = clip(resource_on_off, 36, j, 12, 12);
         }
-        
+
 
 		base_player = new BufferedImage[4];
 		base_enemy = new BufferedImage[4];
@@ -210,7 +210,7 @@ public class Bitmaps_Applet extends Bitmaps {
 			j += 6;
 			lizard_enemy[i] = clip(resource_actors, i*15, j, 15, 6);
 		}
-		
+
 		proj_scissor_player = new BufferedImage[4];
 		proj_scissor_enemy = new BufferedImage[4];
 		proj_paper_player = new BufferedImage[4];

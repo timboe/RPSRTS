@@ -15,27 +15,27 @@ public class Resource extends Sprite {
 	protected int not_reachable_penalty;
 	int penalty_size;
 
-	public Resource(int _ID, int _x, int _y, int _r, ResourceType _type) {
+	public Resource(final int _ID, final int _x, final int _y, final int _r, final ResourceType _type) {
 		super(_ID, _x, _y, _r);
 		type = _type;
-		int _start_stuff = utility.rndI(utility.resource_rnd) + utility.resource_min;
-		
+		final int _start_stuff = utility.rndI(utility.resource_rnd) + utility.resource_min;
+
 		penalty_size = utility.not_reachable_penelty_tocks;
 		Add(_start_stuff);
-		
+
 		toDraw = utility.rndI(4); //for mines and rockpiles (different art)
-		
+
 		//snap me to the world grid
-		WeightedPoint _my_snap = theSpriteManager.ClipToGrid(this.GetLoc());
+		final WeightedPoint _my_snap = theSpriteManager.ClipToGrid(this.GetLoc());
 		if (_my_snap != null) {
 			_my_snap.GiveSprite(this);
-			for (WeightedPoint _s : _my_snap.GetNieghbours()) {
+			for (final WeightedPoint _s : _my_snap.GetNieghbours()) {
 				_s.GiveCollision(this);
 			}
 		}
 	}
-	
-	public void Add(int _n) {
+
+	public void Add(final int _n) {
 		stuff += _n;
 		if (type == ResourceType.Mine) {
 			resource_manager.ModGlobalIron(_n);
@@ -45,12 +45,12 @@ public class Resource extends Sprite {
 			resource_manager.ModGlobalWood(_n);
 		}
 	}
-	
+
 	@Override
 	public boolean GetIsResource() {
 		return true;
 	}
-	
+
 	public boolean GetReachable() {
 		if (not_reachable_penalty > 0) return false;
 		return true;
@@ -63,15 +63,15 @@ public class Resource extends Sprite {
 	public ResourceType GetType() {
 		return type;
 	}
-	
+
 	@Override
 	public void Kill() {
 		if (dead == true) return;
 		dead = true;
-		WeightedPoint _my_snap = theSpriteManager.ClipToGrid(this.GetLoc());
+		final WeightedPoint _my_snap = theSpriteManager.ClipToGrid(this.GetLoc());
 		_my_snap.RemoveSprite(this);
 		if (_my_snap != null) {
-			for (WeightedPoint _s : _my_snap.GetNieghbours()) {
+			for (final WeightedPoint _s : _my_snap.GetNieghbours()) {
 				_s.RemoveSprite(this);
 			}
 		}
@@ -111,10 +111,10 @@ public class Resource extends Sprite {
 		penalty_size += utility.not_reachable_penelty_tocks;
 	}
 
-	public void Tick(int _tick_count) {
+	public void Tick(final int _tick_count) {
 		if ((_tick_count + tick_offset) % ticks_per_tock == 0) Tock();
 	}
-	
+
 	public void Tock() {
 		if (not_reachable_penalty > 0) {
 			--not_reachable_penalty;
@@ -122,7 +122,7 @@ public class Resource extends Sprite {
 		if (utility.rnd() < utility.resource_chance_grow && stuff < utility.resource_max_stuff ) {
 			++stuff;
 		} else if (utility.rnd() < utility.resource_chance_spawn) {
-			WorldPoint spawn_loc = theSpriteManager.FindSpotForResource(this.GetLoc());
+			final WorldPoint spawn_loc = theSpriteManager.FindSpotForResource(this.GetLoc());
 			if (spawn_loc != null) {
 				theSpriteManager.PlaceResource(spawn_loc, this.GetType(), true);
 			}

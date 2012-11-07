@@ -13,10 +13,10 @@ import com.timboe.rpsrts.world.WorldTile;
 
 public class GameWorld {
 	protected final Utility utility = Utility.GetUtility();
-	
+
 	protected static GameWorld this_object;
 	public static GameWorld GetGameWorld() {
-		return this_object;  //set by inherited Applet or Web 
+		return this_object;  //set by inherited Applet or Web
 	}
 
 	protected int world_tiles = 0;
@@ -43,8 +43,8 @@ public class GameWorld {
 	protected GameWorld() {
 		//OVERRIDDEN
 	}
-	
-	public boolean CheckSafeToPlaceTile(float _x, float _y, int _pice_radius) {
+
+	public boolean CheckSafeToPlaceTile(final float _x, final float _y, final int _pice_radius) {
 		int _ID = -1;
 		//HACK!
 		//_x -= tiles_size;
@@ -52,16 +52,16 @@ public class GameWorld {
 		//HACK!
 		for (int dir = 0; dir < 4; ++dir) {
 			switch (dir) {
-				case 0: _ID = utility.XYtoID((int) Math.round(_x - _pice_radius), (int) Math.round(_y)); break;
-				case 1: _ID = utility.XYtoID((int) Math.round(_x + _pice_radius), (int) Math.round(_y)); break;
-				case 2: _ID = utility.XYtoID((int) Math.round(_x), (int)  Math.round(_y - _pice_radius)); break;
-				case 3: _ID = utility.XYtoID((int) Math.round(_x), (int)  Math.round(_y + _pice_radius)); break;
+				case 0: _ID = utility.XYtoID(Math.round(_x - _pice_radius), Math.round(_y)); break;
+				case 1: _ID = utility.XYtoID(Math.round(_x + _pice_radius), Math.round(_y)); break;
+				case 2: _ID = utility.XYtoID(Math.round(_x), Math.round(_y - _pice_radius)); break;
+				case 3: _ID = utility.XYtoID(Math.round(_x), Math.round(_y + _pice_radius)); break;
 			}
 			//_ID = utility.XYtoID((int)_x, (int)_y, world_tiles, tiles_size);
 			if (_ID != -1) {
 				//System.out.println("Tile not walkable! ("+_x+","+_y+") ID:"+_ID);
 				if (tiles[_ID].GetWalkable() == false) return false;
-					
+
 			} else{
 				//System.out.println("WARN Tile check safe to place out of range! ("+_x+","+_y+")");
 				return false;
@@ -85,7 +85,7 @@ public class GameWorld {
 			wg_state = 1;
 			System.out.println("STATE: reset " + wg_state + " RND_C:" + utility.rnd_count);
 		}
-		
+
 		if (utility.gamePaused == true) {
 			return wg_state;
 		}
@@ -280,7 +280,7 @@ public class GameWorld {
 				}
 			}
 		}
-		
+
 //		System.out.println("STATE: MID 1  BIOME " + wg_state + " RND_C:" + utility.rnd_count);
 
 	    //Each biome can now work out its centre of gravity
@@ -338,7 +338,7 @@ public class GameWorld {
 			toAssign_payer.AssignBiomeType(toAssign_type);
 			toAssign_enemy.AssignBiomeType(toAssign_type);
 		}
-		
+
 //		System.out.println("STATE: MID 4  BIOME " + wg_state + " RND_C:" + utility.rnd_count);
 
 
@@ -428,7 +428,7 @@ public class GameWorld {
 				//Give this tile to the other biome
 				//int location = 0;//utility.rnd.nextInt(possibleSwaps.size())
 				final WorldTile tile_to_give = possibleSwaps.elementAt( utility.rndI( possibleSwaps.size() ) );//possibleSwaps.removeFirst();//  //XXX RND BUG
-				Biome OwnerBiome = tile_to_give.GetOwner(); //TODO STILL NOT WORKINg (isn't  it?) 
+				final Biome OwnerBiome = tile_to_give.GetOwner(); //TODO STILL NOT WORKINg (isn't  it?)
 				OwnerBiome.RemoveTile(tile_to_give);
 				myOwner.AddTile(tile_to_give);
 			}
@@ -458,7 +458,7 @@ public class GameWorld {
 			}
 		}
 	}
-	
+
 	private void GenerateWorld_TrimWater() {
 		for (final WorldTile t : tiles) {
 			if (t.GetPartOfBiome() == true && t.GetBiomeType() == BiomeType.WATER) {
@@ -469,7 +469,7 @@ public class GameWorld {
 						++nLand;
 					}
 				}
-				if ( (nLand == 0 && utility.rnd() > utility.wg_PercChanceKeepWater) || t.GetDistanceFromPoint(0, 0) > utility.world_size2) { 
+				if ( (nLand == 0 && utility.rnd() > utility.wg_PercChanceKeepWater) || t.GetDistanceFromPoint(0, 0) > utility.world_size2) {
 					render_tiles.remove(t);
 				}
 			}
@@ -479,7 +479,7 @@ public class GameWorld {
 
 
 
-	public WorldPoint GetIdeadStartingLocation(ObjectOwner _o) {
+	public WorldPoint GetIdeadStartingLocation(final ObjectOwner _o) {
 		float home_rad;
 		float home_ang;
 		if (_o == ObjectOwner.Player) {
@@ -493,7 +493,7 @@ public class GameWorld {
 	}
 
 
-	private LinkedList<WorldTile> GetNeighbour(WorldTile _t, boolean _nnn) {
+	private LinkedList<WorldTile> GetNeighbour(final WorldTile _t, final boolean _nnn) {
 		int toGet = 4;
 		if (_nnn == true) {
 			toGet = 8;
@@ -537,7 +537,7 @@ public class GameWorld {
 		return render_tiles;
 	}
 
-	private float GetSeperation(WorldChunk c1, WorldChunk c2) {
+	private float GetSeperation(final WorldChunk c1, final WorldChunk c2) {
 		final float x_diff = c1.GetXCentre() - c2.GetXCentre();
 		final float y_diff = c1.GetYCentre() - c2.GetYCentre();
 		return (float) Math.sqrt( Math.pow(x_diff, 2) + Math.pow(y_diff, 2));
@@ -551,7 +551,7 @@ public class GameWorld {
 		//OVERRIDDEN
 	}
 
-	private void MergeBiomes(int _b1, int _b2) {
+	private void MergeBiomes(final int _b1, final int _b2) {
 		for (final WorldChunk c : chunks) {
 			if (c.GetBiomeID() == _b2) {
 				c.SetBiomeID(_b1);

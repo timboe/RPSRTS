@@ -12,13 +12,13 @@ import com.timboe.rpsrts.enumerators.ObjectOwner;
 import com.timboe.rpsrts.sprites.Building;
 
 public class Building_App extends Building {
-	
-	Bitmap[] spriteGraphic;	
+
+	Bitmap[] spriteGraphic;
 	Bitmaps_App theBitmaps = Bitmaps_App.GetBitmaps_App();
-	
-	public Building_App(int _ID, int _x, int _y, int _r, BuildingType _bt, ObjectOwner _oo) {
+
+	public Building_App(final int _ID, final int _x, final int _y, final int _r, final BuildingType _bt, final ObjectOwner _oo) {
 		super(_ID, _x, _y, _r, _bt, _oo);
-				
+
 		if (type == BuildingType.Base) {
 			if (_oo == ObjectOwner.Player) {
 				spriteGraphic = theBitmaps.base_player;
@@ -63,14 +63,14 @@ public class Building_App extends Building {
 			}
 		}
 	}
-	
-	public void Render(Canvas canvas, Matrix _af, Matrix _af_translate_zoom, Matrix _af_shear_rotate, Matrix _af_none, int _tick_count) {
+
+	public void Render(final Canvas canvas, final Matrix _af, final Matrix _af_translate_zoom, final Matrix _af_shear_rotate, final Matrix _af_none, final int _tick_count) {
 		if (dead == true) return;
 		if (_tick_count % 2 == 0) {
 			++animStep;
 		}
-		Paint paint = new Paint();
-		float[] transform = new float[2];
+		final Paint paint = new Paint();
+		final float[] transform = new float[2];
 		transform[0] = x;
 		transform[1] = y;
 		_af_shear_rotate.mapPoints(transform);
@@ -81,24 +81,24 @@ public class Building_App extends Building {
 			//Can't place here
 			paint.setColor(Color.RED);
 			paint.setStyle(Paint.Style.FILL);
-	
+
 			final float[] _points = new float[8];
 			_points[0] = x - r - 2;
 			_points[1] = y - r + 2;
 			_points[2] = x - r + 2;
-			_points[3] = y - r - 2;		
+			_points[3] = y - r - 2;
 			_points[4] = x + r + 2;
-			_points[5] = y + r - 2;						
+			_points[5] = y + r - 2;
 			_points[6] = x + r - 2;
-			_points[7] = y + r + 2;							
+			_points[7] = y + r + 2;
 			canvas.drawPoints(_points, paint);
 
 			_points[0] =  x - r - 2;
 			_points[1] =  y + r - 2;
 			_points[2] =  x - r + 2;
-			_points[3] =  y + r + 2;				
+			_points[3] =  y + r + 2;
 			_points[4] =  x + r + 2;
-			_points[5] =  y - r + 2;								
+			_points[5] =  y - r + 2;
 			_points[6] =  x + r - 2;
 			_points[7] =  y - r - 2;
 			canvas.drawPoints(_points, paint);
@@ -123,7 +123,7 @@ public class Building_App extends Building {
 			}
 			canvas.drawRect(_x - r
 					, _y - r - 4 - y_offset
-					, _x - r + Math.round(r * 2 * ((float)health/(float)maxHealth))
+					, _x - r + Math.round(r * 2 * (health/maxHealth))
 					, _y - r - 3 - y_offset
 					, paint);
 			//_g2.fillRect(_x - r, _y - r - 4 - y_offset, _x + r + (int) Math.round(r * 2 * ((double)health/(double)maxHealth) ), 1);
@@ -134,12 +134,12 @@ public class Building_App extends Building {
 //			_g2.setColor(Color.red);
 //			_g2.drawString(Integer.toString(GetEmployees()), _x - r, _y - r - 10);
 //		}
-		
-		Rect box = new Rect(_x - r 
+
+		final Rect box = new Rect(_x - r
 				, _y - r - y_offset
 				, _x + r
 				, _y + r - y_offset);
-		
+
 		if (underConstruction == true) {
 			int conStep = 0;
 			final double healthFrac = (double)health/(double)maxHealth;
@@ -163,6 +163,6 @@ public class Building_App extends Building {
 		}
 
 		canvas.setMatrix(_af_translate_zoom);
-		canvas.drawBitmap(spriteGraphic[animStep % animSteps], null, box, null);	
+		canvas.drawBitmap(spriteGraphic[animStep % animSteps], null, box, null);
 	}
 }

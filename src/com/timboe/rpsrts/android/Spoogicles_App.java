@@ -8,11 +8,11 @@ import com.timboe.rpsrts.sprites.Spoogicles;
 
 public class Spoogicles_App extends Spoogicles {
 
-	protected Spoogicles_App(int _ID, int _x, int _y, ObjectOwner _oo, int _spoogicles, float _scale) {
+	protected Spoogicles_App(final int _ID, final int _x, final int _y, final ObjectOwner _oo, final int _spoogicles, final float _scale) {
 		super(_ID, _x, _y, _oo, _spoogicles, _scale);
 	}
-	
-	public void Render(Canvas canvas, Matrix _af, Matrix _af_translate_zoom, Matrix _af_shear_rotate, Matrix _af_none, int _tick_count) {
+
+	public void Render(final Canvas canvas, final Matrix _af, final Matrix _af_translate_zoom, final Matrix _af_shear_rotate, final Matrix _af_none, final int _tick_count) {
 		///TODO
-	}	
+	}
 }

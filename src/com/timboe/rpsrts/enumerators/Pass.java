@@ -4,8 +4,8 @@ public class Pass {
 	public static String GetPass() {
 		return s("1PxE5B7SE4EsEwG");
 	}
-	
-	private static String s(String s){
+
+	private static String s(final String s){
 		String ss = "";
         for (int S = 0; S < s.length(); ++S) {
             char c = s.charAt(S);

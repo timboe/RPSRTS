@@ -11,27 +11,29 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class AtomicFloat extends Number {
 
     /**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 3707302617589945091L;
-	private AtomicInteger bits;
+	private final AtomicInteger bits;
 
     public AtomicFloat() {
         this(0f);
     }
 
-    public AtomicFloat(float initialValue) {
+    public AtomicFloat(final float initialValue) {
         bits = new AtomicInteger(floatToIntBits(initialValue));
     }
 
-    public final boolean compareAndSet(float expect, float update) {
+    public final boolean compareAndSet(final float expect, final float update) {
         return bits.compareAndSet(floatToIntBits(expect),
                                   floatToIntBits(update));
     }
 
-    public double doubleValue() { return (double) floatValue(); }
-    
-    public float floatValue() {
+    @Override
+	public double doubleValue() { return floatValue(); }
+
+    @Override
+	public float floatValue() {
         return get();
     }
 
@@ -39,21 +41,23 @@ public class AtomicFloat extends Number {
         return intBitsToFloat(bits.get());
     }
 
-    public final float getAndSet(float newValue) {
+    public final float getAndSet(final float newValue) {
         return intBitsToFloat(bits.getAndSet(floatToIntBits(newValue)));
     }
 
-    public int intValue()       { return (int) get();           }
+    @Override
+	public int intValue()       { return (int) get();           }
 
-    public long longValue()     { return (long) get();          }
+    @Override
+	public long longValue()     { return (long) get();          }
 
-    public final void mod(float modValue) {
+    public final void mod(final float modValue) {
         bits.set(floatToIntBits(floatValue() + modValue));
     }
-    public final void set(float newValue) {
+    public final void set(final float newValue) {
         bits.set(floatToIntBits(newValue));
     }
-    public final boolean weakCompareAndSet(float expect, float update) {
+    public final boolean weakCompareAndSet(final float expect, final float update) {
         return bits.weakCompareAndSet(floatToIntBits(expect),
                                       floatToIntBits(update));
     }

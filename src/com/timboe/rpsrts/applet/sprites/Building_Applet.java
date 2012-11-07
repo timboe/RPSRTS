@@ -17,16 +17,16 @@ import com.timboe.rpsrts.sprites.Building;
 
 public class Building_Applet extends Building {
 
-	BufferedImage[] spriteGraphic;	
-	private Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();
-	private TransformStore theTransforms = TransformStore.GetTransformStore();
-	private ShapeStore theShapeStore = ShapeStore.GetShapeStore();
-	private SceneRenderer_Applet theSceneRenderer = SceneRenderer_Applet.GetSceneRenderer_Applet();
+	BufferedImage[] spriteGraphic;
+	private final Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();
+	private final TransformStore theTransforms = TransformStore.GetTransformStore();
+	private final ShapeStore theShapeStore = ShapeStore.GetShapeStore();
+	private final SceneRenderer_Applet theSceneRenderer = SceneRenderer_Applet.GetSceneRenderer_Applet();
 
 
-	public Building_Applet(int _ID, int _x, int _y, int _r, BuildingType _bt, ObjectOwner _oo) {
+	public Building_Applet(final int _ID, final int _x, final int _y, final int _r, final BuildingType _bt, final ObjectOwner _oo) {
 		super(_ID, _x, _y, _r, _bt, _oo);
-		
+
 		if (type == BuildingType.Base) {
 			if (_oo == ObjectOwner.Player) {
 				spriteGraphic = theBitmaps.base_player;
@@ -71,14 +71,14 @@ public class Building_Applet extends Building {
 			}
 		}
 	}
-	
-	public void Render(Graphics2D _g2, int _frame_count) {
+
+	public void Render(final Graphics2D _g2, final int _frame_count) {
 		if (dead == true) return;
 		if (_frame_count % 2 == 0) {
 			++animStep;
 		}
 
-		Point2D transform = theTransforms.getTransformedPoint(x, y);
+		final Point2D transform = theTransforms.getTransformedPoint(x, y);
 		final int _x = (int)(transform.getX());
 		final int _y = (int)(transform.getY());
 
@@ -86,23 +86,23 @@ public class Building_Applet extends Building {
 		if (delete_hover == true) {
 			_g2.setTransform(theTransforms.af);
 			_g2.setColor(Color.red);
-			GeneralPath X = (GeneralPath) theShapeStore.GetCross();
+			final GeneralPath X = theShapeStore.GetCross();
 			X.transform(AffineTransform.getTranslateInstance(x, y));
 			_g2.fill(X);
 			delete_hover = false;
 			return;
 		}
-		
+
 		//Do move symbol
 		if ((move_hover == true && owner == ObjectOwner.Player)
-				|| 
+				||
 				(getiAttract().size() > 0
 				&& owner == ObjectOwner.Player
-				&& theSceneRenderer.MouseTF != null 
+				&& theSceneRenderer.MouseTF != null
 				&& theSceneRenderer.MouseTF.distance(x, y) < r) ) {
 			_g2.setTransform(theTransforms.af);
 			_g2.setColor(Color.green);
-			GeneralPath move = (GeneralPath) theShapeStore.GetMove();
+			final GeneralPath move = theShapeStore.GetMove();
 			move.transform(AffineTransform.getTranslateInstance(x, y));
 			_g2.fill(move);
 			if (utility.mouseDrag == false) move_hover = false;
@@ -118,7 +118,7 @@ public class Building_Applet extends Building {
 			} else {
 				_g2.setColor(Color.blue);
 			}
-			_g2.fillRect(_x - r, _y - r - 8 - y_offset, (int) Math.round(r * 2 * ((float)health/(float)maxHealth) ), 1);
+			_g2.fillRect(_x - r, _y - r - 8 - y_offset, Math.round(r * 2 * (health/maxHealth) ), 1);
 		}
 
 		if (utility.dbg == true) {
@@ -132,7 +132,7 @@ public class Building_Applet extends Building {
 
 		if (underConstruction == true) {
 			int conStep = 0;
-			final float healthFrac = (float)health/(float)maxHealth;
+			final float healthFrac = health/maxHealth;
 			if (healthFrac <= 0.25) {
 				conStep = 0;
 			} else if (healthFrac <= 0.5) {
@@ -152,13 +152,13 @@ public class Building_Applet extends Building {
 			_g2.setTransform(theTransforms.af_translate_zoom);
 			_g2.drawImage(spriteGraphic[animStep % animSteps], _x - r, _y - r - 5 - y_offset, null);
 		}
-		
+
 		if (utility.dbg == true) { //DBG
 			_g2.setColor(Color.blue);
 			_g2.setTransform(theTransforms.af);
 			_g2.fillOval(x - 1, y - 1, 2, 2);
 		}
-		
+
 
 	}
 //

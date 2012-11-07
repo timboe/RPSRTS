@@ -14,12 +14,12 @@ import com.timboe.rpsrts.sprites.Projectile;
 import com.timboe.rpsrts.sprites.Sprite;
 
 public class Projectile_Applet extends Projectile {
-	
-	BufferedImage[] spriteGraphic;	
+
+	BufferedImage[] spriteGraphic;
 	protected Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();
 	protected TransformStore theTransforms = TransformStore.GetTransformStore();
 
-	public Projectile_Applet(int _ID, Actor _source, int _r, Sprite _target) {
+	public Projectile_Applet(final int _ID, final Actor _source, final int _r, final Sprite _target) {
 		super(_ID, _source, _r, _target);
 
 		if (_source.GetOwner() == ObjectOwner.Player) {
@@ -34,14 +34,14 @@ public class Projectile_Applet extends Projectile {
 			else if (_source.GetType() == ActorType.Lizard) spriteGraphic = theBitmaps.proj_lizard_enemy;
 		}
 	}
-	
-	public void Render(Graphics2D _g2, int _tick_count) {
+
+	public void Render(final Graphics2D _g2, final int _tick_count) {
 		if (dead == true) return;
-		
+
 		if (_tick_count % 4 == 0) {
 			++animStep;
 		}
-		
+
 		_g2.setTransform(theTransforms.af_translate_zoom);
 		if (source.GetType() == ActorType.Spock) {
 			if (animStep % animSteps == 0 || animStep % animSteps == 2) {
@@ -53,11 +53,11 @@ public class Projectile_Applet extends Projectile {
 			}
 			Point2D transform = theTransforms.getTransformedPoint(target.GetX(), target.GetY());
 			final int _x1 = (int) transform.getX();
-			final int _y1 = (int) transform.getY(); 
+			final int _y1 = (int) transform.getY();
 			transform = theTransforms.getTransformedPoint(source.GetX(), source.GetY());
 			_g2.drawLine((int)(transform.getX() - 2), (int) (transform.getY() - 7), _x1, _y1 - target.GetR());
 		} else {
-			Point2D transform = theTransforms.getTransformedPoint(x, y);
+			final Point2D transform = theTransforms.getTransformedPoint(x, y);
 			final int _x = (int) transform.getX();
 			final int _y = (int) transform.getY();
 			_g2.drawImage(spriteGraphic[animStep % animSteps], _x - r, _y - r, null);

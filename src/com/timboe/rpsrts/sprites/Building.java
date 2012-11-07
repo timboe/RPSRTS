@@ -14,20 +14,20 @@ public class Building extends Sprite {
 
 	protected BuildingType type;
 	private HashSet<ResourceType> iCollect = new HashSet<ResourceType>();
-	private HashSet<ActorType> iAttract = new HashSet<ActorType>(); 
+	private HashSet<ActorType> iAttract = new HashSet<ActorType>();
 	protected ObjectOwner owner;
 	protected boolean delete_hover = false;
 	protected boolean move_hover = false;
-	private ArrayList<Actor> employees = new ArrayList<Actor>();
+	private final ArrayList<Actor> employees = new ArrayList<Actor>();
 	protected boolean underConstruction;
 	protected int y_offset;
 	private int primedToExplode = 0;
 	protected int shrapnel = 0;
-	
+
 	private int no_local_resource_penalty;
 	private int no_local_resource_counter;
 
-	protected Building(int _ID, int _x, int _y, int _r, BuildingType _bt, ObjectOwner _oo) {
+	protected Building(final int _ID, final int _x, final int _y, final int _r, final BuildingType _bt, final ObjectOwner _oo) {
 		super(_ID, _x, _y, _r);
 		type = _bt;
 		owner = _oo;
@@ -37,9 +37,9 @@ public class Building extends Sprite {
 		maxHealth = utility.building_max_health;
 		resource_manager.AddBuildingToTally(_oo, _bt);
 		no_local_resource_counter = 0;
-		
+
 		GridRegister();
-		
+
 		if (type == BuildingType.Base) {
 			maxHealth *= 20;
 			health = maxHealth;
@@ -81,10 +81,10 @@ public class Building extends Sprite {
 		animStep = utility.rndI(animSteps);
 	}
 
-	public synchronized void AddEmployee(Actor _a) {
+	public synchronized void AddEmployee(final Actor _a) {
 		employees.add(_a);
 	}
-	
+
 	public void BuildAction() {
 		if (underConstruction == false) return;
 		health += utility.building_health_per_build_action;
@@ -102,12 +102,8 @@ public class Building extends Sprite {
 	public HashSet<ActorType> GetAttracts() {
 		return getiAttract();
 	}
-	
 
-	public int GetNoLocalResourceCounter() {
-		return no_local_resource_counter;
-	}
-	
+
 	public Boolean GetBeingBuilt() {
 		return underConstruction;
 	}
@@ -119,13 +115,21 @@ public class Building extends Sprite {
 	public synchronized int GetEmployees() {
 		return employees.size();
 	}
-	
+
+	public HashSet<ActorType> getiAttract() {
+		return iAttract;
+	}
+
+	public HashSet<ResourceType> getiCollect() {
+		return iCollect;
+	}
+
 	@ Override
 	public boolean GetIsBuilding() {
 		return true;
 	}
 
-	public Resource GetNewGatherTask(Actor _client) {
+	public Resource GetNewGatherTask(final Actor _client) {
 		Resource toFetch = null;
 		toFetch = theSpriteManager.GetNearestResource(this, _client, utility.building_gather_radius); //Get nearest resource - no distance requirement
 		if (toFetch == null ) {
@@ -134,6 +138,10 @@ public class Building extends Sprite {
 			//System.out.println(this+" NOT TAKING NO WORKERS FOR "+no_local_resource_penalty+"s (NO LOCAL RESOURCE, STRIKE "+no_local_resource_counter+")");
 		}
 		return toFetch;
+	}
+
+	public int GetNoLocalResourceCounter() {
+		return no_local_resource_counter;
 	}
 
 	@Override
@@ -147,10 +155,10 @@ public class Building extends Sprite {
 
 	private void GridDeRegister() {
 		//snap me to the world grid
-		WeightedPoint _my_snap = theSpriteManager.ClipToGrid(this.GetLoc());
+		final WeightedPoint _my_snap = theSpriteManager.ClipToGrid(this.GetLoc());
 		_my_snap.RemoveSprite(this);
 		if (_my_snap != null) {
-			for (WeightedPoint _s : _my_snap.GetNieghbours()) {
+			for (final WeightedPoint _s : _my_snap.GetNieghbours()) {
 				_s.RemoveSprite(this);
 			}
 		}
@@ -158,10 +166,10 @@ public class Building extends Sprite {
 
 	private void GridRegister() {
 		//snap me to the world grid
-		WeightedPoint _my_snap = theSpriteManager.ClipToGrid(this.GetLoc());
+		final WeightedPoint _my_snap = theSpriteManager.ClipToGrid(this.GetLoc());
 		if (_my_snap != null) {
 			_my_snap.GiveSprite(this);
-			for (WeightedPoint _s : _my_snap.GetNieghbours()) {
+			for (final WeightedPoint _s : _my_snap.GetNieghbours()) {
 				_s.GiveCollision(this);
 			}
 		}
@@ -183,8 +191,8 @@ public class Building extends Sprite {
 		}
 		GridDeRegister();
 	}
-	
-	public synchronized void MoveBuilding(int new_x, int new_y) {
+
+	public synchronized void MoveBuilding(final int new_x, final int new_y) {
 		if (x == new_x && y == new_y) return;
     	if (theSpriteManager.CheckSafe(true
     			, true
@@ -192,7 +200,7 @@ public class Building extends Sprite {
     			, new_y
     			, r
     			, ID
-    			, 0) == false) { 
+    			, 0) == false) {
     		return;
     	}
 		GridDeRegister();
@@ -205,21 +213,37 @@ public class Building extends Sprite {
 			move_hover = true;
 		}
 		//force update destination of followers
-		for (Actor _a : employees) {
+		for (final Actor _a : employees) {
 			_a.Job_Guard_Renavagate();
 		}
 	}
-	
+
 	public boolean Recruiting() {
 		if (no_local_resource_penalty > 0) return false;
 		return true;
 	}
 
-	public synchronized void RemoveEmployee(Actor _a) {
+	public synchronized void RemoveEmployee(final Actor _a) {
 		employees.remove(_a);
 	}
-	
-	public synchronized void Tick(int _tick_count) {
+
+	public synchronized void setiAttract(final HashSet<ActorType> iAttract) {
+		this.iAttract = iAttract;
+	}
+
+	public synchronized void setiCollect(final HashSet<ResourceType> iCollect) {
+		this.iCollect = iCollect;
+	}
+
+	public void SetPrimedToExplode(final int _pte) {
+		primedToExplode += _pte;
+	}
+
+	public void Shrapnel() {
+		shrapnel += utility.building_Explode_ticks;
+	}
+
+	public synchronized void Tick(final int _tick_count) {
 		if ((_tick_count + tick_offset) % ticks_per_tock == 0) Tock();
 		if (shrapnel > 0) {
 			--shrapnel;
@@ -229,24 +253,24 @@ public class Building extends Sprite {
 			SetPrimedToExplode(-1);
 		}
 	}
-	
+
 	private void Tock() {
 		if (no_local_resource_penalty > 0) --no_local_resource_penalty;
 		if (type == BuildingType.Base) return;
 		//Garbage check on employees
-		Vector<Actor> toRemove = new Vector<Actor>();
+		final Vector<Actor> toRemove = new Vector<Actor>();
 		employees.remove(null);
-		for (Actor _a : employees) {
+		for (final Actor _a : employees) {
 			if (_a.GetDead() == true) toRemove.add(_a);
 		}
-		for (Actor _toRem: toRemove) {
+		for (final Actor _toRem: toRemove) {
 			employees.remove(_toRem);
 		}
-		
+
 		if (underConstruction == true) return;
-		
+
 		if (health < maxHealth) ++health;
-		
+
 		if (getiCollect().size() > 0) {
 			resource_manager.TryToSpawnUnit(this); //If a gather
 		} else if (getiAttract().size() > 0 && GetEmployees() > 0) { //if attractor w employees
@@ -255,30 +279,6 @@ public class Building extends Sprite {
 				employees.get(0).QuitJob(true);
 			}
 		}
-	}
-
-	public HashSet<ResourceType> getiCollect() {
-		return iCollect;
-	}
-
-	public synchronized void setiCollect(HashSet<ResourceType> iCollect) {
-		this.iCollect = iCollect;
-	}
-
-	public HashSet<ActorType> getiAttract() {
-		return iAttract;
-	}
-
-	public synchronized void setiAttract(HashSet<ActorType> iAttract) {
-		this.iAttract = iAttract;
-	}
-	
-	public void SetPrimedToExplode(int _pte) {
-		primedToExplode += _pte;
-	}
-	
-	public void Shrapnel() {
-		shrapnel += utility.building_Explode_ticks;
 	}
 
 }

@@ -13,20 +13,20 @@ public class SpecialSpawn_Applet extends SpecialSpawn {
 	protected TransformStore theTransforms = TransformStore.GetTransformStore();
 
 
-	public SpecialSpawn_Applet(int _ID, int _x, int _y, int _r, ActorType _at, ObjectOwner _oo) {
+	public SpecialSpawn_Applet(final int _ID, final int _x, final int _y, final int _r, final ActorType _at, final ObjectOwner _oo) {
 		super(_ID, _x, _y, _r, _at, _oo);
 	}
 
-	public synchronized void Render(Graphics2D _g2, int _tick_count) {
+	public synchronized void Render(final Graphics2D _g2, final int _tick_count) {
 
 		Point2D transform = theTransforms.getTransformedPoint(x , y );
-		int _x_orig = (int)(transform.getX());
-		int _y_orig = (int)(transform.getY());
+		final int _x_orig = (int)(transform.getX());
+		final int _y_orig = (int)(transform.getY());
 		_g2.setTransform(theTransforms.af_translate_zoom);
-	
+
 		if (utility.dbg == true) {
 			_g2.setColor(Color.magenta);
-			_g2.fillRect((int) _x_orig-1, (int) _y_orig-1, 2, 2);
+			_g2.fillRect(_x_orig-1, _y_orig-1, 2, 2);
 		}
 
 
@@ -43,17 +43,17 @@ public class SpecialSpawn_Applet extends SpecialSpawn {
 				final int sy = (int) (r * randomLen * Math.sin(randomAngle));
 				_g2.drawLine(_x_orig, _y_orig, _x_orig + sx, _y_orig + sy);
 			}
-			
+
 			transform = theTransforms.getTransformedPoint(spooge_x.get(s).floatValue(), spooge_y.get(s).floatValue());
-			int _x = (int)Math.round(transform.getX());
-			int _y = (int)Math.round(transform.getY());
-			
+			final int _x = (int)Math.round(transform.getX());
+			final int _y = (int)Math.round(transform.getY());
+
 			//draw
 			if (s % 2 == 0) {
 				_g2.setColor(Color.black);
 			}
-			_g2.fillRect((int) _x, (int) _y, 1, 1);
-			
-		}	
+			_g2.fillRect(_x, _y, 1, 1);
+
+		}
 	}
 }

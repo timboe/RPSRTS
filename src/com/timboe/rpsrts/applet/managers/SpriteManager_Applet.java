@@ -38,50 +38,50 @@ public class SpriteManager_Applet extends SpriteManager {
 		return singleton;
 	}
 
-	private Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();
-	private ShapeStore theShapeStore = ShapeStore.GetShapeStore();
-	private TransformStore theTransforms = TransformStore.GetTransformStore();
-	
+	private final Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();
+	private final ShapeStore theShapeStore = ShapeStore.GetShapeStore();
+	private final TransformStore theTransforms = TransformStore.GetTransformStore();
+
 	private SpriteManager_Applet() {
 		super();
-		this_object = (SpriteManager)this;
+		this_object = this;
 		System.out.println("--- Sprite Manager spawned (depends on Util,World,Path,Resource[linked on Reset()]) : "+this);
 	}
 
 	@Override
-	protected Actor PlatFormSpecific_PlaceActor(WorldPoint _p, ActorType _at, ObjectOwner _o) {
-		return (Actor) new Actor_Applet(++GlobalSpriteCounter, (int)_p.getX(), (int)_p.getY(), utility.actorRadius, _at, _o);
+	protected Explosion PlatformSpecific_Explosion(final int _x, final int _y, final ObjectOwner _oo) {
+		return new Explosion_Applet(++GlobalSpriteCounter, _x, _y, utility.building_Explode_radius, _oo) ;
 	}
 	@Override
-	protected Building PlatformSpecific_PlaceBuilding(WorldPoint _p, int _r, BuildingType _bt, ObjectOwner _oo) {
-		return (Building) new Building_Applet(++GlobalSpriteCounter, (int)_p.getX(), (int)_p.getY(), _r, _bt, _oo);
+	protected Actor PlatFormSpecific_PlaceActor(final WorldPoint _p, final ActorType _at, final ObjectOwner _o) {
+		return new Actor_Applet(++GlobalSpriteCounter, _p.getX(), _p.getY(), utility.actorRadius, _at, _o);
 	}
 	@Override
-	protected Projectile PlatformSpecific_PlaceProjectile(Actor _source, Sprite _target, int _r) {
-		return (Projectile) new Projectile_Applet(++GlobalSpriteCounter, _source, _r, _target);
+	protected Building PlatformSpecific_PlaceBuilding(final WorldPoint _p, final int _r, final BuildingType _bt, final ObjectOwner _oo) {
+		return new Building_Applet(++GlobalSpriteCounter, _p.getX(), _p.getY(), _r, _bt, _oo);
 	}
 	@Override
-	protected Resource PlatformSpecific_PlaceResource(WorldPoint _p, ResourceType _rt) {
-		return (Resource) new Resource_Applet(++GlobalSpriteCounter, (int)_p.getX(), (int)_p.getY(), utility.resourceRadius, _rt);
+	protected Projectile PlatformSpecific_PlaceProjectile(final Actor _source, final Sprite _target, final int _r) {
+		return new Projectile_Applet(++GlobalSpriteCounter, _source, _r, _target);
 	}
 	@Override
-	protected Spoogicles PlatformSpecific_PlaceSpooge(int _x, int _y, ObjectOwner _oo, int _n, float _scale) {
-		return (Spoogicles) new Spoogicles_Applet(++GlobalSpriteCounter, _x, _y, _oo, _n, _scale);
+	protected Resource PlatformSpecific_PlaceResource(final WorldPoint _p, final ResourceType _rt) {
+		return new Resource_Applet(++GlobalSpriteCounter, _p.getX(), _p.getY(), utility.resourceRadius, _rt);
 	}
 	@Override
-	protected WaterfallSplash PlatformSpecific_PlaceWaterfallSplash(int _x, int _y, int _r) {
-		return (WaterfallSplash) new WaterfallSplash_Applet(++GlobalSpriteCounter, _x, _y, _r);
+	protected Spoogicles PlatformSpecific_PlaceSpooge(final int _x, final int _y, final ObjectOwner _oo, final int _n, final float _scale) {
+		return new Spoogicles_Applet(++GlobalSpriteCounter, _x, _y, _oo, _n, _scale);
 	}
 	@Override
-	protected SpecialSpawn PlatformSpecific_SpecialSpawn(int _x, int _y, int _r, ActorType _at, ObjectOwner _oo) {
-		return (SpecialSpawn) new SpecialSpawn_Applet(++GlobalSpriteCounter, _x, _y, _r, _at, _oo);
+	protected WaterfallSplash PlatformSpecific_PlaceWaterfallSplash(final int _x, final int _y, final int _r) {
+		return new WaterfallSplash_Applet(++GlobalSpriteCounter, _x, _y, _r);
 	}
 	@Override
-	protected Explosion PlatformSpecific_Explosion(int _x, int _y, ObjectOwner _oo) {
-		return (Explosion) new Explosion_Applet(++GlobalSpriteCounter, _x, _y, utility.building_Explode_radius, _oo) ;
+	protected SpecialSpawn PlatformSpecific_SpecialSpawn(final int _x, final int _y, final int _r, final ActorType _at, final ObjectOwner _oo) {
+		return new SpecialSpawn_Applet(++GlobalSpriteCounter, _x, _y, _r, _at, _oo);
 	}
-	
-	public void Render(Graphics2D _g2) {
+
+	public void Render(final Graphics2D _g2) {
 		++FrameCount;
 		//Waterfall splashs' are rendered by the Scene Drawer (we just look after them here with other sprites)
 		for (final Sprite _Z : GetSpritesZOrdered()) {
@@ -101,10 +101,10 @@ public class SpriteManager_Applet extends SpriteManager {
 				((Explosion_Applet) _Z).Render(_g2, FrameCount);
 			}
 		}
-		
+
 	}
-	
-	public void SpecialRender(Graphics2D _g2, int _x, int _y, BufferedImage[] _graphic, boolean drawingTopBar) {
+
+	public void SpecialRender(final Graphics2D _g2, final int _x, final int _y, final BufferedImage[] _graphic, final boolean drawingTopBar) {
 		Point2D transform = null;
 		transform = theTransforms.af_shear_rotate.transform(new Point(_x, _y), transform);
 		final int __x = (int)Math.round(transform.getX());
@@ -121,7 +121,7 @@ public class SpriteManager_Applet extends SpriteManager {
 		} else if (_graphic == theBitmaps.off || _graphic == theBitmaps.on) {
 			_r = 6;
 			_y_offset = -6;
-		} else if (_graphic == theBitmaps.paper_player 
+		} else if (_graphic == theBitmaps.paper_player
 				|| _graphic == theBitmaps.rock_player
 				|| _graphic == theBitmaps.scissor_player) {
 			_r = 3;
@@ -136,7 +136,7 @@ public class SpriteManager_Applet extends SpriteManager {
 			}
 			//Can't place here
 			_g2.setColor(Color.red);
-			GeneralPath X = (GeneralPath) theShapeStore.GetCross();
+			final GeneralPath X = theShapeStore.GetCross();
 			X.transform(AffineTransform.getTranslateInstance(_x, _y));
 			_g2.fill(X);
 			return;
@@ -160,15 +160,15 @@ public class SpriteManager_Applet extends SpriteManager {
 			} else {
 				f = FrameCount/2 % animSteps;
 			}
-				
+
 			if (_graphic != null) {
 				_g2.drawImage(_graphic[f], _x - _r, _y - _r - _y_offset, null);
 			}
 		}
 	}
-	
-	
-	public boolean TryPlaceItem(BuildingType _bt, Graphics2D _g2, int _mouse_x, int _mouse_y, boolean _place_remove) {
+
+
+	public boolean TryPlaceItem(final BuildingType _bt, final Graphics2D _g2, final int _mouse_x, final int _mouse_y, final boolean _place_remove) {
 		boolean closeToExisting = false;
 		_g2.setColor(Color.white);
 		_g2.setTransform(theTransforms.af);
@@ -218,7 +218,7 @@ public class SpriteManager_Applet extends SpriteManager {
 							return true;
 						}
 					}
-				}	
+				}
 			}
 		} else if ( CheckSafe(true,true,_mouse_x, _mouse_y, radius_to_check, 0, 0) == true
 				&& resource_manager.CanAfford(_bt, ObjectOwner.Player)

@@ -11,18 +11,18 @@ import com.timboe.rpsrts.enumerators.ResourceType;
 import com.timboe.rpsrts.sprites.Resource;
 
 public class Resource_Applet extends Resource {
-	
-	BufferedImage[] spriteGraphic;	
+
+	BufferedImage[] spriteGraphic;
 	protected Bitmaps_Applet theBitmaps = Bitmaps_Applet.GetBitmaps_Applet();
 	protected TransformStore theTransforms = TransformStore.GetTransformStore();
 
-	public Resource_Applet(int _ID, int _x, int _y, int _r, ResourceType _type) {
+	public Resource_Applet(final int _ID, final int _x, final int _y, final int _r, final ResourceType _type) {
 		super(_ID, _x, _y, _r, _type);
 	}
-	
-	public void Render(Graphics2D _g2, int _tick_count) {
 
-		Point2D transformed_island = theTransforms.getTransformedPoint(x, y);
+	public void Render(final Graphics2D _g2, final int _tick_count) {
+
+		final Point2D transformed_island = theTransforms.getTransformedPoint(x, y);
 		//apply  coordinate transform to convert to island coordinates
 		final int _x = (int)(transformed_island.getX());
 		final int _y = (int)(transformed_island.getY());
@@ -37,7 +37,7 @@ public class Resource_Applet extends Resource {
 			_g2.setTransform(theTransforms.af);
 			_g2.fillOval(x - 2*r, y - 2*r, 4*r, 4*r);
 		}
-		
+
 		if (type == ResourceType.Tree) {
 			_g2.setTransform(theTransforms.af_translate_zoom);
 			_g2.drawImage(theBitmaps.tree[anim], _x - r, _y - r - 9, null);
@@ -51,7 +51,7 @@ public class Resource_Applet extends Resource {
 			_g2.setTransform(theTransforms.af_translate_zoom);
 			_g2.drawImage(theBitmaps.stone[toDraw], _x - r, _y - r - 3, null);
 		}
-		
+
 //		if (utility.dbg == true) {
 //			_g2.setColor(Color.blue);
 //			_g2.setTransform(theTransforms.af);

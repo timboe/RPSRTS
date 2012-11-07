@@ -15,7 +15,7 @@ public class Utility {
 	//RANDOM NUMBER SOURCE
 	public String rndSeedTxt = "Dave";
 	public int rnd_count = 0;
-	private boolean rand_off = false;
+	private final boolean rand_off = false;
 	//
 	public boolean worldGenLock = false;
 	//Global variables
@@ -36,7 +36,7 @@ public class Utility {
 	public boolean sendMouseDragPing = false;
 	public boolean gamePaused = false;
 	public boolean showRedScore = true;
-	public String playerName = ""; 
+	public String playerName = "";
 	//
 	public int _TICK;
 	public long _TIME_OF_LAST_TICK = 0; // Internal
@@ -48,7 +48,7 @@ public class Utility {
 	//---------\\
 	// STATICS \\
 	//---------\\
-	
+
 	//World parameters
 	public final int window_X = 1000;
 	public final int window_Y = 600;
@@ -63,7 +63,7 @@ public class Utility {
 	public final int game_ticks_per_render = 2;
 	public final int slowmo_ticks_per_render = 1;
 	public final int fast_forward_speed = 10;
-	
+
 	//world manager settings
 	public final float wg_seconds_to_wait = 0.5f; //Time to wait between steps
 	public final int wg_DegInCircle = 360;
@@ -81,7 +81,7 @@ public class Utility {
 	public final int wg_PlayerBaseAngle = 315; //starting angle for player
 	public final float minimiser_start = 999999; //Where minimiser routines start
 	public final float wg_PercChanceKeepWater = 0.03f;
-	
+
 	//sprite manager settings
 	public final int pathfinding_max_depth = 100000; //kill pathfinding early in the 500-2000 range
 	//	public final int pathfinding_accuracy = 7; //Current code assumes that pathfinding accuracy == tile size
@@ -93,9 +93,9 @@ public class Utility {
 	public final int specialSpawnRadius = 10;
 	public final int resourceRadius = 3;
 	public final int resources_kept_away_from_base = 75; //clear area around main bases
-	public final int place_res_gaussian = 4; //clustering of mines and rockpiles 
+	public final int place_res_gaussian = 4; //clustering of mines and rockpiles
 	public final float projectile_speed = 1f;
-	
+
 	//actor settings
 	public final int starting_actors = 2;
 	public final int amount_collect_per_tock = 1; //amount to take/give per tock
@@ -111,7 +111,7 @@ public class Utility {
 	public final float actor_poison_rate = 0.15f;
 	public final int actor_poison_ticks = 120;
 	public final float actor_poison_range = 20;
-	
+
 	//biome settings
 	public final int biome_golbal_density_mod = tiles_size/2;//tiles_size; //derived
 	public final float biome_colour_range = 10; //smear of colours in biome
@@ -121,7 +121,7 @@ public class Utility {
 	public final int biome_grass_rnd_density = 3 + biome_golbal_density_mod;
 	public final int biome_forest_min_density = 6 + biome_golbal_density_mod;
 	public final int biome_forest_rnd_density = 6 + biome_golbal_density_mod;
-	
+
 	//resource settings
 	public final int not_reachable_penelty_tocks = 20; //if an actor fails to pathfind to this as a target, how long to quarantine for. This floats with every fail.
 	public final int resource_rnd = 20;
@@ -131,7 +131,7 @@ public class Utility {
 	public final float resource_chance_grow = 0.005f;
 	public final float resource_chance_spawn = 0.0005f; //careful with this one! can fill board up with trees n' junk
 	public final int resource_max_stuff = 50;
-	
+
 	//spooge settings
 	public final float gravity = 0.2f;
 	public final int spooges_actor_death = 20;//20;
@@ -144,7 +144,7 @@ public class Utility {
 	public final float spooges_scale_building_death = 0.4f;
 	public final float spooges_scale_totem_death = 0.3f;
 	public final float spooges_scale_base_death = 0.5f;
-	
+
 	//score settings
 	public final int extra_score_mins = 10; //how many mins until no quick win bonus
 	public final float quick_win_bonus = 2f;
@@ -171,21 +171,21 @@ public class Utility {
 	public final int building_Explode_ticks = 30;
 	public final float building_Explode_damage = 0.5f; //damage per tick
 	public final float building_Explode_vs_building_multiplier = 10f; //above times this for buildings
-	
+
 	//AI
 	public final int AI_BadBuilding_Before_Sell = 3; //building_no_resource_penalty seconds per tick
 	public final int AI_NewUnitsWhenXClosetoCap = 2;
 	public final int AI_BuildCooldown = 40;//tocks (applies per building type)
 	public final int AI_TargetUnitMultipler = 3; //How many fully-populated buildings worth of units is ideal?
 	public final int AI_MinUnits = 3; //Minimum units before UnitGen is always kept TRUE
-	
+
 	//COSTS
 	public final int StartingResources = 5000;
 	public final int COST_Building_Base = 100;
 	public final int COST_Attractor_Base = 25;
 	public final int COST_Actor_Base = 20;
 	public final int EXTRA_Base = 6;
-	
+
 	//0_0\\
 	public final int COST_Woodshop_Wood = 0; //sec
 	public final int COST_Woodshop_Iron = COST_Building_Base; //pri
@@ -208,71 +208,71 @@ public class Utility {
 	public final int EXTRA_Paper_PerWoodmill = EXTRA_Base*2;
 	public final int EXTRA_Rock_PerRockery = EXTRA_Base/2;
 	public final int EXTRA_Scissors_PerSmelter = EXTRA_Base;
-	
+
+	private final Random rndGen = new Random(rndSeedTxt.hashCode());
 	private Utility() {
 		System.out.println("--- Utility spawned (depends on nothing): "+this);
 		SetDesiredFPS(_DESIRED_FPS); //To initially set desired TPS
 	}
-	public WorldPoint PolarToCartesian(float _angle, float _radius) {
+
+	public int GetDesiredTPS() {
+		return _DESIRED_TPS;
+	}
+
+	public int GetTicksPerRender() {
+		return _TICKS_PER_RENDER;
+	}
+	public WorldPoint PolarToCartesian(final float _angle, final float _radius) {
 		final float _x = (float) (_radius * Math.cos(Math.toRadians(_angle)));
 		final float _y = (float) (-_radius * Math.sin(Math.toRadians(_angle)));
-		return new WorldPoint((int)Math.round(_x), (int)Math.round(_y));
+		return new WorldPoint(Math.round(_x), Math.round(_y));
 	}
-	
-	private final Random rndGen = new Random(rndSeedTxt.hashCode());
-
 	public float rnd() {
 		++rnd_count;
 		if (rand_off == true) return 0.3f;
-		else 
+		else
 		return rndGen.nextFloat();
 	}
-	public float rndG(float _mean, float _sigma) {
+
+	public float rndG(final float _mean, final float _sigma) {
 		++rnd_count;
 		if (rand_off == true) return (_mean + ( _sigma * 0.3f ));
 		else return (float) (_mean + ( _sigma * rndGen.nextGaussian() ));
 	}
+
 	public int rndI() {
 		++rnd_count;
 		if (rand_off == true) return 1;
 		else return rndGen.nextInt();
 	}
-	
-	public int rndI(int _n) {
+
+	public int rndI(final int _n) {
 		++rnd_count;
 		if (rand_off == true) return 1;
 		else return rndGen.nextInt(_n);
 	}
 
-	public float Seperation(Number x1, Number x2, Number y1, Number y2) {
+	public float Seperation(final Number x1, final Number x2, final Number y1, final Number y2) {
 		return (float) Math.hypot(x1.floatValue()-x2.floatValue(), y1.floatValue()-y2.floatValue());
 	}
 
-	public float Seperation(WorldPoint a, WorldPoint b) {
+	public float Seperation(final WorldPoint a, final WorldPoint b) {
 		return (float) Math.hypot(a.getX()-b.getX(), a.getY()-b.getY());
 	}
-	
-	public void SetTicksPerRender(int _tps) {
-		_TICKS_PER_RENDER = _tps;
-		_DESIRED_TPS = _DESIRED_FPS * _TICKS_PER_RENDER;
-	}
-	
-	public int GetTicksPerRender() {
-		return _TICKS_PER_RENDER;
-	}
-	
-	public void SetDesiredFPS(int _fps) {
+
+	public void SetDesiredFPS(final int _fps) {
 		_DESIRED_FPS = _fps;
 		_DESIRED_TPS = _DESIRED_FPS * _TICKS_PER_RENDER;
-	}
-	
-	public int GetDesiredTPS() {
-		return _DESIRED_TPS;
 	}
 
 	public void setSeed() {
 		rndGen.setSeed(rndSeedTxt.hashCode());
 		rnd_count = 0;
+	}
+
+	public void SetTicksPerRender(final int _tps) {
+		_TICKS_PER_RENDER = _tps;
+		_DESIRED_TPS = _DESIRED_FPS * _TICKS_PER_RENDER;
 	}
 
 	public int XYtoID(int _x, int _y) {

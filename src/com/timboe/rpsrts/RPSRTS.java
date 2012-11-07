@@ -17,7 +17,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.util.Locale;
 
-
 import com.timboe.rpsrts.applet.managers.GameWorld_Applet;
 import com.timboe.rpsrts.applet.managers.SceneRenderer_Applet;
 import com.timboe.rpsrts.applet.managers.ShapeStore;
@@ -39,7 +38,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 
 	int last_X = -1; //Mouse cursor historic
 	int last_Y = -1;
-	
+
 	private Thread th; //My running thread
 
 	private Image dbImage; //Double buffer
@@ -52,7 +51,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	private final ResourceManager resource_manager = ResourceManager.GetResourceManager();
 	private final SceneRenderer_Applet theSceneRenderer = SceneRenderer_Applet.GetSceneRenderer_Applet();
 	private final ShapeStore theShapeStore = ShapeStore.GetShapeStore();
-	
+
     @Override
 	public void destroy() { }
 
@@ -63,7 +62,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			utility.gameMode = GameMode.gameOverLost;
 		}
 		if (utility.gameMode != GameMode.gameOn) {
-			int seconds_to_win = (int) (utility.game_time_count / 1000);
+			final int seconds_to_win = (int) (utility.game_time_count / 1000);
 			int bonus = (int) (((utility.extra_score_mins * 60) - seconds_to_win) * utility.quick_win_bonus);
 			if (bonus < 0) bonus = 0;
 			if(utility.gameMode == GameMode.gameOverWon) {
@@ -71,7 +70,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			} else {
 				resource_manager.ScorePoints(ObjectOwner.Enemy, bonus);
 			}
-			utility.SetTicksPerRender(utility.slowmo_ticks_per_render); 
+			utility.SetTicksPerRender(utility.slowmo_ticks_per_render);
 			utility.fastForward = false;
 			utility.loose_time = System.currentTimeMillis() / 1000l;
 		}
@@ -91,15 +90,15 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 
 	@Override
 	public void init() {
-		
+
 		if (utility.world_tiles % utility.tiles_per_chunk != 0 ) {
 			System.out.println("FATAL: Chunks must divide evenly into tiles");
 		}
-		
+
 		utility._RPSRTS = this;
 
 		setSize(utility.window_X, utility.window_Y);
-				
+
 		theWorld.Init(); //important!!!!
 
 		addMouseWheelListener(this);
@@ -112,7 +111,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		}
 	}
 	@Override
-	public void keyPressed(KeyEvent e) {
+	public void keyPressed(final KeyEvent e) {
 		if (utility.gameMode == GameMode.titleScreen) {
 			if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
 				if (utility.rndSeedTxt.length() > 0) {
@@ -157,21 +156,21 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		} else if (e.getKeyChar() == 'f') {
 			theSceneRenderer.toggleFF();
 		}
-		
+
 	}
 	@Override
-	public void keyReleased(KeyEvent e) {}
+	public void keyReleased(final KeyEvent e) {}
 
 	@Override
-	public void keyTyped(KeyEvent e) {}
+	public void keyTyped(final KeyEvent e) {}
 
 	@Override
-	public void mouseClicked(MouseEvent e) {}
+	public void mouseClicked(final MouseEvent e) {}
 	@Override
-	public void mouseDragged(MouseEvent e) {
+	public void mouseDragged(final MouseEvent e) {
 		theSceneRenderer.CurMouse = e.getPoint();
 		if (utility.gameMode == GameMode.titleScreen) return;
-		int bothMask = MouseEvent.BUTTON1_DOWN_MASK | MouseEvent.BUTTON3_DOWN_MASK;
+		final int bothMask = MouseEvent.BUTTON1_DOWN_MASK | MouseEvent.BUTTON3_DOWN_MASK;
 		if (e.getModifiers() == InputEvent.BUTTON2_MASK || (e.getModifiersEx() & bothMask) == bothMask) {
 			if (last_X > -1) {
 				if (e.getY() < last_Y) {
@@ -202,26 +201,26 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	}
 
 	@Override
-	public void mouseEntered(MouseEvent arg0) {}
+	public void mouseEntered(final MouseEvent arg0) {}
 
 	@Override
-	public void mouseExited(MouseEvent arg0) {}
+	public void mouseExited(final MouseEvent arg0) {}
 
 	@Override
-	public void mouseMoved(MouseEvent e) {
+	public void mouseMoved(final MouseEvent e) {
 		theSceneRenderer.CurMouse = e.getPoint();
 		theSceneRenderer.mouseMove();
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
+	public void mousePressed(final MouseEvent e) {
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			utility.mouseClick = true;
 		}
 	}
-	
+
 	@Override
-	public void mouseReleased(MouseEvent e) {
+	public void mouseReleased(final MouseEvent e) {
 		utility.mouseDrag = false;
 		theSceneRenderer.buildingToMove = null;
 		if (e.getButton() == MouseEvent.BUTTON3 || e.getButton() == MouseEvent.BUTTON1) {
@@ -231,7 +230,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	}
 
 	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
+	public void mouseWheelMoved(final MouseWheelEvent e) {
 		if (utility.gameMode == GameMode.titleScreen) return;
 		if (e.getWheelRotation() < 0) {
 			theTransforms.zoomIn(false);
@@ -240,9 +239,9 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		}
 
 	}
-	
+
 	@Override
-	public void paint (Graphics g) {
+	public void paint (final Graphics g) {
 		final Graphics2D g2 = (Graphics2D)g;
 
 		if (utility.worldGenLock == true) {
@@ -250,7 +249,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			return;
 		}
 		utility.worldGenLock = true;
-		
+
 	    theTransforms.SetAA(g2,true);
 		theTransforms.updateTransforms();
 		theSceneRenderer.doInverseMouseTransform();
@@ -270,7 +269,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		utility.sendMouseDragPing = false;
 	    g2.setTransform(theTransforms.af_none);
 	    g2.setColor(Color.gray);
-	    GeneralPath x = theShapeStore.GetCross();
+	    final GeneralPath x = theShapeStore.GetCross();
 	    x.transform(AffineTransform.getTranslateInstance(utility.window_X/2, utility.window_Y/2));
 	    x.transform(AffineTransform.getScaleInstance(0.25,0.25));
 	    g2.draw(x);
@@ -293,7 +292,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 				}
 			}
 			utility._TIME_OF_NEXT_TICK = System.currentTimeMillis() + Math.round(1000f / utility.GetDesiredTPS());
-						
+
 			++utility._TICK;
 			if (utility.gamePaused == false && utility.gameMode != GameMode.titleScreen) {
 				theSpriteManger.Tick();
@@ -306,11 +305,11 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 					utility.FPS = 999;
 				}
 			}
-			
+
 			if (utility._TICK % utility.GetTicksPerRender() == 0) {
 				repaint();
 			}
-			
+
 			utility._TIME_OF_LAST_TICK = System.currentTimeMillis();
 			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		}
@@ -325,10 +324,10 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	}
 	@Override
 	public void stop() { }
-	
+
 
 	@Override
-	public void update (Graphics g)	{
+	public void update (final Graphics g)	{
 
 		final Graphics2D g2 = (Graphics2D)g;
 

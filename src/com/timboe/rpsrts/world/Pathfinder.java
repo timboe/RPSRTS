@@ -13,15 +13,15 @@ public class Pathfinder implements Runnable {
 	private final Utility utility = Utility.GetUtility();
 	private final SpriteManager theSpriteManager = SpriteManager.GetSpriteManager();
 	private final PathfinderGrid thePathfinderGrid = PathfinderGrid.GetPathfinderGrid();
-	
+
 	private ArrayList<WorldPoint> result = null; //TODO make me something better
 	private final WorldPoint fromLoc;
 	private final WorldPoint toLoc;
 	private final int r_from;
 	private final int r_to;
 	private Boolean killMe = false;
-	
-    public Pathfinder(Sprite _from, Sprite _to) {
+
+    public Pathfinder(final Sprite _from, final Sprite _to) {
     	if (_to != null) {
     		toLoc = _to.GetLoc();
         	r_to = _to.GetR();
@@ -37,7 +37,7 @@ public class Pathfinder implements Runnable {
         	r_from = 0;
     	}
     }
-    
+
 //    public Pathfinder(WorldPoint _from, WorldPoint _to, int _r) {
 //    	fromLoc = _from;
 //    	toLoc = _to;
@@ -65,11 +65,11 @@ public class Pathfinder implements Runnable {
 
     	final HashMap<WorldPoint, PTWeight> _closed_set = new HashMap<WorldPoint, PTWeight>();
     	final HashMap<WorldPoint, PTWeight> _open_set = new HashMap<WorldPoint, PTWeight>();
-    	
+
 		final float DistToDest = utility.Seperation(fromLoc, toLoc);
 		//get nearest accessible
 		WeightedPoint closed_set_starter_node = theSpriteManager.ClipToGrid(fromLoc);
-		
+
 		//couldn't find a start node
 		if (closed_set_starter_node == null) {
 			Kill();
@@ -78,10 +78,10 @@ System.out.println("FATAL FROM:"+fromLoc.getX()+","+fromLoc.getY()+" TO:"+toLoc.
 			return;
 		} else if (closed_set_starter_node.GetBad() == true) { //this one no good, look around
 			boolean breakout = false; //look around two deep
-			for (WeightedPoint b : closed_set_starter_node.GetNieghbours()) {
+			for (final WeightedPoint b : closed_set_starter_node.GetNieghbours()) {
 				if (b.GetBad() == true) {
-					for (WeightedPoint b_2 : b.GetNieghbours()) {
-						if (b_2.GetBad() == false) { 
+					for (final WeightedPoint b_2 : b.GetNieghbours()) {
+						if (b_2.GetBad() == false) {
 							closed_set_starter_node = b_2;
 							breakout = true;
 						}
@@ -94,12 +94,12 @@ System.out.println("FATAL FROM:"+fromLoc.getX()+","+fromLoc.getY()+" TO:"+toLoc.
 				if (breakout == true) break;
 			}
 		}
-		
-		WorldPoint closed_set_starter_point = closed_set_starter_node.GetLoc();
-		PTWeight start = new PTWeight(0,  DistToDest, DistToDest);
+
+		final WorldPoint closed_set_starter_point = closed_set_starter_node.GetLoc();
+		final PTWeight start = new PTWeight(0,  DistToDest, DistToDest);
 		start.SetLoc(closed_set_starter_point.x,closed_set_starter_point.y);
 		_open_set.put(closed_set_starter_point, start);
-		
+
 		PTWeight soloution = null;
 		int loop = 0;
 		while (_open_set.size() != 0) {
@@ -108,15 +108,15 @@ System.out.println("FATAL FROM:"+fromLoc.getX()+","+fromLoc.getY()+" TO:"+toLoc.
 			WorldPoint A_loc = null;//A.GetLoc();
 			float _min_f = utility.minimiser_start;
 			//Find Open set point with smallest f
-			for (WorldPoint _w : _open_set.keySet()) {
-				PTWeight _p = _open_set.get(_w);
+			for (final WorldPoint _w : _open_set.keySet()) {
+				final PTWeight _p = _open_set.get(_w);
 				if (_p.f_score < _min_f) {
 					_min_f = _p.f_score;
 					A = _p;
 					A_loc = _w;
 				}
 			}
-			
+
 			//Is this the soloution?
 			if ( (++loop > utility.pathfinding_max_depth)
 					|| utility.Seperation(A_loc, toLoc) < (utility.tiles_size + r_from + r_to + 1)) {
@@ -128,21 +128,21 @@ System.out.println("FATAL FROM:"+fromLoc.getX()+","+fromLoc.getY()+" TO:"+toLoc.
 			_closed_set.put(A_loc,A);
 			_open_set.remove(A_loc);
 
-			WeightedPoint a = thePathfinderGrid.point_collection_map.get(A_loc);
-			
+			final WeightedPoint a = thePathfinderGrid.point_collection_map.get(A_loc);
+
 //System.out.println("LOK ARND ("+A_loc.x+","+A_loc.y+") W F_MIN:"+_min_f+", G:"+A.g_score+" H:"+A.h_score+" AND NGNBRS "+a.GetNieghbours().size()+", OPEN SET SIZE:"+_open_set.size()+" C.S SIZE:"+_closed_set.size() );
-			
-			HashSet<WeightedPoint> myNeighbours = a.GetNieghbours();
-			for (WeightedPoint b : myNeighbours) {
+
+			final HashSet<WeightedPoint> myNeighbours = a.GetNieghbours();
+			for (final WeightedPoint b : myNeighbours) {
 				//Bad tile?
 				if (b.GetBad() == true) { // System.out.println("BAD");
 					continue;
 				}
-		
-				WorldPoint B_loc = b.GetLoc();
+
+				final WorldPoint B_loc = b.GetLoc();
 				//Is it in the closed set?
 				if (_closed_set.containsKey(B_loc) == true) continue;
-				
+
 				final float DistAtoB = utility.Seperation(A_loc, B_loc);
 				final float tentative_g_score = A.g_score + DistAtoB;
 
@@ -154,7 +154,7 @@ System.out.println("FATAL FROM:"+fromLoc.getX()+","+fromLoc.getY()+" TO:"+toLoc.
 					_open_set.put(B_loc, B);
 					//_min_f.put(B, B_loc);
 				}
-				
+
 				boolean tentative_is_better = false;
 				if (B.g_score < 0 || tentative_g_score < B.g_score) {
 					tentative_is_better = true;

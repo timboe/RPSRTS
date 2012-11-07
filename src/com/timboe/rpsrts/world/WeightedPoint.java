@@ -10,43 +10,43 @@ public class WeightedPoint {
 
 	int x;
 	int y;
-	WorldPoint myLocation;	
-	
+	WorldPoint myLocation;
+
 	HashSet<WeightedPoint> nieghbour_collection = new HashSet<WeightedPoint>();
-	
+
 	HashSet<Sprite> mySprites = new HashSet<Sprite>();
 	HashSet<Sprite> myCollisions = new HashSet<Sprite>();
 
-	public WeightedPoint(int _x, int _y) {
+	public WeightedPoint(final int _x, final int _y) {
 		x = _x;
 		y = _y;
 		myLocation = new WorldPoint(_x, _y);
 	}
-	
-	public void AddNieghbour(WeightedPoint _n) {
+
+	public void AddNieghbour(final WeightedPoint _n) {
 		nieghbour_collection.add(_n);
 	}
-	
+
 	@Override
-	public boolean equals(Object _to_compare) {
+	public boolean equals(final Object _to_compare) {
 		if (_to_compare.getClass() != this.getClass()) return false;
 		return (this.x == ((WeightedPoint)_to_compare).x && this.y == ((WeightedPoint)_to_compare).y);
 	}
-	
+
 	public boolean GetBad() { //If bad tile then bad, else if bad object
 		if (myCollisions.size() > 0) return true;
 		return false;
 	}
 
-	
+
 	public WorldPoint GetLoc() {
 		return myLocation;
 	}
-	
+
 	public HashSet<WeightedPoint> GetNieghbours() {
 		return nieghbour_collection;
 	}
-	
+
 	public HashSet<Sprite> GetOwnedSprites() {
 		return mySprites;
 	}
@@ -54,11 +54,11 @@ public class WeightedPoint {
 	public WorldPoint GetPoint() {
 		return new WorldPoint(x,y);
 	}
-	
+
 	public int GetX() {
 		return x;
 	}
-	
+
 //	public void Render(Graphics2D _g2, AffineTransform _af) {
 //		if (GetBad() == false) return;
 //		_g2.setColor(Color.WHITE);
@@ -69,11 +69,11 @@ public class WeightedPoint {
 	public int GetY() {
 		return y;
 	}
-	
-	public void GiveCollision(Sprite _s) {
+
+	public void GiveCollision(final Sprite _s) {
 		if (utility.Seperation(myLocation, _s.GetLoc()) < ( _s.GetR() + (2*utility.actorRadius)) ) {//TODO 2x?
 			myCollisions.add(_s);
-		}	
+		}
 	}
 
 
@@ -106,7 +106,7 @@ public class WeightedPoint {
 //		return -1;
 //	}
 
-	public void GiveSprite(Sprite _s) {
+	public void GiveSprite(final Sprite _s) {
 		if (utility.Seperation(myLocation, _s.GetLoc()) < ( _s.GetR() + (2*utility.actorRadius)) ) { //TODO 2x?
 			myCollisions.add(_s);
 		}
@@ -121,7 +121,7 @@ public class WeightedPoint {
 	}
 
 
-	public void RemoveSprite(Sprite _s) {
+	public void RemoveSprite(final Sprite _s) {
 		myCollisions.remove(_s);
 		mySprites.remove(_s);
 	}
@@ -157,7 +157,7 @@ public class WeightedPoint {
 //			weights.put(ID, new PTWeight(0, _hs, 0));
 //		}
 //	}
-	
+
 //	int PruneBelow(Integer _key) {
 //		//System.out.println("PRUNED NODE ("+x+","+y+")");
 //		//while (weights.size() > 5) {

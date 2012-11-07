@@ -17,41 +17,41 @@ public class Biome {
 	int g;
 	int b;
 	float resourceDensity;
-	
+
 	int set_r;
 	int set_g;
 	int set_b;
 
 
-	public Biome(int _ID) {
+	public Biome(final int _ID) {
 		ID = _ID;
 		ownedTiles = new HashSet<WorldTile>();
 		type = BiomeType.NONE;
 	}
 
-	public void AddTile(WorldTile _t){
+	public void AddTile(final WorldTile _t){
 		ownedTiles.add(_t);
 		_t.SetPartOfBiome(this);
 		RandomColour();
 		_t.SetColour(set_r,set_g,set_b);
 		_t.SetWalkable(GetWalkable());
 	}
-	public void AssignBiomeType(BiomeType _type) {
+	public void AssignBiomeType(final BiomeType _type) {
 		type = _type;
 		if (type == BiomeType.DESERT) {
-			r = (int) (218 + Math.round(utility.rndG(0, utility.biome_colour_range)));  //XXX RND BUG
-			g = (int) (165 + Math.round(utility.rndG(0, utility.biome_colour_range)));
-			b = (int) (32 + Math.round(utility.rndG(0, utility.biome_colour_range)));
+			r = (218 + Math.round(utility.rndG(0, utility.biome_colour_range)));  //XXX RND BUG
+			g = (165 + Math.round(utility.rndG(0, utility.biome_colour_range)));
+			b = (32 + Math.round(utility.rndG(0, utility.biome_colour_range)));
 			resourceDensity = (float) ((utility.rndI(utility.biome_desert_rnd_density) + utility.biome_desert_min_density) / 100.);
 		} else if (type == BiomeType.FORREST) {
-			r = (int) (46 + Math.round(utility.rndG(0, utility.biome_colour_range)));  //XXX RND BUG
-			g = (int) (139 + Math.round(utility.rndG(0, utility.biome_colour_range)));
-			b = (int) (87 + Math.round(utility.rndG(0, utility.biome_colour_range)));
+			r = (46 + Math.round(utility.rndG(0, utility.biome_colour_range)));  //XXX RND BUG
+			g = (139 + Math.round(utility.rndG(0, utility.biome_colour_range)));
+			b = (87 + Math.round(utility.rndG(0, utility.biome_colour_range)));
 			resourceDensity = (float) ((utility.rndI(utility.biome_forest_rnd_density) + utility.biome_forest_min_density) / 100.);
 		} else if (type == BiomeType.GRASS) {
-			r = (int) (154 + Math.round(utility.rndG(0, utility.biome_colour_range)));  //XXX RND BUG
-			g = (int) (205 + Math.round(utility.rndG(0, utility.biome_colour_range)));
-			b = (int) (50 + Math.round(utility.rndG(0, utility.biome_colour_range)));
+			r = (154 + Math.round(utility.rndG(0, utility.biome_colour_range)));  //XXX RND BUG
+			g = (205 + Math.round(utility.rndG(0, utility.biome_colour_range)));
+			b = (50 + Math.round(utility.rndG(0, utility.biome_colour_range)));
 			resourceDensity = (float) ((utility.rndI(utility.biome_grass_rnd_density) + utility.biome_grass_min_density) / 100.);
 		} else if (type == BiomeType.WATER) {
 			r = 65;
@@ -76,10 +76,10 @@ public class Biome {
 		}
 		centre_x /= ownedTiles.size();
 		centre_y /= ownedTiles.size();
-		//System.out.println("centre of cluster "+ID+" is:("+centre_x+","+centre_y+")"); 
+		//System.out.println("centre of cluster "+ID+" is:("+centre_x+","+centre_y+")");
 	}
 
-	private int Constrain(int _c) {
+	private int Constrain(final int _c) {
 		if (_c < 0) return 0;
 		else if (_c > 255) return 255;
 		else return _c;
@@ -89,7 +89,7 @@ public class Biome {
 		return type;
 	}
 
-	public float GetDistanceFromPoint(int _x, int _y) {
+	public float GetDistanceFromPoint(final int _x, final int _y) {
 		return (float) Math.sqrt( Math.pow( centre_x - _x, 2) + Math.pow( centre_y - _y, 2));
 	}
 
@@ -107,17 +107,17 @@ public class Biome {
 		else
 			return true;
 	}
-	
+
 	private void RandomColour() {
-		int _r = Math.round(r + utility.rndG(0, utility.biome_colour_range));  //XXX RND BUG
-		int _g = Math.round(g + utility.rndG(0, utility.biome_colour_range));
-		int _b = Math.round(b + utility.rndG(0, utility.biome_colour_range));
+		final int _r = Math.round(r + utility.rndG(0, utility.biome_colour_range));  //XXX RND BUG
+		final int _g = Math.round(g + utility.rndG(0, utility.biome_colour_range));
+		final int _b = Math.round(b + utility.rndG(0, utility.biome_colour_range));
 		set_r = Constrain(_r);
 		set_g = Constrain(_g);
 		set_b = Constrain(_b);
 	}
 
-	public void RemoveTile(WorldTile _t){
+	public void RemoveTile(final WorldTile _t){
 		_t.Reset();
 		ownedTiles.remove(_t);
 	}

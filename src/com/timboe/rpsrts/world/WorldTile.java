@@ -14,7 +14,7 @@ public class WorldTile {
 	protected boolean part_of_biome;
 	protected Biome ownedBy;
 
-	public WorldTile (int _x, int _y,int _tile_size, int _ID) {
+	public WorldTile (final int _x, final int _y,final int _tile_size, final int _ID) {
 		ID = _ID;
 		x = _x;
 		y = _y;
@@ -46,7 +46,7 @@ public class WorldTile {
 			return BiomeType.NONE;
 	}
 
-	public float GetDistanceFromPoint(int _x, int _y) {
+	public float GetDistanceFromPoint(final int _x, final int _y) {
 		return (float) Math.sqrt( Math.pow( GetXCentre() - _x, 2) + Math.pow( GetYCentre() - _y, 2));
 	}
 
@@ -83,27 +83,27 @@ public class WorldTile {
 
 	public void Reset() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	public void SetColour(int R, int G, int B) {
+	public void SetColour(final int R, final int G, final int B) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	public void SetPartOfBiome(Biome _biome) {
+	public void SetPartOfBiome(final Biome _biome) {
 		part_of_biome = true;
 		ownedBy = _biome;
 	}
 
-	public void SetPartOfBiome(boolean _part_of_biome) {
+	public void SetPartOfBiome(final boolean _part_of_biome) {
 		part_of_biome = _part_of_biome;
 	}
 
-	public void SetWalkable(boolean _canWalk) {
+	public void SetWalkable(final boolean _canWalk) {
 		canWalk = _canWalk;
 	}
-	
-	
+
+
 
 }

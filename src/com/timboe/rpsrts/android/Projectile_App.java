@@ -11,10 +11,10 @@ import com.timboe.rpsrts.sprites.Projectile;
 import com.timboe.rpsrts.sprites.Sprite;
 
 public class Projectile_App extends Projectile {
-	Bitmap[] spriteGraphic;	
+	Bitmap[] spriteGraphic;
 	Bitmaps_App theBitmaps = Bitmaps_App.GetBitmaps_App();
-	
-	public Projectile_App(int _ID, Actor _source, int _r, Sprite _target) {
+
+	public Projectile_App(final int _ID, final Actor _source, final int _r, final Sprite _target) {
 		super(_ID, _source, _r, _target);
 
 		if (_source.GetOwner() == ObjectOwner.Player) {
@@ -27,19 +27,19 @@ public class Projectile_App extends Projectile {
 			else if (_source.GetType() == ActorType.Scissors) spriteGraphic = theBitmaps.proj_scissor_enemy;
 		}
 	}
-	
-	public void Render(Canvas canvas, Matrix _af, Matrix _af_translate_zoom, Matrix _af_shear_rotate, Matrix _af_none, int _tick_count) {
+
+	public void Render(final Canvas canvas, final Matrix _af, final Matrix _af_translate_zoom, final Matrix _af_shear_rotate, final Matrix _af_none, final int _tick_count) {
 //		if (dead == true) return;
-//		
+//
 //		if (_tick_count % 2 == 0) {
 //			++animStep;
 //		}
-//		
+//
 //		Point2D transform = null;
 //		transform = _af_shear_rotate.transform(new Point(x, y), transform);
 //		final int _x = (int)Math.round(transform.getX());
 //		final int _y = (int)Math.round(transform.getY());
-//				
+//
 //		_g2.setTransform(_af_translate_zoom);
 //		_g2.drawImage(spriteGraphic[animStep % animSteps], _x - r, _y - r, null);
 	}

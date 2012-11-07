@@ -15,22 +15,22 @@ import com.timboe.rpsrts.managers.ResourceManager;
 import com.timboe.rpsrts.managers.Utility;
 
 public class HighScore implements Runnable {
-	
+
 	private final Utility utility = Utility.GetUtility();
 	private final ResourceManager resource_manager = ResourceManager.GetResourceManager();
+
+	public HighScore() {
+	}
 
 	@Override
 	public void run() {
 		try {
 			SubmitHighScore();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public HighScore() {
-	}
-	
 	public void SubmitHighScore() throws IOException {
 		//Create Post String
 		//Thanks to http://robbamforth.wordpress.com/2009/04/27/java-how-to-post-to-a-htmlphp-post-form/
@@ -51,15 +51,15 @@ public class HighScore implements Runnable {
 		data += "&" + URLEncoder.encode("unitspoisoned", "UTF-8") + "=" + URLEncoder.encode(resource_manager.GetStatistic(GameStatistics.UnitsPoisoned), "UTF-8");
 
 		// Send Data To Page
-		URL url = new URL("http://tim-martin.co.uk/rpsrts_score.php");
-		URLConnection conn = url.openConnection();
+		final URL url = new URL("http://tim-martin.co.uk/rpsrts_score.php");
+		final URLConnection conn = url.openConnection();
 		conn.setDoOutput(true);
-		OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+		final OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
 		wr.write(data);
 		wr.flush();
-		   
+
 		// Get The Response
-		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		final BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		String line;
 		while ((line = rd.readLine()) != null) {
 			System.out.println(line);

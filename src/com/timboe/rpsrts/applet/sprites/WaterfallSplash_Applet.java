@@ -15,20 +15,20 @@ public class WaterfallSplash_Applet extends WaterfallSplash {
 	ShapeStore theShapeStore = ShapeStore.GetShapeStore();
 	GeneralPath waterfall;
 
-	public WaterfallSplash_Applet (int _ID, int _x, int _y, int _r) {
+	public WaterfallSplash_Applet (final int _ID, final int _x, final int _y, final int _r) {
 		super(_ID, _x, _y, _r);
 	}
-	
-	public void Render(Graphics2D _g2) {
+
+	public void Render(final Graphics2D _g2) {
 		//Only show if in `front' (this means negative Z order value)
 		if (GetZOrder() > 0) {
 			return;
 		}
 		_g2.setTransform(theTransforms.af_translate_zoom);
-		Point2D transform = theTransforms.getTransformedPoint(x, y);
-		GeneralPath clonefall = (GeneralPath) theShapeStore.GetWaterfall();
+		final Point2D transform = theTransforms.getTransformedPoint(x, y);
+		final GeneralPath clonefall = theShapeStore.GetWaterfall();
 		clonefall.transform(AffineTransform.getTranslateInstance(transform.getX(), transform.getY() + offset));
-		_g2.fill(clonefall);		
+		_g2.fill(clonefall);
 	}
-	
+
 }

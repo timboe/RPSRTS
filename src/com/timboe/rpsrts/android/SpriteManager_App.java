@@ -33,35 +33,35 @@ public class SpriteManager_App extends SpriteManager {
 
 	private SpriteManager_App() {
 		super();
-		this_object = (SpriteManager)this; 
-	}
-	
-	@Override
-	protected Actor PlatFormSpecific_PlaceActor(WorldPoint _p, ActorType _at, ObjectOwner _o) {
-		return (Actor) new Actor_App(++GlobalSpriteCounter, (int)_p.getX(), (int)_p.getY(), utility.actorRadius, _at, _o);
-	}
-	@Override
-	protected Building PlatformSpecific_PlaceBuilding(WorldPoint _p, int _r, BuildingType _bt, ObjectOwner _oo) {
-		return (Building) new Building_App(++GlobalSpriteCounter, (int)_p.getX(), (int)_p.getY(), _r, _bt, _oo);
-	}
-	@Override
-	protected Projectile PlatformSpecific_PlaceProjectile(Actor _source, Sprite _target, int _r) {
-		return (Projectile) new Projectile_App(++GlobalSpriteCounter, _source, _r, _target);
-	}
-	@Override
-	protected Resource PlatformSpecific_PlaceResource(WorldPoint _p, ResourceType _rt) {
-		return (Resource) new Resource_App(++GlobalSpriteCounter, (int)_p.getX(), (int)_p.getY(), utility.resourceRadius, _rt);
-	}
-	@Override
-	protected Spoogicles PlatformSpecific_PlaceSpooge(int _x, int _y, ObjectOwner _oo, int _n, float _scale) {
-		return (Spoogicles) new Spoogicles_App(++GlobalSpriteCounter, _x, _y, _oo, _n, _scale);
-	}
-	@Override
-	protected WaterfallSplash PlatformSpecific_PlaceWaterfallSplash(int _x, int _y, int _r) {
-		return (WaterfallSplash) new WaterfallSplash_App(++GlobalSpriteCounter, _x, _y, _r);
+		this_object = this;
 	}
 
-	public void Render(Canvas canvas, Matrix _af, Matrix _af_translate_zoom, Matrix _af_shear_rotate, Matrix _af_none) {
+	@Override
+	protected Actor PlatFormSpecific_PlaceActor(final WorldPoint _p, final ActorType _at, final ObjectOwner _o) {
+		return new Actor_App(++GlobalSpriteCounter, _p.getX(), _p.getY(), utility.actorRadius, _at, _o);
+	}
+	@Override
+	protected Building PlatformSpecific_PlaceBuilding(final WorldPoint _p, final int _r, final BuildingType _bt, final ObjectOwner _oo) {
+		return new Building_App(++GlobalSpriteCounter, _p.getX(), _p.getY(), _r, _bt, _oo);
+	}
+	@Override
+	protected Projectile PlatformSpecific_PlaceProjectile(final Actor _source, final Sprite _target, final int _r) {
+		return new Projectile_App(++GlobalSpriteCounter, _source, _r, _target);
+	}
+	@Override
+	protected Resource PlatformSpecific_PlaceResource(final WorldPoint _p, final ResourceType _rt) {
+		return new Resource_App(++GlobalSpriteCounter, _p.getX(), _p.getY(), utility.resourceRadius, _rt);
+	}
+	@Override
+	protected Spoogicles PlatformSpecific_PlaceSpooge(final int _x, final int _y, final ObjectOwner _oo, final int _n, final float _scale) {
+		return new Spoogicles_App(++GlobalSpriteCounter, _x, _y, _oo, _n, _scale);
+	}
+	@Override
+	protected WaterfallSplash PlatformSpecific_PlaceWaterfallSplash(final int _x, final int _y, final int _r) {
+		return new WaterfallSplash_App(++GlobalSpriteCounter, _x, _y, _r);
+	}
+
+	public void Render(final Canvas canvas, final Matrix _af, final Matrix _af_translate_zoom, final Matrix _af_shear_rotate, final Matrix _af_none) {
 		for (final Sprite _Z : GetSpritesZOrdered()) {
 			if (_Z.GetIsActor() == true) {
 				((Actor_App) _Z).Render(canvas, _af, _af_translate_zoom, _af_shear_rotate, _af_none, TickCount);
@@ -76,10 +76,10 @@ public class SpriteManager_App extends SpriteManager {
 			}
 		}
 	}
-	
-	
-	public void SpecialRender(Canvas canvas, Matrix _af, Matrix _af_translate_zoom, Matrix _af_shear_rotate, Matrix _af_none, int _x, int _y, Bitmap[] _graphic, boolean drawingTopBar) {
-		float[] transform = new float[2];
+
+
+	public void SpecialRender(final Canvas canvas, final Matrix _af, final Matrix _af_translate_zoom, final Matrix _af_shear_rotate, final Matrix _af_none, final int _x, final int _y, final Bitmap[] _graphic, final boolean drawingTopBar) {
+		final float[] transform = new float[2];
 		transform[0] = _x;
 		transform[1] = _y;
 		_af_shear_rotate.mapPoints(transform);
@@ -98,7 +98,7 @@ public class SpriteManager_App extends SpriteManager {
 		} else if (_graphic == theBitmaps.off || _graphic == theBitmaps.on) {
 			_r = 6;
 			_y_offset = -6;
-		} else if (_graphic == theBitmaps.paper_player 
+		} else if (_graphic == theBitmaps.paper_player
 				|| _graphic == theBitmaps.rock_player
 				|| _graphic == theBitmaps.scissor_player) {
 			_r = 3;
@@ -114,7 +114,7 @@ public class SpriteManager_App extends SpriteManager {
 				//_g2.setTransform(_af_none);
 			}
 			//Can't place here
-			Paint paint = new Paint();
+			final Paint paint = new Paint();
 			paint.setColor(Color.RED);
 			paint.setStyle(Paint.Style.FILL);
 
@@ -128,19 +128,19 @@ public class SpriteManager_App extends SpriteManager {
 //			_y_points[1] = _y - _r - 2;
 //			_y_points[2] = _y + _r - 2;
 //			_y_points[3] = _y + _r + 2;
-			
+
 			_points[0] = _x - _r - 2;
 			_points[1] = _y - _r + 2;
-			
+
 			_points[2] = _x - _r + 2;
 			_points[3] = _y - _r - 2;
-							
+
 			_points[4] = _x + _r + 2;
 			_points[5] = _y + _r - 2;
-											
+
 			_points[6] = _x + _r - 2;
 			_points[7] = _y + _r + 2;
-													
+
 			canvas.drawPoints(_points, paint);
 			//_g2.fillPolygon(_x_points, _y_points, 4);
 
@@ -152,19 +152,19 @@ public class SpriteManager_App extends SpriteManager {
 //			_y_points[1] = _y + _r + 2;
 //			_y_points[2] = _y - _r + 2;
 //			_y_points[3] = _y - _r - 2;
-			
+
 			_points[0] =  _x - _r - 2;
 			_points[1] =  _y + _r - 2;
-					
+
 			_points[2] =  _x - _r + 2;
 			_points[3] =  _y + _r + 2;
-									
+
 			_points[4] =  _x + _r + 2;
 			_points[5] =  _y - _r + 2;
-													
+
 			_points[6] =  _x + _r - 2;
 			_points[7] =  _y - _r - 2;
-			
+
 			canvas.drawPoints(_points, paint);
 			//_g2.fillPolygon(_x_points, _y_points, 4);
 			return;
@@ -173,24 +173,24 @@ public class SpriteManager_App extends SpriteManager {
 		if (drawingTopBar == false) {
 			canvas.setMatrix(_af_translate_zoom);
 			if (_graphic != null) {
-				Rect box = new Rect(__x - _r,    __y - _r - _y_offset,    __x + _r,   __y + _r - _y_offset);
+				final Rect box = new Rect(__x - _r,    __y - _r - _y_offset,    __x + _r,   __y + _r - _y_offset);
 				canvas.drawBitmap(_graphic[TickCount/2 % animSteps], null, box, null);
 				//_g2.drawImage(_graphic[TickCount/2 % animSteps], __x - _r, __y - _r - _y_offset, null);
 			}
 		} else { //Drawing top bar
 			if (_graphic != null) {
-				Rect box = new Rect(_x - _r,    _y - _r - _y_offset,    _x + _r,   _y + _r - _y_offset);
+				final Rect box = new Rect(_x - _r,    _y - _r - _y_offset,    _x + _r,   _y + _r - _y_offset);
 				canvas.drawBitmap(_graphic[TickCount/2 % animSteps], null, box, null);
 			}
 		}
 	}
-	
-	
-	public boolean TryPlaceItem(BuildingType _bt, Canvas canvas,
-			Matrix _af, Matrix _af_translate_zoom, Matrix _af_shear_rotate, Matrix _af_none,
-			int _mouse_x, int _mouse_y, boolean _place_remove) {
+
+
+	public boolean TryPlaceItem(final BuildingType _bt, final Canvas canvas,
+			final Matrix _af, final Matrix _af_translate_zoom, final Matrix _af_shear_rotate, final Matrix _af_none,
+			final int _mouse_x, final int _mouse_y, final boolean _place_remove) {
 		boolean closeToExisting = false;
-		Paint paint = new Paint();
+		final Paint paint = new Paint();
 		paint.setColor(Color.WHITE);
 		//_g2.setColor(Color.white);
 		//_g2.setTransform(_af);
@@ -212,7 +212,7 @@ public class SpriteManager_App extends SpriteManager {
 					continue;
 				}
 				for (int angle = (TickCount%utility.building_Place_degrees); angle <= utility.wg_DegInCircle; angle += utility.building_Place_degrees) {
-					RectF _rect = new RectF(_b.GetX() - utility.building_gather_radius,
+					final RectF _rect = new RectF(_b.GetX() - utility.building_gather_radius,
 							_b.GetY() - utility.building_gather_radius,
 							_b.GetX() + utility.building_gather_radius,
 							_b.GetY() + utility.building_gather_radius);
@@ -276,7 +276,7 @@ public class SpriteManager_App extends SpriteManager {
 				//_g2.setTransform(_af);
 				canvas.setMatrix(_af);
 				for (int angle = (TickCount%utility.building_Place_degrees); angle <= utility.wg_DegInCircle; angle += utility.building_Place_degrees) {
-					RectF _rect = new RectF(_mouse_x - utility.building_gather_radius,
+					final RectF _rect = new RectF(_mouse_x - utility.building_gather_radius,
 							_mouse_y - utility.building_gather_radius,
 							_mouse_x + utility.building_gather_radius,
 							_mouse_y + utility.building_gather_radius);

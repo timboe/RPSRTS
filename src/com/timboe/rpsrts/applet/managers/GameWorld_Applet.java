@@ -15,24 +15,24 @@ public class GameWorld_Applet extends GameWorld {
 	public static GameWorld_Applet GetGameWorld_Applet() {
 		return singleton;
 	}
-	
+
 	private SceneRenderer_Applet theSceneRenderer;
 
 	public GameWorld_Applet() {
 		super();
-		this_object = (GameWorld)this; 
+		this_object = this;
 		System.out.println("--- World Manager spawned (depends on Util,Scene[Linked on Init()]) : "+this);
 	}
-	
-	public void DrawChunks(Graphics2D _g2, boolean _useEnergy, boolean _aa) {
+
+	public void DrawChunks(final Graphics2D _g2, final boolean _useEnergy, final boolean _aa) {
 		_g2.setFont(theSceneRenderer.myGridFont);
 		for (final WorldChunk_Applet c : (WorldChunk_Applet[]) chunks) {
 			c.DrawTileState(_g2, _useEnergy, _aa);
 		}
-		_g2.setFont(theSceneRenderer.myFont);	
+		_g2.setFont(theSceneRenderer.myFont);
 	}
-	
-	public void DrawIslandEdge(Graphics2D g2) {
+
+	public void DrawIslandEdge(final Graphics2D g2) {
 		g2.setColor (Color.white);
 		int angle = 0;
 		for (final long edge : island_offset) {
@@ -42,14 +42,15 @@ public class GameWorld_Applet extends GameWorld {
 			++angle;
 		}
 	}
-	
-	public void DrawTiles(Graphics2D _g2, boolean _renderAll, boolean _aa) {
+
+	public void DrawTiles(final Graphics2D _g2, final boolean _renderAll, final boolean _aa) {
 		if (_renderAll == true) {
 			for (final WorldTile_Applet t : (WorldTile_Applet[]) tiles) {
 				t.DrawTile(_g2,_aa,false);
 			}
 		} else {
 			@SuppressWarnings({ "unchecked", "rawtypes" })
+			final
 			HashSet<WorldTile_Applet> render_tiles_app = (HashSet) render_tiles;
 			for (final WorldTile_Applet t : render_tiles_app) {
 				t.DrawTile(_g2,_aa,false);
@@ -65,13 +66,13 @@ public class GameWorld_Applet extends GameWorld {
 		tiles_size = utility.tiles_size;
 		chunks_size = utility.tiles_size * utility.tiles_per_chunk;
 		world_size = world_tiles * tiles_size;
-		island_size = (int) Math.round(utility.island_scale * world_size);
-		
+		island_size = Math.round(utility.island_scale * world_size);
+
 		tiles = new WorldTile_Applet[world_tiles*world_tiles];
 		chunks = new WorldChunk_Applet[world_chunks*world_chunks];
 		render_tiles = new HashSet<WorldTile>();
 		biomes = new HashSet<Biome>();
-		
+
 		int ID = 0;
 	    for (int x = -(world_size/2); x < (world_size/2); x = x + tiles_size) {
 		    for (int y = -(world_size/2); y < (world_size/2); y = y + tiles_size) {
@@ -85,11 +86,11 @@ public class GameWorld_Applet extends GameWorld {
 		    	chunks[ID++] = new WorldChunk_Applet(x,y,chunks_size,ID);
 		    }
 	    }
-	    
+
 	    theSceneRenderer = SceneRenderer_Applet.GetSceneRenderer_Applet();
 	}
 
-	
+
 //	public void HighlightTile(int _x, int _y, Graphics2D _g2, boolean _aa) {
 //	final int _ID = utility.XYtoID(_x, _y, world_tiles, tiles_size);
 //	if (_ID != -1) {

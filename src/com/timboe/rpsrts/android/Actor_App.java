@@ -12,11 +12,11 @@ import com.timboe.rpsrts.enumerators.ObjectOwner;
 import com.timboe.rpsrts.sprites.Actor;
 
 public class Actor_App extends Actor {
-	
-	Bitmap[] spriteGraphic;	
+
+	Bitmap[] spriteGraphic;
 	Bitmaps_App theBitmaps = Bitmaps_App.GetBitmaps_App();
 
-	public Actor_App(int _ID, int _x, int _y, int _r, ActorType _at, ObjectOwner _oo) {
+	public Actor_App(final int _ID, final int _x, final int _y, final int _r, final ActorType _at, final ObjectOwner _oo) {
 		super(_ID, _x, _y, _r, _at, _oo);
 
 		if (type == ActorType.Paper) {
@@ -40,23 +40,23 @@ public class Actor_App extends Actor {
 
 		}
 	}
-		
-	public void Render(Canvas canvas, Matrix _af, Matrix _af_translate_zoom, Matrix _af_shear_rotate, Matrix _af_none, int _tick_count) {
+
+	public void Render(final Canvas canvas, final Matrix _af, final Matrix _af_translate_zoom, final Matrix _af_shear_rotate, final Matrix _af_none, final int _tick_count) {
 		if (dead == true) return;
-		Paint paint = new Paint();
-		float[] transform = new float[2];
+		final Paint paint = new Paint();
+		final float[] transform = new float[2];
 		transform[0] = x;
 		transform[1] = y;
 		_af_shear_rotate.mapPoints(transform);
 		final int _x = (int)transform[0];
 		final int _y = (int)transform[1];
-		
-		Rect box = new Rect(_x - r 
+
+		final Rect box = new Rect(_x - r
 				, _y - r
 				, _x + r
 				, _y + r);
 		canvas.setMatrix(_af_translate_zoom);
-		canvas.drawBitmap(spriteGraphic[animStep % animSteps], null, box, null);	
+		canvas.drawBitmap(spriteGraphic[animStep % animSteps], null, box, null);
 //
 //		_g2.setTransform(_af_translate_zoom);
 //		_g2.drawImage(spriteGraphic[animStep % animSteps], _x - r, _y - r, null);
@@ -69,7 +69,7 @@ public class Actor_App extends Actor {
 					, _x + r
 					, _y - r - 2
 					, paint);
-			
+
 			//_g2.setColor(Color.black);
 			//_g2.fillRect(_x - r, _y - r - 3, r * 2, 1);
 			//_g2.setColor(Color.green);
@@ -96,7 +96,7 @@ public class Actor_App extends Actor {
 		}
 		canvas.drawRect(_x - r
 				, _y - r - 2
-				, _x - r + Math.round(r * 2 * ((float)health/(float)maxHealth) )
+				, _x - r + Math.round(r * 2 * (health/maxHealth) )
 				, _y - r - 1
 				, paint);
 //		_g2.fillRect(_x - r, _y - r - 2, (int) Math.round(r * 2 * ((float)health/(float)maxHealth) ), 1);
@@ -145,6 +145,6 @@ public class Actor_App extends Actor {
 //			_g2.drawOval(destination.GetX()-4, destination.GetY()-4, 8, 8);
 //		}
 	}
-	
-	
+
+
 }

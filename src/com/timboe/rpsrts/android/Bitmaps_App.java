@@ -1,25 +1,25 @@
 package com.timboe.rpsrts.android;
 
-import com.timboe.rpsrts.managers.Bitmaps;
-
 import android.graphics.Bitmap;
 
+import com.timboe.rpsrts.managers.Bitmaps;
+
 public class Bitmaps_App extends Bitmaps {
-	
+
 	private static Bitmaps_App singleton = new Bitmaps_App();
-	
+
 	public static Bitmaps_App GetBitmaps_App() {
 		return singleton;
 	}
-	
+
 	public Bitmap off[];
 	public Bitmap on[];
-	
+
 	public Bitmap tree[];
 	public Bitmap cactus[];
 	public Bitmap mine[];
 	public Bitmap stone[];
-	
+
 	public Bitmap base_player[];
 	public Bitmap base_enemy[];
 	public Bitmap construction_player[];
@@ -30,21 +30,21 @@ public class Bitmaps_App extends Bitmaps {
 	public Bitmap woodshop_enemy[];
 	public Bitmap rockery_player[];
 	public Bitmap rockery_enemy[];
-	
+
 	public Bitmap attractor_scissors_player[];
 	public Bitmap attractor_paper_player[];
 	public Bitmap attractor_rock_player[];
 	public Bitmap attractor_scissors_enemy[];
 	public Bitmap attractor_paper_enemy[];
 	public Bitmap attractor_rock_enemy[];
-	
+
 	public Bitmap scissor_player[];
 	public Bitmap scissor_enemy[];
 	public Bitmap paper_player[];
 	public Bitmap paper_enemy[];
 	public Bitmap rock_player[];
 	public Bitmap rock_enemy[];
-	
+
 	public Bitmap proj_scissor_player[];
 	public Bitmap proj_scissor_enemy[];
 	public Bitmap proj_paper_player[];
@@ -53,29 +53,29 @@ public class Bitmaps_App extends Bitmaps {
 	public Bitmap proj_rock_enemy[];
 
 	public Bitmap X[];
-	
+
 	private  Bitmaps_App() {
 		super();
 	}
-	
-	public void Init(Bitmap resource_sheet,
-			Bitmap resource_actors,
-			Bitmap resource_attractor,
-			Bitmap resource_trees,
-			Bitmap resource_on_off,
-			Bitmap resource_projectile,
-			Bitmap resource_mine,
-			Bitmap resouce_stone) {
-		
+
+	public void Init(final Bitmap resource_sheet,
+			final Bitmap resource_actors,
+			final Bitmap resource_attractor,
+			final Bitmap resource_trees,
+			final Bitmap resource_on_off,
+			final Bitmap resource_projectile,
+			final Bitmap resource_mine,
+			final Bitmap resouce_stone) {
+
         X = new Bitmap[1];
-        
+
         on = new Bitmap[4];
         off = new Bitmap[4];
         for (int i = 0; i < 4; ++i) {
         	on[i] = Bitmap.createBitmap(resource_on_off, 0, 0, 12, 6);//clip(resource_on_off, 0, 0, 12, 6);
         	off[i] = Bitmap.createBitmap(resource_on_off, 0, 6, 12, 6);
         }
-		
+
 		base_player = new Bitmap[4];
 		base_enemy = new Bitmap[4];
 		construction_player = new Bitmap[4];
@@ -108,7 +108,7 @@ public class Bitmaps_App extends Bitmaps {
 			j += 16;
 			rockery_enemy [i] = Bitmap.createBitmap(resource_sheet, i*16, j, 16, 16);
 		}
-		
+
 		scissor_player = new Bitmap[4];
 		scissor_enemy = new Bitmap[4];
 		paper_player = new Bitmap[4];
@@ -129,7 +129,7 @@ public class Bitmaps_App extends Bitmaps {
 			j += 6;
 			rock_enemy[i] = Bitmap.createBitmap(resource_actors, i*6, j, 6, 6);
 		}
-		
+
 		proj_scissor_player = new Bitmap[4];
 		proj_scissor_enemy = new Bitmap[4];
 		proj_paper_player = new Bitmap[4];
@@ -185,6 +185,6 @@ public class Bitmaps_App extends Bitmaps {
 			mine[i] = Bitmap.createBitmap(resource_mine, i*6, 0, 6, 6);
 			stone[i] = Bitmap.createBitmap(resouce_stone, i*6, 0, 6, 6);
 		}
-		
+
 	}
 }

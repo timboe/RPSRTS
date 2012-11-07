@@ -7,14 +7,14 @@ public class WorldChunk extends WorldTile {
 	protected float state;
 	protected int biome_ID;
 
-	public WorldChunk(int _x, int _y, int _tile_size, int _ID) {
+	public WorldChunk(final int _x, final int _y, final int _tile_size, final int _ID) {
 		super(_x, _y, _tile_size, _ID);
 		//As WorldTile
 		state = 0;
 		biome_ID = 0;
 	}
 
-	public void AddState(float _state) {
+	public void AddState(final float _state) {
 		state = state + _state;
 	}
 
@@ -32,11 +32,11 @@ public class WorldChunk extends WorldTile {
 		biome_ID = 0;
 	}
 
-	public void SetBiomeID(int _ID) {
+	public void SetBiomeID(final int _ID) {
 		biome_ID = _ID;
 	}
 
-	public void SetState(float _state) {
+	public void SetState(final float _state) {
 		state = _state;
 	}
 

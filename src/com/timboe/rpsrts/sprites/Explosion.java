@@ -8,20 +8,25 @@ import com.timboe.rpsrts.enumerators.ObjectOwner;
 public class Explosion extends Sprite {
 
 	protected ObjectOwner owner;
-	private int explode_time = 30;
+	private final int explode_time = 30;
 	private int explode_tick;
 	protected ArrayList<AtomicInteger> shells = new ArrayList<AtomicInteger>();
 	protected ArrayList<AtomicInteger> chunks = new ArrayList<AtomicInteger>();
 	protected ArrayList<Float> chunk_angle = new ArrayList<Float>();
 
 	int shell_velocity = 2;
-	
-	protected Explosion(int _ID, int _x, int _y, int _r, ObjectOwner _oo) {
+
+	protected Explosion(final int _ID, final int _x, final int _y, final int _r, final ObjectOwner _oo) {
 		super(_ID, _x, _y, _r);
 		owner = _oo;
 	}
-	
-	public synchronized void Tick(int _tick_count) {
+
+	@Override
+	public boolean GetIsExplosion() {
+		return true;
+	}
+
+	public synchronized void Tick(final int _tick_count) {
 		if (explode_tick < explode_time && utility.rnd() < 0.2) {
 			shells.add( new AtomicInteger(0) );
 		}
@@ -33,7 +38,7 @@ public class Explosion extends Sprite {
 		}
 		++explode_tick;
 		boolean alive = false;
-		for (AtomicInteger _f : shells) {
+		for (final AtomicInteger _f : shells) {
 			_f.set( _f.get() + shell_velocity-1);
 			if (_f.get() > r) {
 				_f.set( 10000 );
@@ -41,7 +46,7 @@ public class Explosion extends Sprite {
 				alive = true;
 			}
 		}
-		for (AtomicInteger _f : chunks) {
+		for (final AtomicInteger _f : chunks) {
 			_f.set( _f.get() + shell_velocity);
 			if (_f.get() > r) {
 				_f.set( 10000 );
@@ -52,11 +57,6 @@ public class Explosion extends Sprite {
 		if (explode_tick > explode_time && alive == false) {
 			Kill();
 		}
-	}
-	
-	@Override
-	public boolean GetIsExplosion() {
-		return true;
 	}
 
 }
