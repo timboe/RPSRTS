@@ -91,8 +91,8 @@ public class SpriteManager {
 	private void CheckActorCombat(){
 		synchronized (GetActorObjects()) {
 			for (final Actor _a : GetActorObjects()) {
-				//TODO check this, currently won't change target mid-fight if targeting a person
-				if (_a.GetAttackTarget() != null && _a.GetAttackTarget().GetIsActor() == true) {
+				//TODO check this, currently won't change target mid-fight if targeting a person (unless spock)
+				if (_a.GetAttackTarget() != null && _a.GetAttackTarget().GetIsActor() == true && _a.GetType() != ActorType.Spock) {
 					continue;
 				}
 				Sprite chosen_target = null;

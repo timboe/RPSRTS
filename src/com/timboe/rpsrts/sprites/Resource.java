@@ -107,7 +107,7 @@ public class Resource extends Sprite {
 
 	public void SetUnreachable() {
 		not_reachable_penalty += penalty_size;
-		System.out.println("WARN: Node unr. by actor on job! Quar. for tocks:"+not_reachable_penalty);
+		//System.out.println("WARN: Node unr. by actor on job! Quar. for tocks:"+not_reachable_penalty);
 		penalty_size += utility.not_reachable_penelty_tocks;
 	}
 

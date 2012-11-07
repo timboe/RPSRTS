@@ -751,8 +751,9 @@ public class SceneRenderer_Applet {
 	    	if (placed == true) {
 	    		buildingToPlace = null;
 	    	}
-	    } else if (buildingToMove != null) {
+	    } else if (buildingToMove != null && buildingToMove.GetOwner() == ObjectOwner.Player) {
 	    		buildingToMove.MoveBuilding((int)MouseTF.getX(), (int)MouseTF.getY());
+				System.out.println("USER MOVE ATTRACTOR TO:"+(int)MouseTF.getX()+","+(int)MouseTF.getY());
         } else if (utility.sendMouseDragPing == true) {
 	    	//am i over a building?
 	    	buildingToMove = theSpriteManger.GetBuildingAtMouse((int)MouseTF.getX(), (int)MouseTF.getY());

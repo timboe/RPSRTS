@@ -37,6 +37,7 @@ public class HighScore implements Runnable {
 		String data = URLEncoder.encode("pwd",    "UTF-8") + "=" + URLEncoder.encode(Pass.GetPass(), "UTF-8");
 		data += "&" + URLEncoder.encode("name",    "UTF-8") + "=" + URLEncoder.encode(utility.playerName, "UTF-8");
 		data += "&" + URLEncoder.encode("score",   "UTF-8") + "=" + URLEncoder.encode(Integer.toString(resource_manager.GetScore(ObjectOwner.Player)), "UTF-8");
+		data += "&" + URLEncoder.encode("enemyscore",   "UTF-8") + "=" + URLEncoder.encode(Integer.toString(resource_manager.GetScore(ObjectOwner.Enemy)), "UTF-8");
 		data += "&" + URLEncoder.encode("wintime", "UTF-8") + "=" + URLEncoder.encode(Long.toString(utility.game_time_count/1000l), "UTF-8");
 		//Add statistics
 		data += "&" + URLEncoder.encode("buildingsconstructed", "UTF-8") + "=" + URLEncoder.encode(resource_manager.GetStatistic(GameStatistics.BuildingsConstructed), "UTF-8");

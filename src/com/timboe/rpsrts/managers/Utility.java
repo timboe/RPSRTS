@@ -21,7 +21,7 @@ public class Utility {
 	//Global variables
 	public RPSRTS _RPSRTS;
 	public boolean dbg = true; //debug flag
-	public boolean noPlayers = false; //AI takes over both teams
+	public boolean noPlayers = true; //AI takes over both teams
 	public boolean soundOn = true;
 	public boolean highQuality = true;
 	public boolean fastForward = false;
@@ -53,7 +53,7 @@ public class Utility {
 	public final int window_X = 1000;
 	public final int window_Y = 600;
 	public final int tiles_per_chunk = 8; //Used for coarse kT algo
-	public final int world_tiles = 176; //Number of tile elements on X
+	public final int world_tiles = 216; //Number of tile elements on X was 176
 	public final int tiles_size = 7; //Size of tile element in pixels
 	public final int world_size = world_tiles*tiles_size;
 	public final int world_size2 = world_size/2;
@@ -62,7 +62,7 @@ public class Utility {
 	public final int do_fps_every_x_ticks = 6; // refresh FPS after X frames
 	public final int game_ticks_per_render = 2;
 	public final int slowmo_ticks_per_render = 1;
-	public final int fast_forward_speed = 100;
+	public final int fast_forward_speed = 10;
 	
 	//world manager settings
 	public final float wg_seconds_to_wait = 0.5f; //Time to wait between steps
@@ -92,7 +92,7 @@ public class Utility {
 	public final int projectileRadius = 2;
 	public final int specialSpawnRadius = 10;
 	public final int resourceRadius = 3;
-	public final int resources_kept_away_from_base = 50; //clear area around main bases
+	public final int resources_kept_away_from_base = 75; //clear area around main bases
 	public final int place_res_gaussian = 4; //clustering of mines and rockpiles 
 	public final float projectile_speed = 1f;
 	
@@ -180,7 +180,7 @@ public class Utility {
 	public final int AI_MinUnits = 3; //Minimum units before UnitGen is always kept TRUE
 	
 	//COSTS
-	public final int StartingResources = 500;
+	public final int StartingResources = 5000;
 	public final int COST_Building_Base = 100;
 	public final int COST_Attractor_Base = 25;
 	public final int COST_Actor_Base = 20;

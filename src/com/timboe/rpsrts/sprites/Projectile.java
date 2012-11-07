@@ -41,7 +41,9 @@ public class Projectile extends Sprite {
 		
 		if (source.GetType() == ActorType.Spock && target != null && target.GetDead() == false) {
 			target.Attack(((float)strength*(float)multiplier) / (float)utility.ticks_per_tock);
-			theSpriteManager.PlaceSpooge(target.GetX(), target.GetY(), target.GetOwner(), utility.spooges_hit, utility.spooges_scale_hit);
+			if (_tick_count % 2 == 0) {
+				theSpriteManager.PlaceSpooge(target.GetX(), target.GetY(), target.GetOwner(), utility.spooges_hit, utility.spooges_scale_hit);
+			}
 			return;
 		}
 		

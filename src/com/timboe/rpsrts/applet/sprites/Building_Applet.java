@@ -124,7 +124,7 @@ public class Building_Applet extends Building {
 		if (utility.dbg == true) {
 			_g2.setTransform(theTransforms.af_translate_zoom);
 			_g2.setColor(Color.red);
-			_g2.drawString(Integer.toString(GetEmployees()), _x - r, _y - r - 10);
+			_g2.drawString(Integer.toString(GetEmployees()), _x + r, _y - r - 10);
 			_g2.setColor(Color.red);
 			_g2.setTransform(theTransforms.af);
 			_g2.fillOval(x - r, y - r, 2*r, 2*r);

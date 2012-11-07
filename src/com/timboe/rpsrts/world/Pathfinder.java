@@ -38,12 +38,12 @@ public class Pathfinder implements Runnable {
     	}
     }
     
-    public Pathfinder(WorldPoint _from, WorldPoint _to, int _r) {
-    	fromLoc = _from;
-    	toLoc = _to;
-    	r_from = _r;
-    	r_to = _r;
-    }
+//    public Pathfinder(WorldPoint _from, WorldPoint _to, int _r) {
+//    	fromLoc = _from;
+//    	toLoc = _to;
+//    	r_from = _r;
+//    	r_to = _r;
+//    }
 
     public ArrayList<WorldPoint> GetResult() {
     	return result;
@@ -73,6 +73,8 @@ public class Pathfinder implements Runnable {
 		//couldn't find a start node
 		if (closed_set_starter_node == null) {
 			Kill();
+System.out.println("FATAL FROM:"+fromLoc.getX()+","+fromLoc.getY()+" TO:"+toLoc.getX()+","+toLoc.getY()+" : NO STARTER NODE!");
+
 			return;
 		} else if (closed_set_starter_node.GetBad() == true) { //this one no good, look around
 			boolean breakout = false; //look around two deep
@@ -117,9 +119,9 @@ public class Pathfinder implements Runnable {
 			
 			//Is this the soloution?
 			if ( (++loop > utility.pathfinding_max_depth)
-					|| utility.Seperation(A_loc, toLoc) < (utility.tiles_size + r_from + r_to)) {
-					//|| (Math.abs(A.GetX() - _to.GetX()) <= pathfinding_accuracy && Math.abs(A.GetY() - _to.GetY()) <= pathfinding_accuracy) ) {
-				soloution = A;
+					|| utility.Seperation(A_loc, toLoc) < (utility.tiles_size + r_from + r_to + 1)) {
+					//XXX HACK - THIS +1 IS INFURATINGLY REQUIRED TO STOP PATHFINDING FAILING ON ENEMY MOVING TOTEM IN +VE WORLD-SPACE
+					soloution = A;
 				break;
 			}
 
@@ -186,7 +188,7 @@ public class Pathfinder implements Runnable {
 			}
 //System.out.println("INFO Took "+loop+" alg loops: PATH FINDING MINIMISED, WE CAN GET TO ("+soloution.X+","+soloution.Y+") in "+result.size()+" steps! ");
 		} else {
-//System.out.println("FATAL Took "+loop+" alg loops : PATH FINDING EPIC FAIL!");
+//System.out.println("FATAL FROM:"+fromLoc.getX()+","+fromLoc.getY()+" TO:"+toLoc.getX()+","+toLoc.getY()+" Took "+loop+" alg loops : PATH FINDING EPIC FAIL!");
 			result = null;
 		}
 		_closed_set.clear();

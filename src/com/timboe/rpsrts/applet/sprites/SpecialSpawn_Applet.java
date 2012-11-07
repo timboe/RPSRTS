@@ -31,12 +31,12 @@ public class SpecialSpawn_Applet extends SpecialSpawn {
 
 
 		for (int s = 0; s < nSpooge; ++s) {
+			if (spawnType == ActorType.Spock) {
+				_g2.setColor(Color.yellow);
+			} else if (spawnType == ActorType.Lizard) {
+				_g2.setColor(Color.green);
+			}
 			if (utility.Seperation(spooge_x.get(s), x, spooge_y.get(s), y) < r) {
-				if (spawnType == ActorType.Spock) {
-					_g2.setColor(Color.yellow);
-				} else if (spawnType == ActorType.Lizard) {
-					_g2.setColor(Color.green);
-				}
 				final float randomAngle = (float) (utility.rnd() * Math.PI * 2f);
 				final float randomLen = utility.rnd();
 				final int sx = (int) (r * randomLen * Math.cos(randomAngle));
@@ -50,7 +50,7 @@ public class SpecialSpawn_Applet extends SpecialSpawn {
 			
 			//draw
 			if (s % 2 == 0) {
-				_g2.setColor(Color.white);
+				_g2.setColor(Color.black);
 			}
 			_g2.fillRect((int) _x, (int) _y, 1, 1);
 			

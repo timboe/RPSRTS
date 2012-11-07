@@ -127,6 +127,7 @@ public class Actor_Applet extends Actor {
 		}
 		
 		if (utility.dbg == true) {
+			//_g2.drawString(job.toString(), _x, _y);
 			_g2.setTransform(theTransforms.af);
 			if (wander != null) {
 				_g2.setColor(Color.yellow);

@@ -33,9 +33,9 @@ public class Resource_Applet extends Resource {
 		}
 
 		if (not_reachable_penalty > 0 && utility.dbg == true) {
-			_g2.setColor(Color.red);
+			_g2.setColor(Color.white);
 			_g2.setTransform(theTransforms.af);
-			_g2.fillOval(x - r, y - r, 2*r, 2*r);
+			_g2.fillOval(x - 2*r, y - 2*r, 4*r, 4*r);
 		}
 		
 		if (type == ResourceType.Tree) {
@@ -52,13 +52,13 @@ public class Resource_Applet extends Resource {
 			_g2.drawImage(theBitmaps.stone[toDraw], _x - r, _y - r - 3, null);
 		}
 		
-		if (utility.dbg == true) {
-			_g2.setColor(Color.blue);
-			_g2.setTransform(theTransforms.af);
-			_g2.fillOval(x - 1, y - 1, 2, 2);
-			_g2.setColor(Color.white);
-			_g2.setTransform(theTransforms.af_translate_zoom);
-			_g2.drawString(Integer.toString(stuff), _x - r, _y - r);
-		}
+//		if (utility.dbg == true) {
+//			_g2.setColor(Color.blue);
+//			_g2.setTransform(theTransforms.af);
+//			_g2.fillOval(x - 1, y - 1, 2, 2);
+//			_g2.setColor(Color.white);
+//			_g2.setTransform(theTransforms.af_translate_zoom);
+//			_g2.drawString(Integer.toString(stuff), _x - r, _y - r);
+//		}
 	}
 }

@@ -81,7 +81,7 @@ public class Building extends Sprite {
 		animStep = utility.rndI(animSteps);
 	}
 
-	public void AddEmployee(Actor _a) {
+	public synchronized void AddEmployee(Actor _a) {
 		employees.add(_a);
 	}
 	
@@ -116,7 +116,7 @@ public class Building extends Sprite {
 		return getiCollect();
 	}
 
-	public int GetEmployees() {
+	public synchronized int GetEmployees() {
 		return employees.size();
 	}
 	
@@ -131,7 +131,7 @@ public class Building extends Sprite {
 		if (toFetch == null ) {
 			no_local_resource_penalty += utility.building_no_resource_penalty;
 			no_local_resource_counter++;
-			System.out.println(this+" NOT TAKING NO WORKERS FOR "+no_local_resource_penalty+"s (NO LOCAL RESOURCE, STRIKE "+no_local_resource_counter+")");
+			//System.out.println(this+" NOT TAKING NO WORKERS FOR "+no_local_resource_penalty+"s (NO LOCAL RESOURCE, STRIKE "+no_local_resource_counter+")");
 		}
 		return toFetch;
 	}
@@ -184,7 +184,7 @@ public class Building extends Sprite {
 		GridDeRegister();
 	}
 	
-	public void MoveBuilding(int new_x, int new_y) {
+	public synchronized void MoveBuilding(int new_x, int new_y) {
 		if (x == new_x && y == new_y) return;
     	if (theSpriteManager.CheckSafe(true
     			, true
@@ -204,6 +204,10 @@ public class Building extends Sprite {
 		if (GetOwner() == ObjectOwner.Player) {
 			move_hover = true;
 		}
+		//force update destination of followers
+		for (Actor _a : employees) {
+			_a.Job_Guard_Renavagate();
+		}
 	}
 	
 	public boolean Recruiting() {
@@ -211,11 +215,11 @@ public class Building extends Sprite {
 		return true;
 	}
 
-	public void RemoveEmployee(Actor _a) {
+	public synchronized void RemoveEmployee(Actor _a) {
 		employees.remove(_a);
 	}
 	
-	public void Tick(int _tick_count) {
+	public synchronized void Tick(int _tick_count) {
 		if ((_tick_count + tick_offset) % ticks_per_tock == 0) Tock();
 		if (shrapnel > 0) {
 			--shrapnel;
@@ -226,7 +230,7 @@ public class Building extends Sprite {
 		}
 	}
 	
-	public void Tock() {
+	private void Tock() {
 		if (no_local_resource_penalty > 0) --no_local_resource_penalty;
 		if (type == BuildingType.Base) return;
 		//Garbage check on employees
@@ -257,7 +261,7 @@ public class Building extends Sprite {
 		return iCollect;
 	}
 
-	public void setiCollect(HashSet<ResourceType> iCollect) {
+	public synchronized void setiCollect(HashSet<ResourceType> iCollect) {
 		this.iCollect = iCollect;
 	}
 
@@ -265,7 +269,7 @@ public class Building extends Sprite {
 		return iAttract;
 	}
 
-	public void setiAttract(HashSet<ActorType> iAttract) {
+	public synchronized void setiAttract(HashSet<ActorType> iAttract) {
 		this.iAttract = iAttract;
 	}
 	

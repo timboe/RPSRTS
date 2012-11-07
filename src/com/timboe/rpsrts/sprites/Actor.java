@@ -49,6 +49,8 @@ public class Actor extends Sprite {
 	protected WorldPoint wander;
 	protected int tocks_since_quit;
 
+	protected int renavTEMP = 0;
+	
 	protected Actor(int _ID, int _x, int _y, int _r, ActorType _at, ObjectOwner _oo) {
 		super(_ID, _x, _y, _r);
 		owner = _oo;
@@ -91,8 +93,8 @@ public class Actor extends Sprite {
 		health = maxHealth;
 		animStep = utility.rndI(animSteps);
 	}
-
-	private boolean AttemptMove(float _suggest_new_x, float _suggest_new_y) {
+	
+	private boolean AttemptMove(float _suggest_new_x, float _suggest_new_y, boolean force) {
 		if ((int) Math.round(_suggest_new_x) == x && (int) Math.round(_suggest_new_y) == y) { //if sub pixel
 			x_prec = _suggest_new_x;
 			y_prec = _suggest_new_y;
@@ -104,7 +106,7 @@ public class Actor extends Sprite {
 			_ID = destination.GetID();
 		}
 		//Building&Resouce=YES Actor=NO
-		if (theSpriteManager.CheckSafe(true,false,(int) Math.round(_suggest_new_x), (int) Math.round(_suggest_new_y), 1, _ID, 0) == true) { //TODO Check the effect of reducing the radius of the collision check here
+		if (force == true || theSpriteManager.CheckSafe(true,false,(int) Math.round(_suggest_new_x), (int) Math.round(_suggest_new_y), 1, _ID, 0) == true) { //TODO Check the effect of reducing the radius of the collision check here
 			x_prec = _suggest_new_x;
 			y_prec = _suggest_new_y;
 			x = (int) Math.round(x_prec);
@@ -330,22 +332,33 @@ public class Actor extends Sprite {
 				SetDestinationInitial(boss);
 				return;
 			} else if (navagate_status == PathfindStatus.Failed) {//Navagation failed - I quit!
+				System.out.println("#################### QUIT GUARD INITIAL PATHFIND Job:"+job+" boss:"+boss.GetType()+" behaviour:"+behaviour+" navStat:"+navagate_status+" WPL:"+waypoint_list+" OO:"+owner+" RENavs"+renavTEMP);
 				QuitJob(false);
 			} else if (navagate_status == PathfindStatus.Passed) { //navagation good
 				behaviour = ActorBehaviour.MovingToTarget;
 			}
 		} else if (tick == true && behaviour == ActorBehaviour.MovingToTarget) {
+		   // if (navagate_status == PathfindStatus.Failed) {//If change direction mid
+			//	System.out.println("#################### QUIT GUARD CANNOT FOLLOW");
+		   // 	QuitJob(false);
+		   // }
 			final boolean arrivedAtTarget = Move();
 			if (arrivedAtTarget == true) {
 				behaviour = ActorBehaviour.Guarding;
 			}
 		} else if (tick == true && behaviour == ActorBehaviour.Guarding) {
 			if (utility.Seperation(GetLoc(), boss.GetLoc()) > 2 * utility.wander_radius) {
-				behaviour = ActorBehaviour.DoingNothing;
+				Job_Guard_Renavagate();
 				return;
 			}
 			WanderAbout(boss, utility.wander_radius, utility.wander_pull_to_target);
 		}
+	}
+	
+	public synchronized void Job_Guard_Renavagate() {
+		behaviour = ActorBehaviour.DoingNothing;
+		navagate_status = PathfindStatus.NotRun;
+		++renavTEMP;
 	}
 	
 	private void Job_Idle() {
@@ -366,7 +379,7 @@ public class Actor extends Sprite {
 	}
 	
 	@Override
-	public void Kill() {
+	public synchronized void Kill() {
 		if (dead == true) return;
 		theSpriteManager.PlaceSpooge(x, y, GetOwner(), utility.spooges_actor_death, utility.spooges_scale_actor_death);
 		QuitJob(true);
@@ -377,24 +390,21 @@ public class Actor extends Sprite {
 	private boolean Move() { //Goal in mind pathfinding
 		if (waypoint != null) { //Have at least one destination in list
 			//System.out.println("moveLoop FIRST WAYPOINT WP("+waypoint.getX()+","+waypoint.getY()+") POS ("+x_prec+","+y_prec+")");
-			final float _hypotenuse = utility.Seperation(x_prec, waypoint.getX(), y_prec, waypoint.getY()); //  // Math.sqrt( Math.pow(x_prec - destination_list.lastElement().getX(),2) +  Math.pow(y_prec - destination_list.lastElement().getY(),2) );
+			final float _hypotenuse = utility.Seperation(x_prec, waypoint.getX(), y_prec, waypoint.getY()); //  
 			float radiusToAchieve = 1f; //If pathfinding to pathfind node
-			if (waypoint_list != null && waypoint_list.size() == 0) {
-				radiusToAchieve = utility.tiles_size + r + destination.GetR(); //If final target (pathfinding accuracy now tiles_size
-			}
 			if (_hypotenuse <= radiusToAchieve) { //At waypoint?
 				//Is there another waypoint?
 				if (waypoint_list != null && waypoint_list.size() > 0) {
 					waypoint = waypoint_list.remove( waypoint_list.size() - 1 );
 				} else {
 					//OK, so no more waypoints - are we there?
-					if (utility.Seperation(waypoint, destination.GetLoc()) < r + destination.GetR()) {
+					if (utility.Seperation(GetLoc(), destination.GetLoc()) < r + destination.GetR() + (utility.tiles_size * 2)) {
 						//System.out.println("INFO REACHED FINAL DESTINATION");
 						ClearDestination();
 						return true;
 					} else {
-						//NOPE, GO STRAIGHT LINE - IF WE HIT SOMETHING THEN ROUTE GETS RECALCULATED
-						waypoint = destination.GetLoc();
+						//NOPE, MUST HAVE MOVED!
+						SetDestination(destination);
 					}
 				}
 				return false;
@@ -402,7 +412,7 @@ public class Actor extends Sprite {
 
 			final float _suggest_new_x = x_prec - (((x_prec - waypoint.getX()) / _hypotenuse) * (speed * ( 1 - ((carryAmount/strength)/2.f))) );
 			final float _suggest_new_y = y_prec - (((y_prec - waypoint.getY()) / _hypotenuse) * (speed * ( 1 - ((carryAmount/strength)/2.f))) );
-			final boolean allowed = AttemptMove(_suggest_new_x, _suggest_new_y);
+			final boolean allowed = AttemptMove(_suggest_new_x, _suggest_new_y, true); //FORCE as following waypoints
 			if (allowed == false) {
 				++stuck;
 				if (stuck == 8) {
@@ -424,7 +434,7 @@ public class Actor extends Sprite {
 		return false;
 	}
 
-	public void QuitJob(boolean resign) {
+	public synchronized void QuitJob(boolean resign) {
 		ClearDestination();
 		if (resign == false) {
 			tocks_since_quit = utility.tocks_before_retake_job_from_boss;
@@ -439,7 +449,7 @@ public class Actor extends Sprite {
 	}
 
 
-	private void SetDestination(Sprite _d) {
+	public synchronized void SetDestination(Sprite _d) {
 		wander = null;
 		navagate_status = PathfindStatus.NotRun;
 		pathfinder = new Pathfinder(this, _d);
@@ -448,12 +458,13 @@ public class Actor extends Sprite {
 		destination = _d;
 	}
 
-	private void SetDestinationInitial(Sprite _d) {
+	public synchronized void SetDestinationInitial(Sprite _d) {
 		stuck = 0;
 		SetDestination(_d);
 	}
 
-	public void SetJob(ActorJob _j, Building _boss) {
+	public synchronized void SetJob(ActorJob _j, Building _boss) {
+		//if (job == ActorJob.Guard) System.out.println("@@@@@@@@@@@@@@@@@@@ Assigning a new job to current guard Job:"+_j+" Boss:"+_boss);
 		job = _j;
 		boss = _boss;
 		target = null;
@@ -463,7 +474,7 @@ public class Actor extends Sprite {
 		behaviour = ActorBehaviour.DoingNothing;
 	}
 
-	public void SetNemesis(Sprite _nemesis) {
+	public synchronized void SetNemesis(Sprite _nemesis) {
 		attack_target = _nemesis;
 		wander = null;
 	}
@@ -520,7 +531,7 @@ public class Actor extends Sprite {
 		
 	}
 
-	public void Tock() {
+	private void Tock() {
 		tock = true;
 		tick = false;
 		if (tocks_since_quit > 0) { //Chill out period before I can be hired by the same building again
@@ -534,11 +545,31 @@ public class Actor extends Sprite {
 			Job_Attack();
 	    } else if (job == ActorJob.Builder) {
 	    	Job_Build();
-		/////////////////////////////////////////////////////////////////////////////////
 		} else if (job == ActorJob.Gather) {
 			Job_Gather();
 		}
+		/////////////////////////////////////////////////////////////////////////////////
+		UnStick();
+		
 		if (attack_target == null && health < maxHealth) ++health;
+	}
+
+	private void UnStick() {
+		//If i have been left somewhere which should not be occupiable
+		if (waypoint == null && theSpriteManager.CheckSafe(true,false,(int) Math.round(x_prec), (int) Math.round(y_prec), 1, 0, 0) == false) { //My current pixel is BAD
+			int max_search = 50;
+			for (int search_area = 1; search_area <= max_search; search_area += 2) {
+				//Try and unstick me!
+				WorldPoint jumpTo = theSpriteManager.FindGoodSpot( GetLoc(), r, search_area, false);
+				if (jumpTo != null) {
+					if (AttemptMove(jumpTo.getX(), jumpTo.getY(), false) == true) {
+						//System.out.println(GetOwner()+" "+GetType()+" has been unstuck at search radius "+search_area+".");
+						return;
+					}
+				}
+			}
+			System.out.println(GetOwner()+" "+GetType()+" has FAILED TO BE UNSTUCK SEARCHING UP TO  "+max_search+".");
+		}
 	}
 
 	private void WanderAbout (Sprite _target, int _wander_radius, int _pull) { //target optional - random walk towards target
@@ -568,21 +599,21 @@ public class Actor extends Sprite {
 		}
 		final float _suggest_new_x = x_prec - (((x_prec - wander.getX()) / _hypotenuse) * (speed * ( 1 - ((carryAmount/strength)/2.f))) );
 		final float _suggest_new_y = y_prec - (((y_prec - wander.getY()) / _hypotenuse) * (speed * ( 1 - ((carryAmount/strength)/2.f))) );
-		final boolean allowed = AttemptMove(_suggest_new_x, _suggest_new_y);
+		final boolean allowed = AttemptMove(_suggest_new_x, _suggest_new_y, false); //Don't FORCE
 		if (allowed == false) {
 			wander = null;
 		}
 	}
 
-	public Sprite GetAttackTarget() {
+	public synchronized Sprite GetAttackTarget() {
 		return attack_target;
 	}
 
-	public void Poison() {
+	public synchronized void Poison() {
 		poisoned += utility.actor_poison_ticks;
 	}
 	
-	public void Shrapnel() {
+	public synchronized void Shrapnel() {
 		shrapnel += utility.building_Explode_ticks;
 	}
 }
