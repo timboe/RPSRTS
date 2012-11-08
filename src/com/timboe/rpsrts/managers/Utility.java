@@ -52,7 +52,7 @@ public class Utility {
 	public final int window_X = 1000;
 	public final int window_Y = 600;
 	public final int tiles_per_chunk = 8; //Used for coarse kT algo
-	public final int world_tiles = 216; //Number of tile elements on X was 176
+	public final int world_tiles = 184; //Number of tile elements on X was 176
 	public final int tiles_size = 7; //Size of tile element in pixels
 	public final int world_size = world_tiles*tiles_size;
 	public final int world_size2 = world_size/2;
@@ -113,7 +113,7 @@ public class Utility {
 	public final float actor_poison_range = 20;
 
 	//biome settings
-	public final int biome_golbal_density_mod = tiles_size/2;//tiles_size; //derived
+	public final int biome_golbal_density_mod = tiles_size;//tiles_size; //derived
 	public final float biome_colour_range = 10; //smear of colours in biome
 	public final int biome_desert_min_density = 2 + biome_golbal_density_mod;
 	public final int biome_desert_rnd_density = 2 + biome_golbal_density_mod;
@@ -186,7 +186,7 @@ public class Utility {
 	public final float AI_ChanceOfRushAttack = 0.5f;
 
 	//COSTS
-	public final int StartingResources = 750;
+	public final int StartingResources = 7500;
 	public final int COST_Building_Base = 100;
 	public final int COST_Attractor_Base = 25;
 	public final int COST_Actor_Base = 20;

@@ -213,9 +213,9 @@ public class Building extends Sprite {
 			move_hover = true;
 		}
 		//force update destination of followers
-		for (final Actor _a : employees) {
-			_a.Job_Guard_Renavagate();
-		}
+//		for (final Actor _a : employees) {
+//			_a.Job_Guard_Renavagate();
+//		}
 	}
 
 	public boolean Recruiting() {

@@ -265,10 +265,8 @@ public class AI implements Runnable {
 				if (_a.GetOwner() == me) continue; //Get enemy actors
 				//...which are attacking
 				if (_a.GetAttackTarget() == null) continue; 
-				//...a building
-				if (_a.GetAttackTarget().GetIsBuilding() == false) continue;
 				//... something other than one of our attrators
-				if (((Building)_a.GetAttackTarget()).getiAttract().size() > 0) continue; 
+				if (_a.GetAttackTarget().GetIsBuilding() == true && ((Building)_a.GetAttackTarget()).getiAttract().size() > 0) continue; 
 				//...within the radius of our bases expansion
 				if (utility.Seperation(_a.GetLoc(), theSpriteManager.GetBase(me).GetLoc()) > defence_radius) continue;
 				//do we already have an attack or defence attractor in the area? Check up to 3x wander radius

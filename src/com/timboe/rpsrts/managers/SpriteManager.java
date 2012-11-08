@@ -45,6 +45,7 @@ public class SpriteManager {
 	private float ws_time_of_last_operation = 0;
 	private boolean worldSeeded = false;
 	protected int TickCount = 0;
+	protected int TockCount = 0;
 	protected int FrameCount = 0;
 
 	protected Thread pathfinding_thread;
@@ -1008,6 +1009,10 @@ public class SpriteManager {
 	}
 
 	public void Tock() { //or, the 'long tick'
+		if (++TockCount % 60 == 0) {
+			TockUnitCount();
+		}
+		
 		Garbage();
 
 		CheckActorCombat(); //FIGHT!
@@ -1018,5 +1023,17 @@ public class SpriteManager {
 
 		if (AI_thread.isAlive() == false) AI_thread.run();
 		if (utility.noPlayers == true && AIHuman_thread.isAlive() == false) AIHuman_thread.run();
+	}
+	
+	private synchronized void TockUnitCount() {
+		System.out.println("Sizes: Explosion:"+GetExplosionObjects().size()
+				+" Actor:"+GetActorObjects().size()
+				+" Building:"+GetBuildingOjects().size()
+				+" Collision:"+GetCollisionObjects().size()
+				+" Projectile:"+GetProjectileObjects().size()
+				+" Resource:"+GetResourceObjects().size()
+				+" Spooge"+GetSpoogiclesObjects().size()
+				+" Waterfall:"+GetWaterfallSplashObjects().size()
+				+" SpeshSpawn:"+GetSpecialSpawnObjects().size());
 	}
 }
