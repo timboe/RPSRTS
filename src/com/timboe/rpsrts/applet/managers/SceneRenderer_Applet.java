@@ -125,7 +125,7 @@ public class SceneRenderer_Applet {
     	} else {
     		final int seeding = theSpriteManger.SeedWorld();
     		if (seeding == -1) { //Tits up - start again
-    			utility._RPSRTS.genNewWorld();
+    			utility._RPSRTS.genNewWorld(true);
     		}
     		drawSea(_g2,true);
     		drawBufferedBackground(_g2);
@@ -251,10 +251,18 @@ public class SceneRenderer_Applet {
 		if (utility.gameMode == GameMode.gameOverWon) {
 			g2.setTransform(theTransforms.af_none);
 			g2.drawImage(theBitmaps.WIN,0,0,null);
+			String cursor = "";
+			if ((System.currentTimeMillis() / 1000L) % 2 == 0) { // if even second
+				cursor = "|";
+			}
+			drawButton(g2, 520, 50, 460, "YOUR NAME:"+utility.playerName+cursor, 20);
+			g2.setFont(myFont);
+			drawStatBox(g2, "By entering a name below, you agree to upload and display of your", "score along with statistics from your game.", "", "", 480, 8, 500, 15);
+			
 			if (utility.playerName != "") {
 				clicked = drawButton(g2, 185, 500, 610, "SUBMIT MY SCORE!", 60);
 			} else {
-				clicked = drawButton(g2, 185, 500, 610, "BACK TO TITLE SCREEN", 0);
+				clicked = drawButton(g2, 185, 500, 610, "EXIT TO TITLE", 70);
 			}
 		} else {
 			g2.setTransform(theTransforms.af_none);
@@ -266,26 +274,17 @@ public class SceneRenderer_Applet {
 				//Do high score!
 				highScoreThread.run();
 			}
-			utility._RPSRTS.genNewWorld();
-			utility.doWorldGen = false;
+			utility._RPSRTS.genNewWorld(false);
 		}
 
 		if (utility.showRedScore == true) {
-			clicked = drawButton(g2, 10, 50, 480, "RED SCORE:"+resource_manager.GetScore(ObjectOwner.Player), 20);
+			clicked = drawButton(g2, 10, 50, 500, "RED SCORE:"+resource_manager.GetScore(ObjectOwner.Player), 20);
 		} else {
-			clicked = drawButton(g2, 10, 50, 480, "BLU SCORE:"+resource_manager.GetScore(ObjectOwner.Enemy), 20);
+			clicked = drawButton(g2, 10, 50, 500, "BLU SCORE:"+resource_manager.GetScore(ObjectOwner.Enemy), 20);
 		}
 		if (clicked == true) {
 			utility.showRedScore = !utility.showRedScore;
 		}
-
-		String cursor = "";
-		if ((System.currentTimeMillis() / 1000L) % 2 == 0) { // if even second
-			cursor = "|";
-		}
-		drawButton(g2, 500, 50, 480, "YOUR NAME:"+utility.playerName+cursor, 20);
-		g2.setFont(myFont);
-		drawStatBox(g2, "By entering a name below, you agree to upload and display of your", " score along with statistics from your game.", "", "", 480, 8, 500, 18);
 
 	}
 
@@ -294,10 +293,9 @@ public class SceneRenderer_Applet {
 		if (clicked == true) {
 			utility.gamePaused = false;
 		}
-		clicked = drawButton(g2, 350, 300, 300, "QUIT", 100);
+		clicked = drawButton(g2, 350, 300, 300, "QUIT", 95);
 		if (clicked == true) {
-			utility._RPSRTS.genNewWorld();
-			utility.doWorldGen = false;
+			utility._RPSRTS.genNewWorld(false);
 			utility.gamePaused = false;
 		}
 		g2.setFont(myFont);
@@ -368,7 +366,8 @@ public class SceneRenderer_Applet {
 			c1 = backing_brown;
 			c2 = front_blue;
 			if (utility.mouseClick == true) {
-				utility._RPSRTS.genNewWorld();
+				utility.rndSeedTxt = Integer.toString( utility.rndI(10000000) );
+				utility._RPSRTS.genNewWorld(true);
 			}
 		}
 		g2.setColor(c1);
@@ -467,17 +466,16 @@ public class SceneRenderer_Applet {
 		g2.drawString("RPSRTS", x+34, y+90);
 		g2.setClip(null);
 
-		boolean clicked = drawButton(g2, 250, 300, 500, "GENERATE ISLAND", 43);
+		boolean clicked = drawButton(g2, 250, 350, 500, "GENERATE ISLAND", 43);
 		if (clicked == true) {
-			utility._RPSRTS.genNewWorld();
-
+			utility._RPSRTS.genNewWorld(true);
 		}
 
-		String cursor = "";
-		if ((System.currentTimeMillis() / 1000L) % 2 == 0) { // if even second
-			cursor = "|";
-		}
-		clicked = drawButton(g2, 175, 400, 650, "ISLAND SEED:"+utility.rndSeedTxt+cursor, 20);
+//		String cursor = "";
+//		if ((System.currentTimeMillis() / 1000L) % 2 == 0) { // if even second
+//			cursor = "|";
+//		}
+//		clicked = drawButton(g2, 175, 400, 650, "ISLAND SEED:"+utility.rndSeedTxt+cursor, 20);
 	}
 
     private void drawTopBar(final Graphics2D _g2) {
@@ -752,7 +750,7 @@ public class SceneRenderer_Applet {
 	    	}
 	    } else if (buildingToMove != null && buildingToMove.GetOwner() == ObjectOwner.Player) {
 	    		buildingToMove.MoveBuilding((int)MouseTF.getX(), (int)MouseTF.getY());
-				System.out.println("USER MOVE ATTRACTOR TO:"+(int)MouseTF.getX()+","+(int)MouseTF.getY());
+				//System.out.println("USER MOVE ATTRACTOR TO:"+(int)MouseTF.getX()+","+(int)MouseTF.getY());
         } else if (utility.sendMouseDragPing == true) {
 	    	//am i over a building?
 	    	buildingToMove = theSpriteManger.GetBuildingAtMouse((int)MouseTF.getX(), (int)MouseTF.getY());

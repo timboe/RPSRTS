@@ -1,7 +1,6 @@
 package com.timboe.rpsrts;
 
 import java.applet.Applet;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -13,13 +12,10 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
 import java.util.Locale;
 
 import com.timboe.rpsrts.applet.managers.GameWorld_Applet;
 import com.timboe.rpsrts.applet.managers.SceneRenderer_Applet;
-import com.timboe.rpsrts.applet.managers.ShapeStore;
 import com.timboe.rpsrts.applet.managers.SpriteManager_Applet;
 import com.timboe.rpsrts.applet.managers.TransformStore;
 import com.timboe.rpsrts.enumerators.GameMode;
@@ -50,7 +46,6 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	private final TransformStore theTransforms = TransformStore.GetTransformStore();
 	private final ResourceManager resource_manager = ResourceManager.GetResourceManager();
 	private final SceneRenderer_Applet theSceneRenderer = SceneRenderer_Applet.GetSceneRenderer_Applet();
-	private final ShapeStore theShapeStore = ShapeStore.GetShapeStore();
 
     @Override
 	public void destroy() { }
@@ -76,16 +71,20 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		}
 	}
 
-	public void genNewWorld() {
+	public void genNewWorld(boolean _start) {
 		utility.gameMode = GameMode.titleScreen;
 		theTransforms.Reset();
-		utility.doWorldGen = true;
 		utility.game_time_count = 0;
-		utility.setSeed();
 		theSpriteManger.Reset();
 		theWorld.Reset();
 		theSceneRenderer.background_buffered = null;
 		utility._TICK = 0;
+		if (_start == true) {
+			utility.doWorldGen = true;
+		} else {
+			utility.doWorldGen = false;
+		}
+		utility.setSeed();
 	}
 
 	@Override
@@ -100,6 +99,7 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		setSize(utility.window_X, utility.window_Y);
 
 		theWorld.Init(); //important!!!!
+		utility.rndSeedTxt = Integer.toString( utility.rndI(10000000) );
 
 		addMouseWheelListener(this);
 		addMouseMotionListener(this);
@@ -107,12 +107,14 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		addKeyListener(this);
 
 		if (utility.dbg == true) {
-			genNewWorld();
+			genNewWorld(true);
+		} else {
+			genNewWorld(false);
 		}
 	}
 	@Override
 	public void keyPressed(final KeyEvent e) {
-		if (utility.gameMode == GameMode.titleScreen) {
+		if (utility.gameMode == GameMode.titleScreen && utility.doWorldGen == false) {
 			if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
 				if (utility.rndSeedTxt.length() > 0) {
 					utility.rndSeedTxt = utility.rndSeedTxt.substring(0, utility.rndSeedTxt.length()-1 );
@@ -139,21 +141,21 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			utility.mouseClick = false;
 			theSceneRenderer.buildingToPlace = null;
 			theSceneRenderer.buildingToMove = null;
-		} else if (e.getKeyChar() == 'q') {
+		} else if (e.getKeyChar() == 'q' || e.getKeyChar() == 'Q') {
 			theSceneRenderer.toggleQuality();
-		} else if (e.getKeyChar() == 'd') {
+		} else if (e.getKeyChar() == 'D') {
 			utility.dbg = !utility.dbg;
-		} else if (e.getKeyChar() == 's') {
+		} else if (e.getKeyChar() == 's' || e.getKeyChar() == 'S') {
 			theSceneRenderer.toggleSound();
-		} else if (e.getKeyChar() == 'w') {
-			genNewWorld();
-		} else if (e.getKeyChar() == 'c') {
+		} else if (e.getKeyChar() == 'W') {
+			genNewWorld(true);
+		} else if (e.getKeyChar() == '£') {
 			resource_manager.AddResources(ResourceType.Cactus, 100, ObjectOwner.Player);
 			resource_manager.AddResources(ResourceType.Rockpile, 100, ObjectOwner.Player);
 			resource_manager.AddResources(ResourceType.Mine, 100, ObjectOwner.Player);
-		} else if (e.getKeyChar() == 'p') {
+		} else if (e.getKeyChar() == 'p' || e.getKeyChar() == 'P') {
 			theSceneRenderer.togglePause();
-		} else if (e.getKeyChar() == 'f') {
+		} else if (e.getKeyChar() == 'f' || e.getKeyChar() == 'F') {
 			theSceneRenderer.toggleFF();
 		}
 
@@ -227,28 +229,27 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 			last_X = -1;
 			last_Y = -1;
 		}
+		if (e.getButton() == MouseEvent.BUTTON3) {
+			theSceneRenderer.buildingToPlace = null;
+			theSceneRenderer.buildingToMove = null;
+		}
 	}
 
 	@Override
 	public void mouseWheelMoved(final MouseWheelEvent e) {
-		if (utility.gameMode == GameMode.titleScreen) return;
-		if (e.getWheelRotation() < 0) {
-			theTransforms.zoomIn(false);
-		} else {
-			theTransforms.zoomOut(false);
+		if (utility.gameMode != GameMode.titleScreen) {
+			if (e.getWheelRotation() < 0) {
+				theTransforms.zoomIn(false);
+			} else {
+				theTransforms.zoomOut(false);
+			}
 		}
-
+		e.consume();
 	}
 
 	@Override
 	public void paint (final Graphics g) {
 		final Graphics2D g2 = (Graphics2D)g;
-
-		if (utility.worldGenLock == true) {
-			System.out.println("LOCK!!!!!");
-			return;
-		}
-		utility.worldGenLock = true;
 
 	    theTransforms.SetAA(g2,true);
 		theTransforms.updateTransforms();
@@ -268,12 +269,6 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 		utility.mouseClick = false;
 		utility.sendMouseDragPing = false;
 	    g2.setTransform(theTransforms.af_none);
-	    g2.setColor(Color.gray);
-	    final GeneralPath x = theShapeStore.GetCross();
-	    x.transform(AffineTransform.getTranslateInstance(utility.window_X/2, utility.window_Y/2));
-	    x.transform(AffineTransform.getScaleInstance(0.25,0.25));
-	    g2.draw(x);
-		utility.worldGenLock = false;
 	}
 
 

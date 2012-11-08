@@ -14,7 +14,7 @@ public class Pathfinder implements Runnable {
 	private final SpriteManager theSpriteManager = SpriteManager.GetSpriteManager();
 	private final PathfinderGrid thePathfinderGrid = PathfinderGrid.GetPathfinderGrid();
 
-	private ArrayList<WorldPoint> result = null; //TODO make me something better
+	private ArrayList<WorldPoint> result = null;
 	private final WorldPoint fromLoc;
 	private final WorldPoint toLoc;
 	private final int r_from;
@@ -37,13 +37,6 @@ public class Pathfinder implements Runnable {
         	r_from = 0;
     	}
     }
-
-//    public Pathfinder(WorldPoint _from, WorldPoint _to, int _r) {
-//    	fromLoc = _from;
-//    	toLoc = _to;
-//    	r_from = _r;
-//    	r_to = _r;
-//    }
 
     public ArrayList<WorldPoint> GetResult() {
     	return result;
@@ -74,7 +67,6 @@ public class Pathfinder implements Runnable {
 		if (closed_set_starter_node == null) {
 			Kill();
 System.out.println("FATAL FROM:"+fromLoc.getX()+","+fromLoc.getY()+" TO:"+toLoc.getX()+","+toLoc.getY()+" : NO STARTER NODE!");
-
 			return;
 		} else if (closed_set_starter_node.GetBad() == true) { //this one no good, look around
 			boolean breakout = false; //look around two deep
@@ -104,8 +96,8 @@ System.out.println("FATAL FROM:"+fromLoc.getX()+","+fromLoc.getY()+" TO:"+toLoc.
 		int loop = 0;
 		while (_open_set.size() != 0) {
 			//While there are points in the Open Set
-			PTWeight A = null;//_sorted_set.first();
-			WorldPoint A_loc = null;//A.GetLoc();
+			PTWeight A = null;
+			WorldPoint A_loc = null;
 			float _min_f = utility.minimiser_start;
 			//Find Open set point with smallest f
 			for (final WorldPoint _w : _open_set.keySet()) {
@@ -119,13 +111,13 @@ System.out.println("FATAL FROM:"+fromLoc.getX()+","+fromLoc.getY()+" TO:"+toLoc.
 
 			//Is this the soloution?
 			if ( (++loop > utility.pathfinding_max_depth)
-					|| utility.Seperation(A_loc, toLoc) < (utility.tiles_size + r_from + r_to + 1)) {
-					//XXX HACK - THIS +1 IS INFURATINGLY REQUIRED TO STOP PATHFINDING FAILING ON ENEMY MOVING TOTEM IN +VE WORLD-SPACE
-					soloution = A;
+					|| utility.Seperation(A_loc, toLoc) < (utility.tiles_size + r_from + r_to + 2)) {
+					//XXX HACK - THIS +1 or +2 IS INFURATINGLY REQUIRED TO STOP PATHFINDING FAILING ON ENEMY MOVING TOTEM IN +VE WORLD-SPACE
+				soloution = A;
 				break;
 			}
 
-			_closed_set.put(A_loc,A);
+			_closed_set.put(A_loc, A);
 			_open_set.remove(A_loc);
 
 			final WeightedPoint a = thePathfinderGrid.point_collection_map.get(A_loc);
@@ -135,7 +127,7 @@ System.out.println("FATAL FROM:"+fromLoc.getX()+","+fromLoc.getY()+" TO:"+toLoc.
 			final HashSet<WeightedPoint> myNeighbours = a.GetNieghbours();
 			for (final WeightedPoint b : myNeighbours) {
 				//Bad tile?
-				if (b.GetBad() == true) { // System.out.println("BAD");
+				if (b.GetBad() == true) {
 					continue;
 				}
 
@@ -152,7 +144,6 @@ System.out.println("FATAL FROM:"+fromLoc.getX()+","+fromLoc.getY()+" TO:"+toLoc.
 				if (B == null) {
 					B = new PTWeight(-1, -1, -1);
 					_open_set.put(B_loc, B);
-					//_min_f.put(B, B_loc);
 				}
 
 				boolean tentative_is_better = false;
@@ -176,15 +167,9 @@ System.out.println("FATAL FROM:"+fromLoc.getX()+","+fromLoc.getY()+" TO:"+toLoc.
 			result = new ArrayList<WorldPoint>();
 			result.add(soloution.GetLoc());
 			PTWeight p = soloution.came_from;
-			while (true) {
-				if (p == null) {
-					break;
-				}
-				p = p.came_from;
-				if (p == null) {
-					break;
-				}
+			while (p != null) {
 				result.add(p.GetLoc());
+				p = p.came_from;
 			}
 //System.out.println("INFO Took "+loop+" alg loops: PATH FINDING MINIMISED, WE CAN GET TO ("+soloution.X+","+soloution.Y+") in "+result.size()+" steps! ");
 		} else {

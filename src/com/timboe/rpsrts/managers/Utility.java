@@ -13,14 +13,13 @@ public class Utility {
 	}
 
 	//RANDOM NUMBER SOURCE
-	public String rndSeedTxt = "Dave";
+	public String rndSeedTxt = "";
 	public int rnd_count = 0;
-	private final boolean rand_off = false;
+	private boolean rand_off = false;
 	//
-	public boolean worldGenLock = false;
 	//Global variables
 	public RPSRTS _RPSRTS;
-	public boolean dbg = true; //debug flag
+	public boolean dbg = false; //debug flag
 	public boolean noPlayers = true; //AI takes over both teams
 	public boolean soundOn = true;
 	public boolean highQuality = true;
@@ -70,17 +69,18 @@ public class Utility {
 	public final float island_scale = 0.75f; //Size of initial circular island w.r.t. world
 	public final float wg_CrinkleScale = 30; //Multiplier to Gaussian edge smear
 	public final int wg_CrinkleCoarseness = 3; //Maximum gradient to smear under
+	public final int wg_kt_break_alg_every_X_loops = 30;
 	public final float wg_kTStartPt = 1.f; //Min random chunk energy
 	public final float wg_kTEndPt = 10.f; //Max random chunk energy
 	public final float wg_kT_R =  14 * tiles_size; //kT algorithm R parameter  (derived)
 	public final int wg_MinBiomes = 15; //Min number of generated biomes
 	public final long wg_MaxBiomes = 65*100; //Max number of generated biomes
-	public final float wg_MainBaseRadius = 0.8f; //How far out the main bases are placed
+	public final float wg_MainBaseRadius = 1.2f; //How far out the main bases are placed
 	public final int wg_ErrodeIterations = 4; //times to errode world
 	public final int wg_EnemyBaseAngle = 135; //starting angle for enemy
 	public final int wg_PlayerBaseAngle = 315; //starting angle for player
 	public final float minimiser_start = 999999; //Where minimiser routines start
-	public final float wg_PercChanceKeepWater = 0.03f;
+	public final float wg_PercChanceKeepWater = 0.04f;
 
 	//sprite manager settings
 	public final int pathfinding_max_depth = 100000; //kill pathfinding early in the 500-2000 range
@@ -104,7 +104,7 @@ public class Utility {
 	public final int tocks_before_retake_job_from_boss = 5; //How long before retake job from same boss once quit
 	public final int actor_look_for_spot_radius = 50;
 	public final int actor_aggro_radius = 60;
-	public final float actor_speed = 0.5f;
+	public final float actor_speed = 1f; //was 0.5f
 	public final float actor_strength = 4f;
 	public final float actor_starting_health = 50f;
 	public final int actor_attack_range = 30;
@@ -137,7 +137,7 @@ public class Utility {
 	public final int spooges_actor_death = 20;//20;
 	public final int spooges_hit = 2;//2;
 	public final int spooges_building_death = 200;// 200;
-	public final int spooges_totem_death = 0; //30
+	public final int spooges_totem_death = 50; //30
 	public final int spooges_base_death = 1000;
 	public final float spooges_scale_actor_death = 0.2f;
 	public final float spooges_scale_hit = 0.2f;
@@ -157,7 +157,7 @@ public class Utility {
 	public final float waterfall_fall_rate = 1f;
 
 	//building settings
-	public final int building_gather_radius = 100;
+	public final int building_gather_radius = 120;
 	public final int building_gatherers_per_site = 2;
 	public final int building_health_per_build_action = 5;
 	public final int building_max_health = 200;
@@ -176,11 +176,17 @@ public class Utility {
 	public final int AI_BadBuilding_Before_Sell = 3; //building_no_resource_penalty seconds per tick
 	public final int AI_NewUnitsWhenXClosetoCap = 2;
 	public final int AI_BuildCooldown = 40;//tocks (applies per building type)
-	public final int AI_TargetUnitMultipler = 3; //How many fully-populated buildings worth of units is ideal?
+	public final int AI_TargetUnitMultipler = 4; //How many fully-populated buildings worth of units is ideal? (increased chance of attack as gets close to cap)
 	public final int AI_MinUnits = 3; //Minimum units before UnitGen is always kept TRUE
+	public final float AI_AttackTocks = 0.01f; //try attack on 1% of tocks
+	public final float AI_DefenceTocks = 0.25f; //Defend on 25% of tocks
+	public final int AI_DefenceRadius = 3 * wander_radius;
+	public final int AI_AttackRadius = 2 * wander_radius;
+	public final float AI_ChanceToKillLoanAttack = 0.7f; //Suppress attacking with one unit type
+	public final float AI_ChanceOfRushAttack = 0.5f;
 
 	//COSTS
-	public final int StartingResources = 5000;
+	public final int StartingResources = 750;
 	public final int COST_Building_Base = 100;
 	public final int COST_Attractor_Base = 25;
 	public final int COST_Actor_Base = 20;
@@ -209,7 +215,7 @@ public class Utility {
 	public final int EXTRA_Rock_PerRockery = EXTRA_Base/2;
 	public final int EXTRA_Scissors_PerSmelter = EXTRA_Base;
 
-	private final Random rndGen = new Random(rndSeedTxt.hashCode());
+	private final Random rndGen = new Random();
 	private Utility() {
 		System.out.println("--- Utility spawned (depends on nothing): "+this);
 		SetDesiredFPS(_DESIRED_FPS); //To initially set desired TPS

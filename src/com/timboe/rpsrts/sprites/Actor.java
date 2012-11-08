@@ -49,8 +49,6 @@ public class Actor extends Sprite {
 	protected WorldPoint wander;
 	protected int tocks_since_quit;
 
-	protected int renavTEMP = 0;
-
 	protected Actor(final int _ID, final int _x, final int _y, final int _r, final ActorType _at, final ObjectOwner _oo) {
 		super(_ID, _x, _y, _r);
 		owner = _oo;
@@ -76,18 +74,17 @@ public class Actor extends Sprite {
 			iCollect.add(ResourceType.Cactus);
 			iCollect.add(ResourceType.Tree);
 		}
-		speed = utility.actor_speed * RPS;
-		strength = (int) (utility.actor_strength / RPS);
-		maxHealth = (int) (utility.actor_starting_health / RPS);
-		ticks_per_tock *= RPS;
+		speed = Math.round((float)utility.actor_speed * RPS);
+		strength = Math.round((float)utility.actor_strength / RPS);
+		maxHealth = Math.round((float)utility.actor_starting_health / RPS);
+		ticks_per_tock = Math.round((float)ticks_per_tock * RPS);
 		attack_range = utility.actor_attack_range;
-
 
 		if (type == ActorType.Spock || type == ActorType.Lizard) {
 			//spock = paper+scissors, lizard = paper+rock
 			maxHealth = (int) (utility.actor_starting_health * utility.EXTRA_Scissors_PerSmelter * 2);
 			strength = (int) (utility.actor_strength * utility.EXTRA_Scissors_PerSmelter * 2);
-			ticks_per_tock *= 0.5;
+			ticks_per_tock = Math.round((float)ticks_per_tock * 0.5f);
 		}
 
 		health = maxHealth;
@@ -138,6 +135,22 @@ public class Actor extends Sprite {
 		return iCollect;
 	}
 
+	public boolean GetFacingWest() {
+		//The lizard sprite is east/west dependent
+		WorldPoint dest;
+		if (waypoint != null) { 
+			dest = waypoint;
+		} else if (wander != null) {
+			dest = wander;
+		} else {
+			return true;
+		}
+		if ( ((GetX() - dest.getX()) * Math.cos(utility.rotateAngle)) + ((GetY() - dest.getY()) * Math.sin(utility.rotateAngle)) > 0) {
+			return true;
+		}
+		return false;
+	}
+	
 	public boolean GetIfPreferedTarget(final Sprite to_compare) {
 		if (to_compare.GetIsActor() == true) {
 			if (type == ActorType.Paper && ((Actor) to_compare).GetType() == ActorType.Rock ) return true;
@@ -195,8 +208,7 @@ public class Actor extends Sprite {
 		if (tick == true) {
 			if (wander != null
 					|| utility.Seperation(GetLoc(), attack_target.GetLoc()) > attack_range
-					|| utility.rnd() < (0.01f * RPS)) { //TODO tweak this range, down from 0.05 to 0.01
-				//if (wander == null) wander = theSpriteManager.FindGoodSpot(attack_target.GetLoc(), r, attack_range, false);
+					|| utility.rnd() < (0.001f * RPS)) { //Binomial prob for paper at 60 TPS of this firing is 6%
 				WanderAbout(attack_target, attack_range/2, attack_range/4);
 			}
 		}
@@ -336,16 +348,12 @@ public class Actor extends Sprite {
 				SetDestinationInitial(boss);
 				return;
 			} else if (navagate_status == PathfindStatus.Failed) {//Navagation failed - I quit!
-				System.out.println("#################### QUIT GUARD INITIAL PATHFIND Job:"+job+" boss:"+boss.GetType()+" behaviour:"+behaviour+" navStat:"+navagate_status+" WPL:"+waypoint_list+" OO:"+owner+" RENavs"+renavTEMP);
+				System.out.println("#################### QUIT GUARD INITIAL PATHFIND Job:"+job+" boss:"+boss.GetType()+" behaviour:"+behaviour+" navStat:"+navagate_status+" WPL:"+waypoint_list+" OO:"+owner);
 				QuitJob(false);
 			} else if (navagate_status == PathfindStatus.Passed) { //navagation good
 				behaviour = ActorBehaviour.MovingToTarget;
 			}
 		} else if (tick == true && behaviour == ActorBehaviour.MovingToTarget) {
-		   // if (navagate_status == PathfindStatus.Failed) {//If change direction mid
-			//	System.out.println("#################### QUIT GUARD CANNOT FOLLOW");
-		   // 	QuitJob(false);
-		   // }
 			final boolean arrivedAtTarget = Move();
 			if (arrivedAtTarget == true) {
 				behaviour = ActorBehaviour.Guarding;
@@ -362,7 +370,6 @@ public class Actor extends Sprite {
 	public synchronized void Job_Guard_Renavagate() {
 		behaviour = ActorBehaviour.DoingNothing;
 		navagate_status = PathfindStatus.NotRun;
-		++renavTEMP;
 	}
 
 	private void Job_Idle() {

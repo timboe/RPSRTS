@@ -173,7 +173,7 @@ public class TransformStore {
 	public void zoomIn(final boolean slow) {
 		updateNeeded = true;
 		if (slow == true) {
-			ZOOM = ZOOM * 1.01f;
+			ZOOM = ZOOM * 1.02f;
 		} else {
 			ZOOM = ZOOM * 1.20f;
 		}
@@ -185,7 +185,7 @@ public class TransformStore {
 	public void zoomOut(final boolean slow) {
 		updateNeeded = true;
 		if (slow == true) {
-			 ZOOM = ZOOM * 0.99f;
+			 ZOOM = ZOOM * 0.98f;
 		} else {
 			 ZOOM = ZOOM * 0.8f;
 		}

@@ -45,7 +45,7 @@ public class Projectile_Applet extends Projectile {
 		_g2.setTransform(theTransforms.af_translate_zoom);
 		if (source.GetType() == ActorType.Spock) {
 			if (animStep % animSteps == 0 || animStep % animSteps == 2) {
-				_g2.setColor(Color.white);
+				_g2.setColor(Color.yellow);
 			} else if (source.GetOwner() == ObjectOwner.Player) {
 				_g2.setColor(Color.red);
 			} else {

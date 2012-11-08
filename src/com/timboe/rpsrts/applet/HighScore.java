@@ -36,6 +36,7 @@ public class HighScore implements Runnable {
 		//Thanks to http://robbamforth.wordpress.com/2009/04/27/java-how-to-post-to-a-htmlphp-post-form/
 		String data = URLEncoder.encode("pwd",    "UTF-8") + "=" + URLEncoder.encode(Pass.GetPass(), "UTF-8");
 		data += "&" + URLEncoder.encode("name",    "UTF-8") + "=" + URLEncoder.encode(utility.playerName, "UTF-8");
+		data += "&" + URLEncoder.encode("seed",    "UTF-8") + "=" + URLEncoder.encode(utility.rndSeedTxt, "UTF-8");
 		data += "&" + URLEncoder.encode("score",   "UTF-8") + "=" + URLEncoder.encode(Integer.toString(resource_manager.GetScore(ObjectOwner.Player)), "UTF-8");
 		data += "&" + URLEncoder.encode("enemyscore",   "UTF-8") + "=" + URLEncoder.encode(Integer.toString(resource_manager.GetScore(ObjectOwner.Enemy)), "UTF-8");
 		data += "&" + URLEncoder.encode("wintime", "UTF-8") + "=" + URLEncoder.encode(Long.toString(utility.game_time_count/1000l), "UTF-8");

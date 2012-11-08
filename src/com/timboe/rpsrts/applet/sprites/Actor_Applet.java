@@ -94,7 +94,11 @@ public class Actor_Applet extends Actor {
 			_g2.drawImage(spriteGraphic[animStep % animSteps], _x - r + 1, _y - (4*r) - 3, null);
 			health_offset = 14;
 		} else if (GetType() == ActorType.Lizard) {
-			_g2.drawImage(spriteGraphic[animStep % animSteps], _x - (2*r) - 2, _y - r - 3, null);
+			int anim_offset = 0;
+			if (GetFacingWest() == false) {
+				anim_offset = 4;
+			}
+			_g2.drawImage(spriteGraphic[(animStep % animSteps) + anim_offset], _x - (2*r) - 2, _y - r - 3, null);
 		} else {
 			_g2.drawImage(spriteGraphic[animStep % animSteps], _x - r, _y - r - 3, null);
 		}

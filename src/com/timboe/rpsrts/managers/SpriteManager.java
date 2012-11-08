@@ -47,18 +47,18 @@ public class SpriteManager {
 	protected int TickCount = 0;
 	protected int FrameCount = 0;
 
-	Thread pathfinding_thread;
-	Pathfinder pathfinder;
+	protected Thread pathfinding_thread;
+	protected Pathfinder pathfinder;
 
-	Thread AI_thread;
-	AI theAI;
-	Thread AIHuman_thread;
-	AI theHumanAI;
+	protected Thread AI_thread;
+	protected AI theAI;
+	protected Thread AIHuman_thread;
+	protected AI theHumanAI;
 
 	public int GlobalSpriteCounter;
 
-	private Building player_base;
-	private Building enemy_base;
+	protected Building player_base;
+	protected Building enemy_base;
 
 	private final HashSet<Sprite> CollisionObjects = new HashSet<Sprite>();
 	private final HashSet<Actor> ActorObjects = new HashSet<Actor>();
@@ -91,7 +91,7 @@ public class SpriteManager {
 	private void CheckActorCombat(){
 		synchronized (GetActorObjects()) {
 			for (final Actor _a : GetActorObjects()) {
-				//TODO check this, currently won't change target mid-fight if targeting a person (unless spock)
+				//TODO check this, currently won't change target mid-fight if targeting a person (unless spock who likes shooting buildings)
 				if (_a.GetAttackTarget() != null && _a.GetAttackTarget().GetIsActor() == true && _a.GetType() != ActorType.Spock) {
 					continue;
 				}
@@ -130,24 +130,26 @@ public class SpriteManager {
 						}
 					}
 				}
-				if (chosen_target != null) {
+				if (chosen_target != null  && _a.GetType() != ActorType.Spock) {
 					_a.SetNemesis(chosen_target);
 					continue;
 				}
-				for (final Sprite _target : BuildingOjects) {
-					if (_target.GetDead() == true) {
-						continue;
-					}
-					if (_a.GetOwner() == _target.GetOwner()) {
-						continue;
-					}
-					if (utility.Seperation(_a.GetLoc(), _target.GetLoc()) > utility.actor_aggro_radius) {
-						continue;
-					}
-					if (chosen_target == null || _a.GetIfPreferedTarget(_target) == true) {
-						if (utility.Seperation(_a.GetLoc(), _target.GetLoc()) < min_distance) {
-							chosen_target = _target;
-							min_distance = utility.Seperation(_a.GetLoc(), _target.GetLoc());
+				synchronized (GetBuildingOjects()) {
+					for (final Sprite _target : GetBuildingOjects()) {
+						if (_target.GetDead() == true) {
+							continue;
+						}
+						if (_a.GetOwner() == _target.GetOwner()) {
+							continue;
+						}
+						if (utility.Seperation(_a.GetLoc(), _target.GetLoc()) > utility.actor_aggro_radius) {
+							continue;
+						}
+						if (chosen_target == null || _a.GetIfPreferedTarget(_target) == true) {
+							if (utility.Seperation(_a.GetLoc(), _target.GetLoc()) < min_distance) {
+								chosen_target = _target;
+								min_distance = utility.Seperation(_a.GetLoc(), _target.GetLoc());
+							}
 						}
 					}
 				}
@@ -212,8 +214,9 @@ public class SpriteManager {
 							toHire.SetJob(ActorJob.Gather, _b);
 						}
 					} else if (toHireEmployed != null && _b.GetBeingBuilt() == true) {
+						toHireEmployed.QuitJob(true);
 						toHireEmployed.SetJob(ActorJob.Builder, _b);
-						System.out.println("NEW JOB "+toHireEmployed.GetOwner()+" "+toHireEmployed.GetType()+" is going to --EHMERGEHNCY-- BUILD for "+_b.GetType());
+						//System.out.println("NEW JOB "+toHireEmployed.GetOwner()+" "+toHireEmployed.GetType()+" is going to --EHMERGEHNCY-- BUILD for "+_b.GetType());
 					}
 				} else { //ATTRACTOR TYPE
 					if (_b.GetEmployees() >= resource_manager.GetActorsPerAttractor(_b.GetOwner(), _b.GetType())) {
@@ -302,11 +305,7 @@ public class SpriteManager {
 					if (_ID2_to_ignore_collision_of == _a.GetID()) {
 						continue;
 					}
-					final int _x_d = _a.GetX() - _x;
-					final int _y_d = _a.GetY() - _y;
-					final float sep = (float) Math.sqrt( (_x_d * _x_d) + (_y_d * _y_d) );
-					final float combRad = _r + _a.GetR();
-					if (sep < combRad) return false;
+					if (utility.Seperation(_a.GetX(), _x, _a.GetY(), _y) < _r + _a.GetR()) return false;
 				}
 			}
 		}
@@ -314,7 +313,6 @@ public class SpriteManager {
 	}
 
 	private void CheckSpecialSpawn() {
-
 		//See if we can spawn a special unit type
 		//spock = paper+scissors, lizard = paper+rock
 		synchronized (GetBuildingOjects()) {
@@ -417,7 +415,6 @@ public class SpriteManager {
 	public WorldPoint FindSpotForResource(final WorldPoint _loc) {
 		return FindGoodSpot(_loc, utility.resourceRadius, utility.tiles_size, true);
 	}
-
 
 	public void Garbage() {
 		final Vector<Sprite> toKill = new Vector<Sprite>();
@@ -774,12 +771,6 @@ public class SpriteManager {
 			 resource_manager = ResourceManager.GetResourceManager();
 		 }
 		resource_manager.Reset();
-		//Start the AI
-		theAI = new AI(ObjectOwner.Enemy); //AI playing as the bad guys (blue)
-		AI_thread = new Thread(theAI);
-		theHumanAI = new AI(ObjectOwner.Player);  //AI playing as the player (red)
-		AIHuman_thread = new Thread(theHumanAI);
-
 	}
 
 	public int SeedWorld() {
@@ -805,8 +796,9 @@ public class SpriteManager {
 			thePathfinderGrid.Init();
 			System.out.println("DONE CONSTRUCT GRID");
 
-			final WorldPoint player_location = FindGoodSpot(player_starting, utility.buildingRadius, utility.look_for_spot_radius, false);
-			final WorldPoint enemy_location = FindGoodSpot(enemy_starting, utility.buildingRadius, utility.look_for_spot_radius, false);
+			//Pretend bases are bigger than actually are such that they don't go too close to water
+			final WorldPoint player_location = FindGoodSpot(player_starting, utility.buildingRadius*4, utility.look_for_spot_radius, false);
+			final WorldPoint enemy_location = FindGoodSpot(enemy_starting, utility.buildingRadius*4, utility.look_for_spot_radius, false);
 
 			if (player_location != null) {
 				player_base = PlaceBuilding(player_location, BuildingType.Base, ObjectOwner.Player);
@@ -939,6 +931,11 @@ public class SpriteManager {
 			++ws_step;
 			ws_time_of_last_operation = (System.nanoTime() / 10000000000f);
 			worldSeeded = true;
+			//Spawn the AI
+			theAI = new AI(ObjectOwner.Enemy); //AI playing as the bad guys (blue)
+			AI_thread = new Thread(theAI);
+			theHumanAI = new AI(ObjectOwner.Player);  //AI playing as the player (red)
+			AIHuman_thread = new Thread(theHumanAI);
 			System.out.println("STATE: MAGIC FINAL NUMBER AT SPRITE STATE " + ws_step + " RND_C:" + utility.rnd_count);
 		}
 

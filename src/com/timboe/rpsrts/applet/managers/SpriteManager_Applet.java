@@ -101,6 +101,18 @@ public class SpriteManager_Applet extends SpriteManager {
 				((Explosion_Applet) _Z).Render(_g2, FrameCount);
 			}
 		}
+		if (utility.dbg == true && theAI != null && enemy_base != null) {
+			_g2.setTransform(theTransforms.af);
+			float _r = theAI.GetDefenceRadius();
+			_g2.setColor(Color.white);
+			_g2.drawOval((int)(enemy_base.GetX() - _r), (int)(enemy_base.GetY() - _r), (int)(2*_r), (int)(2*_r));
+		}
+		if (utility.dbg == true && theHumanAI != null && player_base != null) {
+			_g2.setTransform(theTransforms.af);
+			float _r = theHumanAI.GetDefenceRadius();
+			_g2.setColor(Color.white);
+			_g2.drawOval((int)(player_base.GetX() - _r), (int)(player_base.GetY() - _r), (int)(2*_r), (int)(2*_r));
+		}
 
 	}
 

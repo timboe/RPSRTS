@@ -127,7 +127,7 @@ public class GameWorld {
 			final boolean allGood = GenerateWorld_AssignBiomes();
 			if (allGood == false) {
 				System.out.println("--WORLD GEN FAILS ON ASSIGN BIOMES");
-				utility._RPSRTS.genNewWorld();
+				utility._RPSRTS.genNewWorld(true);
 				return 5;
 			} else {
 				wg_time_of_last_operation = (System.nanoTime() / 1000000000f);
@@ -168,7 +168,7 @@ public class GameWorld {
 		//apply kT
 		int loop = 0;
 		while (true) {
-			if (++loop % 20 == 0) return -1; //Algo in progress
+			if (++loop % utility.wg_kt_break_alg_every_X_loops == 0) return -1; //Algo in progress
 			float min = utility.minimiser_start;
 			WorldChunk _c1 = null;
 			WorldChunk _c2 = null;

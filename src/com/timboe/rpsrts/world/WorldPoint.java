@@ -16,7 +16,6 @@ public class WorldPoint {
 
 	@Override
 	public boolean equals(final Object _to_compare) {
-		//System.out.println(": IN COMPARE :");
 		if (_to_compare.getClass() != this.getClass()) return false;
 		return (this.x == ((WorldPoint) _to_compare).x && this.y == ((WorldPoint) _to_compare).y);
 	}
@@ -32,7 +31,7 @@ public class WorldPoint {
 	@Override
 	public int hashCode() {
 		//System.out.println("<HASHCODE CALLED>");
-		return (1000000*x)+y;
+		return (103099*x)+(99661*y);
 	}
 
 	public void incrimentX(final int _x) {

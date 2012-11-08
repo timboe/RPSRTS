@@ -50,7 +50,11 @@ public class SpecialSpawn_Applet extends SpecialSpawn {
 
 			//draw
 			if (s % 2 == 0) {
-				_g2.setColor(Color.black);
+				if (owner == ObjectOwner.Player) {
+					_g2.setColor(Color.red);
+				} else if (owner == ObjectOwner.Enemy) {
+					_g2.setColor(Color.blue);
+				}
 			}
 			_g2.fillRect(_x, _y, 1, 1);
 

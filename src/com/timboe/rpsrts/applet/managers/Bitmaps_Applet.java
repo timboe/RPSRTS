@@ -186,8 +186,8 @@ public class Bitmaps_Applet extends Bitmaps {
 		rock_enemy = new BufferedImage[4];
 		spock_player = new BufferedImage[4];
 		spock_enemy = new BufferedImage[4];
-		lizard_player = new BufferedImage[4];
-		lizard_enemy = new BufferedImage[4];
+		lizard_player = new BufferedImage[8];
+		lizard_enemy = new BufferedImage[8];
 		for (int i=0; i<4; ++i) {
 			int j = 0;
 			scissor_player[i] = clip(resource_actors, i*6, j, 6, 6);
@@ -205,10 +205,12 @@ public class Bitmaps_Applet extends Bitmaps {
 			spock_player[i] = clip(resource_actors, i*5, j, 5, 15);
 			j += 15;
 			spock_enemy[i] = clip(resource_actors, i*5, j, 5, 15);
-			j += 15;
-			lizard_player[i] = clip(resource_actors, i*15, j, 15, 6);
+			j -= 15;
+			lizard_player[i]   = clip(resource_actors, 20 + (i*15), j,    15, 6);
+			lizard_player[i+4] = clip(resource_actors, 20 + (i*15), j+12, 15, 6);
 			j += 6;
-			lizard_enemy[i] = clip(resource_actors, i*15, j, 15, 6);
+			lizard_enemy[i]   = clip(resource_actors, 20 + (i*15), j,    15, 6);
+			lizard_enemy[i+4] = clip(resource_actors, 20 + (i*15), j+12, 15, 6);
 		}
 
 		proj_scissor_player = new BufferedImage[4];
