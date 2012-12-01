@@ -271,46 +271,112 @@ public class RPSRTS extends Applet implements Runnable, MouseWheelListener, Mous
 	    g2.setTransform(theTransforms.af_none);
 	}
 
+	private long _SECOND_COUNT = 0;
+	private int _FRAMES = 0;
+	
+    private long _TIME_OF_NEXT_TICK; // Internal
 
 	@Override
 	public void run() {
 		// lower ThreadPriority
-		Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+		//Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 		// run a long while (true) this means in our case "always"
+
+		
 		while (true) {
-			if (utility._TIME_OF_NEXT_TICK > System.currentTimeMillis()) {
+			long now = (System.nanoTime() / 1000000);
+
+			if (_TIME_OF_NEXT_TICK > now) {
 				// too soon to repaint, wait...
 				try {
-					Thread.sleep(Math.abs(utility._TIME_OF_NEXT_TICK - System.currentTimeMillis()));
+					Thread.sleep(_TIME_OF_NEXT_TICK - now);
 				} catch (final InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-			utility._TIME_OF_NEXT_TICK = System.currentTimeMillis() + Math.round(1000f / utility.GetDesiredTPS());
-
-			++utility._TICK;
+//
 			if (utility.gamePaused == false && utility.gameMode != GameMode.titleScreen) {
-				theSpriteManger.Tick();
-				utility.game_time_count += (System.currentTimeMillis() - utility._TIME_OF_LAST_TICK);
+				//for (int i = 0; i < utility.GetTicksPerRender(); ++i) { 
+					++utility._TICK;
+					theSpriteManger.Tick();
+				//}
+				utility.game_time_count += now - utility._TIME_OF_LAST_TICK;
 			}
+			
+			repaint();
+			++_FRAMES;
+//			
+			_SECOND_COUNT += (now - utility._TIME_OF_LAST_TICK);
+			if (_SECOND_COUNT >= 1000l) {
+				utility.FPS = _FRAMES;
+				_SECOND_COUNT = 0;
+				_FRAMES = 0;
+				//System.out.println("_TIME_OF_LAST_TICK:"+utility._TIME_OF_LAST_TICK+ "  _TIME_OF_NEXT_TICK" + _TIME_OF_NEXT_TICK+ " DIF:" +(_TIME_OF_NEXT_TICK-utility._TIME_OF_LAST_TICK)+ " FPS:"+utility.FPS);
 
-			if (utility._TICK % utility.do_fps_every_x_ticks == 0) {
-				utility.FPS = Math.round((1. / (System.currentTimeMillis() - utility._TIME_OF_LAST_TICK)* 1000.) / utility.GetTicksPerRender());
-				if (utility.FPS > 999) {
-					utility.FPS = 999;
-				}
 			}
+			
+			_TIME_OF_NEXT_TICK = (System.nanoTime() / 1000000) + (1000l / utility.GetDesiredTPS());
+			utility._TIME_OF_LAST_TICK = now;
+			
 
-			if (utility._TICK % utility.GetTicksPerRender() == 0) {
-				repaint();
-			}
+//			if (utility._TICK % utility.do_fps_every_x_ticks == 0) {
+//
+//				utility.FPS =  (System.currentTimeMillis() - utility._TIME_OF_LAST_TICK) ;
+//
+//				//				if (utility.FPS > 999) {
+////					utility.FPS = 999;
+////				}
+//			}
 
-			utility._TIME_OF_LAST_TICK = System.currentTimeMillis();
-			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+//			if (utility._TICK % utility.GetTicksPerRender() == 0) {
+//				repaint();
+//				++_FRAMES;
+//			}
+
+//			utility._TIME_OF_LAST_TICK = System.currentTimeMillis();
+//			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		}
 	}
 
 
+//    public void run()
+//    {
+//        float lastTime = (System.nanoTime() / 1000000) / 1000.0f;
+//
+//        double msPerTick = 1.0 / TICKS_PER_SECOND;
+//
+//        while (true)
+//        {
+//            synchronized (this)
+//            {
+//                float now = (System.nanoTime() / 1000000) / 1000.0f;
+//                int frameTicks = 0;
+//                while (now - lastTime > msPerTick)
+//                {
+//                    if (frameTicks++ < MAX_TICKS_PER_FRAME) {
+//                    	//tick();
+//                    }
+//
+//                    lastTime += msPerTick;
+//                }
+//
+//                //if (!paused)
+//                //{
+//                repaint();
+//               // }
+//            }
+//
+//            try
+//            {
+//                Thread.sleep(4);
+//            }
+//            catch (InterruptedException e)
+//            {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
+    
 
 	@Override
 	public void start() {

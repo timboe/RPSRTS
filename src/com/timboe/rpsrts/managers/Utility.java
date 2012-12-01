@@ -20,7 +20,7 @@ public class Utility {
 	//Global variables
 	public RPSRTS _RPSRTS;
 	public boolean dbg = false; //debug flag
-	public boolean noPlayers = true; //AI takes over both teams
+	public boolean noPlayers = false; //AI takes over both teams
 	public boolean soundOn = true;
 	public boolean highQuality = true;
 	public boolean fastForward = false;
@@ -37,12 +37,11 @@ public class Utility {
 	public boolean showRedScore = true;
 	public String playerName = "";
 	//
-	public int _TICK;
+	public long _TICK;
 	public long _TIME_OF_LAST_TICK = 0; // Internal
-	public long _TIME_OF_NEXT_TICK; // Internal
-	private int _DESIRED_FPS = 30; // Frames per second to aim for
-	private int _DESIRED_TPS;
-	private int _TICKS_PER_RENDER = 2; //nominal is 2 (game will go suuuper fast if this is bumped up)
+	private long _DESIRED_FPS = 30; // Frames per second to aim for
+	private long _DESIRED_TPS;
+	private long _TICKS_PER_RENDER = 1; //nominal is 2 (game will go suuuper fast if this is bumped up)
 
 	//---------\\
 	// STATICS \\
@@ -59,7 +58,7 @@ public class Utility {
 	//time, fps & update settings
 	public final int ticks_per_tock = 60; //at 30 FPS, 2 ticks per render, this is one tock per second
 	public final int do_fps_every_x_ticks = 6; // refresh FPS after X frames
-	public final int game_ticks_per_render = 2;
+	public final int game_ticks_per_render = 1;
 	public final int slowmo_ticks_per_render = 1;
 	public final int fast_forward_speed = 10;
 
@@ -133,7 +132,7 @@ public class Utility {
 	public final int resource_max_stuff = 50;
 
 	//spooge settings
-	public final float gravity = 0.2f;
+	public final float gravity = 0.4f;
 	public final int spooges_actor_death = 20;//20;
 	public final int spooges_hit = 2;//2;
 	public final int spooges_building_death = 200;// 200;
@@ -221,11 +220,11 @@ public class Utility {
 		SetDesiredFPS(_DESIRED_FPS); //To initially set desired TPS
 	}
 
-	public int GetDesiredTPS() {
+	public long GetDesiredTPS() {
 		return _DESIRED_TPS;
 	}
 
-	public int GetTicksPerRender() {
+	public long GetTicksPerRender() {
 		return _TICKS_PER_RENDER;
 	}
 	public WorldPoint PolarToCartesian(final float _angle, final float _radius) {
@@ -266,8 +265,8 @@ public class Utility {
 		return (float) Math.hypot(a.getX()-b.getX(), a.getY()-b.getY());
 	}
 
-	public void SetDesiredFPS(final int _fps) {
-		_DESIRED_FPS = _fps;
+	public void SetDesiredFPS(final long _DESIRED_FPS2) {
+		_DESIRED_FPS = _DESIRED_FPS2;
 		_DESIRED_TPS = _DESIRED_FPS * _TICKS_PER_RENDER;
 	}
 
@@ -276,8 +275,8 @@ public class Utility {
 		rnd_count = 0;
 	}
 
-	public void SetTicksPerRender(final int _tps) {
-		_TICKS_PER_RENDER = _tps;
+	public void SetTicksPerRender(final long l) {
+		_TICKS_PER_RENDER = l;
 		_DESIRED_TPS = _DESIRED_FPS * _TICKS_PER_RENDER;
 	}
 

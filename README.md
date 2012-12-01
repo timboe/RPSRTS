@@ -1,5 +1,6 @@
 # Rock Paper Scissors the Real-time Strategy Game #
-## -Implemented in Java- ##
+
+This work is licensed under the Creative Commons Attribution-ShareAlike 2.0 UK: England & Wales License. To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/2.0/uk/.
 
 I should initially point out that this was my first experience with both Java and with writing a game of this complexity. 
 

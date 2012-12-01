@@ -154,13 +154,13 @@ public class SceneRenderer_Applet {
     	_g2.setTransform(theTransforms.af_none);
 		_g2.translate(utility.window_X - 130, utility.window_Y - 30);
 		_g2.scale(3, 3);
-		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.sound, true);
+		//theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.sound, true);
 		_g2.translate(12, 0);
 		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.quality, true);
 		_g2.translate(12, 0);
 		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.pause, true);
 		_g2.translate(12, 0);
-		theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.ff, true);
+		//theSpriteManger.SpecialRender(_g2, 0, 0, theBitmaps.ff, true);
 		_g2.setTransform(theTransforms.af_none);
 		_g2.setFont(myFont);
 		int _x = 0;
@@ -170,11 +170,11 @@ public class SceneRenderer_Applet {
 			_y=(int)CurMouse.getY() - 40;
 		}
 		if (buildingStatBox == 100) {
-			if (utility.soundOn) {
-				drawStatBox(_g2, "Click to mute.", "", "", "", _x - 65, _y, 135, 13);
-			} else {
-				drawStatBox(_g2, "Click to un-mute.", "", "", "", _x - 65, _y, 135, 13);
-			}
+//			if (utility.soundOn) {
+//				drawStatBox(_g2, "Click to mute.", "", "", "", _x - 65, _y, 135, 13);
+//			} else {
+//				drawStatBox(_g2, "Click to un-mute.", "", "", "", _x - 65, _y, 135, 13);
+//			}
 		} else if (buildingStatBox == 101) {
 			if (utility.highQuality == true) {
 				drawStatBox(_g2, "Click to decrease quality.", "", "", "", _x - 110, _y, 200, 13);
@@ -188,11 +188,11 @@ public class SceneRenderer_Applet {
 				drawStatBox(_g2, "Click to un-pause.", "", "", "", _x - 90, _y, 145, 13);
 			}
 		} else if (buildingStatBox == 103) {
-			if (utility.fastForward == false) {
-				drawStatBox(_g2, "Click to fast-forward.", "", "", "", _x - 210, _y, 230, 13);
-			} else {
-				drawStatBox(_g2, "Click to play at normal speed.", "", "", "", _x - 210, _y, 230, 13);
-			}
+//			if (utility.fastForward == false) {
+//				drawStatBox(_g2, "Click to fast-forward.", "", "", "", _x - 210, _y, 230, 13);
+//			} else {
+//				drawStatBox(_g2, "Click to play at normal speed.", "", "", "", _x - 210, _y, 230, 13);
+//			}
 		}
 
     }
@@ -511,7 +511,7 @@ public class SceneRenderer_Applet {
 
 		_g2.drawString(resource_manager.GetResourceText(), 15, 20);
 		_g2.drawString(resource_manager.GetUnitText(), 15, 40);
-		_g2.drawString("SEED:"+utility.rndSeedTxt+" FPS:"+utility.FPS+" Score:"+resource_manager.GetScore(ObjectOwner.Player), 15, 60);
+		_g2.drawString("FPS:"+utility.FPS+" Score:"+resource_manager.GetScore(ObjectOwner.Player), 15, 60);
 
     	_g2.setTransform(theTransforms.af_none);
 		_g2.translate(con_start_x + (0 * x_add), y_height/2);
@@ -787,12 +787,12 @@ public class SceneRenderer_Applet {
 	}
 
 	public void toggleFF() {
-		utility.fastForward = !utility.fastForward;
-		if (utility.fastForward == true) {
-			utility.SetTicksPerRender(utility.GetTicksPerRender() * utility.fast_forward_speed);
-		} else {
-			utility.SetTicksPerRender(utility.game_ticks_per_render);
-		}
+//		utility.fastForward = !utility.fastForward;
+//		if (utility.fastForward == true) {
+//			utility.SetTicksPerRender(utility.GetTicksPerRender() * utility.fast_forward_speed);
+//		} else {
+//			utility.SetTicksPerRender(utility.game_ticks_per_render);
+//		}
 	}
 
 	public void togglePause() {
