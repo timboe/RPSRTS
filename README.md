@@ -1,12 +1,14 @@
 # Rock Paper Scissors the Real-time Strategy Game #
 
+![Licence][1]
+
 This work is licensed under the Creative Commons Attribution-ShareAlike 2.0 UK: England & Wales License. To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/2.0/uk/.
 
 I should initially point out that this was my first experience with both Java and with writing a game of this complexity. 
 
 I have tried to retrospectively streamline it, though the code and program flow remains rather ugly in places.
 
-![Global Warfare][1]
+![Global Warfare][2]
 
 ## To Run ##
 
@@ -33,14 +35,15 @@ Add a new Java Applet run configuration for com.timboe.rpsrts.RPSRTS
  - A* Path-finding.
  - High scores and statistics.
 
-![Attacking BLU][2]
+![Attacking BLU][3]
 
 ----------
 
 Work-in-progress: Android compatibility. All dependence on AWT is contained within the applet package, some very early code is present in the android package which needs to be revisited. Mostly working with different render calls to Canvas rather than Graphics2D and Matrix rather than AffineTransform objects.
 
-This project was originally inspired by Notch's [Breaking The Tower][3]
+This project was originally inspired by Notch's [Breaking The Tower][4]
 
-  [1]: http://tim-martin.co.uk/images/rpsrts/rpsrts_demo_01.png
-  [2]: http://tim-martin.co.uk/images/rpsrts/rpsrts_demo_02.png
-  [3]: http://www.mojang.com/notch/ld12/breaking/
+  [1]: http://i.creativecommons.org/l/by-sa/2.0/uk/88x31.png
+  [2]: http://tim-martin.co.uk/images/rpsrts/rpsrts_demo_01.png
+  [3]: http://tim-martin.co.uk/images/rpsrts/rpsrts_demo_02.png
+  [4]: http://www.mojang.com/notch/ld12/breaking/
